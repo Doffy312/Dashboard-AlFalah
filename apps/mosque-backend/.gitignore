@@ -1,0 +1,6 @@
+# mosque-backend
+
+node_modules/
+dist/
+.env
+drizzle/

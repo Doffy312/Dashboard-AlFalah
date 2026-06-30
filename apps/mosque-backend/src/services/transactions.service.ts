@@ -1,0 +1,187 @@
+import { eq, ilike, and, sql, desc } from "drizzle-orm";
+import { db } from "../config/db.js";
+import { transaction } from "../db/schema/index.js";
+
+// ─── Types ───────────────────────────────────────────────────────────
+
+export interface CreateTransactionInput {
+  date: string;
+  type: "Pemasukan" | "Pengeluaran";
+  category: string;
+  amount: string;
+  description: string;
+  programId?: string | null;
+}
+
+export interface TransactionFilters {
+  search?: string;
+  category?: string;
+  month?: string; // YYYY-MM format
+  page?: number;
+  limit?: number;
+}
+
+// ─── Service ─────────────────────────────────────────────────────────
+
+export class TransactionService {
+  async findAll(filters: TransactionFilters = {}) {
+    const { search, category, month, page = 1, limit = 20 } = filters;
+    const conditions = [];
+
+    if (search) {
+      conditions.push(ilike(transaction.description, `%${search}%`));
+    }
+    if (category) {
+      conditions.push(eq(transaction.category, category));
+    }
+    if (month) {
+      // Filter by YYYY-MM
+      conditions.push(
+        sql`DATE_FORMAT(${transaction.date}, '%Y-%m') = ${month}`
+      );
+    }
+
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
+    const offset = (page - 1) * limit;
+
+    const [data, countResult] = await Promise.all([
+      db
+        .select()
+        .from(transaction)
+        .where(where)
+        .orderBy(desc(transaction.date), desc(transaction.createdAt))
+        .limit(limit)
+        .offset(offset),
+      db
+        .select({ count: sql<number>`count(*)` })
+        .from(transaction)
+        .where(where),
+    ]);
+
+    return data;
+  }
+
+  async findById(id: string) {
+    const result = await db
+      .select()
+      .from(transaction)
+      .where(eq(transaction.id, id))
+      .limit(1);
+    return result[0] ?? null;
+  }
+
+  async create(data: CreateTransactionInput, userId: string) {
+    const result = await db
+      .insert(transaction)
+      .values({
+        date: data.date,
+        type: data.type,
+        category: data.category,
+        amount: data.amount,
+        description: data.description,
+        programId: data.programId || null,
+        createdBy: userId,
+      });
+
+    const newTransaction = result[0];
+
+    import("./notifications.service.js").then((ns) => {
+      ns.notificationService.create({
+        type: "Keuangan",
+        title: `Transaksi ${data.type} Baru`,
+        description: `Rp ${Number(data.amount).toLocaleString('id-ID')} - ${data.description}`,
+      });
+    });
+
+    return newTransaction;
+  }
+
+  async update(id: string, data: Partial<CreateTransactionInput>) {
+    const result = await db
+      .update(transaction)
+      .set({
+        ...data,
+        programId: data.programId || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(transaction.id, id))
+      ;
+    return result[0] ?? null;
+  }
+
+  async delete(id: string) {
+    const result = await db
+      .delete(transaction)
+      .where(eq(transaction.id, id))
+      ;
+    return result[0] ?? null;
+  }
+
+  /**
+   * Financial summary: saldo, totals, and current month breakdown.
+   * Mirrors the logic in KeuanganContext.summaries.
+   */
+  async getSummary() {
+    const now = new Date();
+    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    const result = await db
+      .select({
+        totalPemasukan: sql<string>`coalesce(sum(case when ${transaction.type} = 'Pemasukan' then ${transaction.amount} else 0 end), 0)`,
+        totalPengeluaran: sql<string>`coalesce(sum(case when ${transaction.type} = 'Pengeluaran' then ${transaction.amount} else 0 end), 0)`,
+        pemasukanBulanIni: sql<string>`coalesce(sum(case when ${transaction.type} = 'Pemasukan' and DATE_FORMAT(${transaction.date}, '%Y-%m') = ${currentMonth} then ${transaction.amount} else 0 end), 0)`,
+        pengeluaranBulanIni: sql<string>`coalesce(sum(case when ${transaction.type} = 'Pengeluaran' and DATE_FORMAT(${transaction.date}, '%Y-%m') = ${currentMonth} then ${transaction.amount} else 0 end), 0)`,
+      })
+      .from(transaction);
+
+    const row = result[0];
+    const totalPemasukan = Number(row?.totalPemasukan ?? 0);
+    const totalPengeluaran = Number(row?.totalPengeluaran ?? 0);
+
+    return {
+      saldoSaatIni: totalPemasukan - totalPengeluaran,
+      totalPemasukan,
+      totalPengeluaran,
+      pemasukanBulanIni: Number(row?.pemasukanBulanIni ?? 0),
+      pengeluaranBulanIni: Number(row?.pengeluaranBulanIni ?? 0),
+    };
+  }
+
+  /**
+   * Monthly cashflow grouped by month for a given year.
+   * Used by the Dashboard bar chart.
+   */
+  async getMonthlyCashflow(year: number) {
+    const result = await db
+      .select({
+        month: sql<string>`DATE_FORMAT(${transaction.date}, '%m')`,
+        type: transaction.type,
+        total: sql<string>`sum(${transaction.amount})`,
+      })
+      .from(transaction)
+      .where(sql`YEAR(${transaction.date}) = ${year}`)
+      .groupBy(sql`DATE_FORMAT(${transaction.date}, '%m')`, transaction.type)
+      .orderBy(sql`DATE_FORMAT(${transaction.date}, '%m')`);
+
+    return result;
+  }
+
+  /**
+   * Category distribution for the donut chart.
+   */
+  async getCategoryDistribution() {
+    const result = await db
+      .select({
+        category: transaction.category,
+        total: sql<string>`sum(${transaction.amount})`,
+      })
+      .from(transaction)
+      .where(eq(transaction.type, "Pengeluaran"))
+      .groupBy(transaction.category)
+      .orderBy(sql`sum(${transaction.amount}) desc`);
+
+    return result;
+  }
+}
+
+export const transactionService = new TransactionService();
