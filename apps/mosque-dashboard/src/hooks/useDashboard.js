@@ -35,3 +35,10 @@ export function useUpcomingPrograms() {
     queryFn: () => dashboardApi.getUpcomingPrograms(),
   });
 }
+
+export function useCompletedPrograms() {
+  return useQuery({
+    queryKey: ["dashboardCompletedPrograms"],
+    queryFn: () => dashboardApi.getCompletedPrograms(),
+  });
+}

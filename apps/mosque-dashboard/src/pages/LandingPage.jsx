@@ -5,7 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, Legend
 } from 'recharts';
-import { useDashboardSummary, useCashflow, useAllocation, useUpcomingPrograms } from '../hooks/useDashboard';
+import { useDashboardSummary, useCashflow, useAllocation, useCompletedPrograms } from '../hooks/useDashboard';
 import { useRealtimeSync } from '../hooks/useRealtimeSync';
 import { formatCurrency } from '../lib/utils';
 
@@ -23,7 +23,7 @@ const LandingPage = () => {
   const { data: summary } = useDashboardSummary();
   const { data: cashflowRaw } = useCashflow(new Date().getFullYear());
   const { data: allocation } = useAllocation();
-  const { data: upcomingPrograms } = useUpcomingPrograms();
+  const { data: completedPrograms } = useCompletedPrograms();
 
   const totalJemaah = summary?.jemaah?.total ?? 0;
   
@@ -36,8 +36,8 @@ const LandingPage = () => {
     { name: 'Fakir', value: summary.jemaah.Fakir || 0 },
   ].filter(c => c.value > 0) : [];
   const saldo = summary?.finance?.saldoSaatIni ?? 0;
-  const pemasukan = summary?.finance?.pemasukanBulanIni ?? 0;
-  const pengeluaran = summary?.finance?.pengeluaranBulanIni ?? 0;
+  const pemasukan = summary?.finance?.totalPemasukan ?? 0;
+  const pengeluaran = summary?.finance?.totalPengeluaran ?? 0;
 
   // Map cashflow to last 6 months for chart
   const currentMonth = new Date().getMonth();
@@ -196,7 +196,7 @@ const LandingPage = () => {
             
             <div className="bg-[#111a24] p-8 rounded-3xl border border-[#1a2432] shadow-sm flex flex-col justify-center">
               <div className="flex justify-between items-start mb-2">
-                <p className="text-gray-400 font-bold uppercase tracking-wider text-xs">Pemasukan Bulan Ini</p>
+                <p className="text-gray-400 font-bold uppercase tracking-wider text-xs">Total Pemasukan</p>
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
                   <ArrowRight size={16} className="-rotate-90" />
                 </div>
@@ -206,7 +206,7 @@ const LandingPage = () => {
             
             <div className="bg-[#111a24] p-8 rounded-3xl border border-[#1a2432] shadow-sm flex flex-col justify-center">
               <div className="flex justify-between items-start mb-2">
-                <p className="text-gray-400 font-bold uppercase tracking-wider text-xs">Pengeluaran Bulan Ini</p>
+                <p className="text-gray-400 font-bold uppercase tracking-wider text-xs">Total Pengeluaran</p>
                 <div className="w-8 h-8 rounded-lg bg-[#d97706]/20 text-[#d97706] flex items-center justify-center">
                   <ArrowRight size={16} className="rotate-90" />
                 </div>
@@ -270,39 +270,62 @@ const LandingPage = () => {
 
       {/* SECTION 3: PROGRAM KERJA */}
       <section className="py-20 px-6 lg:px-16 bg-[#0f161e] border-t border-[#1a2432]">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-white mb-4">Progres Program Kerja & Pembangunan</h2>
-            <p className="text-gray-400">
-              Pantau langsung agenda yang sedang berjalan dan tingkat penyelesaiannya.
+            <h2 className="text-3xl font-bold text-white mb-4">Laporan Program Kerja & Kegiatan (Selesai)</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Dokumentasi berbagai program kegiatan masjid yang telah diselesaikan dengan baik untuk kemaslahatan umat.
             </p>
           </div>
 
-          <div className="space-y-6">
-            {/* Realtime upcoming programs */}
-            {upcomingPrograms && upcomingPrograms.length > 0 ? (
-              upcomingPrograms.map((program, idx) => {
-                const progress = program.status === 'Selesai' ? 100 : program.status === 'Sedang Berjalan' ? 50 : 15;
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Realtime completed programs */}
+            {completedPrograms && completedPrograms.length > 0 ? (
+              completedPrograms.map((program, idx) => {
+                const coverImage = program.documentationUrls && program.documentationUrls.length > 0 
+                  ? `http://localhost:3001${program.documentationUrls[0]}` 
+                  : `https://picsum.photos/seed/${program.id}/600/400`;
+                  
                 return (
-                  <div key={idx} className="bg-[#111a24] p-6 rounded-2xl shadow-sm border border-[#1a2432] hover:border-emerald-500/50 transition-colors">
-                    <div className="flex justify-between items-center mb-4">
-                      <h4 className="font-bold text-white text-lg">{program.name}</h4>
-                      <span className="text-sm font-bold text-emerald-400 bg-emerald-500/10 px-4 py-1.5 rounded-full border border-emerald-500/20">{program.status}</span>
+                  <div key={idx} className="bg-[#111a24] rounded-2xl shadow-sm border border-[#1a2432] overflow-hidden hover:border-emerald-500/50 transition-colors flex flex-col group">
+                    <div className="h-48 bg-[#1a2432] relative overflow-hidden">
+                      <img 
+                        src={coverImage} 
+                        alt="Dokumentasi Program" 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => { e.target.src = 'https://picsum.photos/600/400?grayscale'; }}
+                      />
+                      <div className="absolute top-3 right-3">
+                        <span className="text-xs font-bold text-white bg-emerald-500 px-3 py-1 rounded-full shadow-sm">
+                          {program.status}
+                        </span>
+                      </div>
                     </div>
-                    <div className="w-full bg-[#1a2432] rounded-full h-4 overflow-hidden">
-                      <div 
-                        className="bg-emerald-500 h-full rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
-                        style={{ width: `${progress}%` }}
-                      >
-                        <div className="absolute inset-0 bg-white/20" style={{ backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent)', backgroundSize: '1rem 1rem' }}></div>
+                    <div className="p-6 flex flex-col flex-1">
+                      <p className="text-xs text-emerald-400 font-bold mb-2 uppercase tracking-wide">
+                        {new Date(program.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </p>
+                      <h4 className="font-bold text-white text-xl mb-3 leading-tight">{program.name}</h4>
+                      <p className="text-gray-400 text-sm mb-4 flex-1 line-clamp-3">
+                        {program.description || 'Tidak ada deskripsi singkat.'}
+                      </p>
+                      <div className="border-t border-[#1a2432] pt-4 mt-auto">
+                        <p className="text-sm text-gray-500 flex justify-between">
+                          <span>Anggaran:</span> 
+                          <span className="text-gray-300 font-semibold">{formatCurrency(program.budget)}</span>
+                        </p>
+                        <p className="text-sm text-gray-500 flex justify-between mt-1">
+                          <span>Penanggung Jawab:</span> 
+                          <span className="text-gray-300 font-medium">{program.pic}</span>
+                        </p>
                       </div>
                     </div>
                   </div>
                 );
               })
             ) : (
-              <div className="bg-[#111a24] p-8 rounded-2xl shadow-sm border border-[#1a2432] text-center">
-                <p className="text-gray-400">Belum ada program kerja yang berjalan atau direncanakan saat ini.</p>
+              <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-[#111a24] p-12 rounded-2xl shadow-sm border border-[#1a2432] text-center">
+                <p className="text-gray-400">Belum ada program kerja yang selesai saat ini.</p>
               </div>
             )}
           </div>

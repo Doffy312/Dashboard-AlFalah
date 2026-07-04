@@ -1,9 +1,17 @@
 const API_BASE = "/api";
 
 async function request(path, options = {}) {
+  const isFormData = options.body instanceof FormData;
+  const headers = { ...options.headers };
+  if (!isFormData) {
+    headers["Content-Type"] = headers["Content-Type"] || "application/json";
+  } else {
+    delete headers["Content-Type"];
+  }
+
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
-    headers: { "Content-Type": "application/json", ...options.headers },
+    headers,
   });
   
   if (!res.ok) {
@@ -35,6 +43,12 @@ export const programApi = {
   create: (data) => request("/programs", { method: "POST", body: JSON.stringify(data) }),
   update: (id, data) => request(`/programs/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   updateStatus: (id, status) => request(`/programs/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+  completeProgram: (id, formData) => request(`/programs/${id}/complete`, {
+    method: "PATCH",
+    // We don't JSON stringify formData, and we don't set Content-Type (browser sets multipart/form-data with boundary automatically)
+    body: formData,
+    headers: {} 
+  }),
   delete: (id) => request(`/programs/${id}`, { method: "DELETE" }),
   getSummary: () => request("/programs/summary"),
 };
@@ -69,4 +83,5 @@ export const dashboardApi = {
   getAllocation: () => request("/dashboard/allocation"),
   getRecentActivity: () => request("/dashboard/recent-activity"),
   getUpcomingPrograms: () => request("/dashboard/upcoming-programs"),
+  getCompletedPrograms: () => request("/dashboard/completed-programs"),
 };

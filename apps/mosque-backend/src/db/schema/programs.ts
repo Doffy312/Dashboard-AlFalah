@@ -6,6 +6,7 @@ import {
   varchar,
   decimal,
   timestamp,
+  json,
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 import { user } from "./auth.js";
@@ -22,6 +23,8 @@ export const program = mysqlTable("programs", {
   date: date("date", { mode: "string" }).notNull(),
   description: text("description").notNull(),
   evaluation: text("evaluation"), // Only filled when status = 'Selesai'
+  reportDocUrl: text("report_doc_url"),
+  documentationUrls: json("documentation_urls"),
   createdBy: varchar("created_by", { length: 255 }).references(() => user.id, {
     onDelete: "set null",
   }),

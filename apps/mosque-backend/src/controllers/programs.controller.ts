@@ -98,6 +98,36 @@ export class ProgramController {
       res.status(500).json({ error: "Failed to fetch program summary" });
     }
   }
+
+  async completeProgram(req: Request, res: Response) {
+    try {
+      const id = req.params.id as string;
+      
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      let reportDocUrl: string | null = null;
+      let documentationUrls: string[] = [];
+
+      if (files?.report && files.report.length > 0) {
+        reportDocUrl = `/uploads/${files.report[0].filename}`;
+      }
+
+      if (files?.photos && files.photos.length > 0) {
+        documentationUrls = files.photos.map(file => `/uploads/${file.filename}`);
+      }
+
+      const result = await programService.completeProgram(id, reportDocUrl, documentationUrls);
+      if (!result) {
+        res.status(404).json({ error: "Program not found" });
+        return;
+      }
+      
+      getSocketIO().emit("dataUpdate", { entity: "programs" });
+      res.json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to complete program" });
+    }
+  }
 }
 
 export const programController = new ProgramController();

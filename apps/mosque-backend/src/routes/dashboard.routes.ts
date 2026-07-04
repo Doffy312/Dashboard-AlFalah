@@ -12,5 +12,6 @@ router.get("/cashflow", dashboardController.getCashflow);
 router.get("/allocation", dashboardController.getAllocation);
 router.get("/recent-activity", dashboardController.getRecentActivity);
 router.get("/upcoming-programs", dashboardController.getUpcomingPrograms);
+router.get("/completed-programs", dashboardController.getCompletedPrograms);
 
 export default router;

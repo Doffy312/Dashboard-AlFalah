@@ -13,7 +13,14 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        name: initialData.name,
+        address: initialData.address,
+        phone: initialData.phone,
+        category: initialData.category,
+        skills: initialData.skills || '',
+        notes: initialData.notes || ''
+      });
     } else {
       setFormData({
         name: '',

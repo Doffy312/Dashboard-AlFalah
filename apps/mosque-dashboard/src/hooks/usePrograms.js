@@ -50,17 +50,30 @@ export function useUpdateProgram() {
   });
 }
 
-export function useUpdateProgramStatus() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, status }) => programApi.updateStatus(id, status),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["programs"] });
-      queryClient.invalidateQueries({ queryKey: ["program", variables.id] });
-      queryClient.invalidateQueries({ queryKey: ["programSummary"] });
-    },
-  });
-}
+  export function useUpdateProgramStatus() {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationFn: ({ id, status }) => programApi.updateStatus(id, status),
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({ queryKey: ["programs"] });
+        queryClient.invalidateQueries({ queryKey: ["program", variables.id] });
+        queryClient.invalidateQueries({ queryKey: ["programSummary"] });
+      },
+    });
+  }
+  
+  export function useCompleteProgram() {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationFn: ({ id, formData }) => programApi.completeProgram(id, formData),
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({ queryKey: ["programs"] });
+        queryClient.invalidateQueries({ queryKey: ["program", variables.id] });
+        queryClient.invalidateQueries({ queryKey: ["programSummary"] });
+        queryClient.invalidateQueries({ queryKey: ["dashboardCompletedPrograms"] });
+      },
+    });
+  }
 
 export function useDeleteProgram() {
   const queryClient = useQueryClient();

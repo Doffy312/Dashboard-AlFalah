@@ -5,6 +5,8 @@ import { errorHandler } from "./middlewares/error.middleware.js";
 import apiRoutes from "./routes/index.js";
 import { createServer } from "http";
 import { initializeSocket } from "./lib/socket.js";
+import path from "path";
+import fs from "fs";
 
 const app = express();
 const httpServer = createServer(app);
@@ -21,6 +23,13 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ─── Static Files ────────────────────────────────────────────────────
+const uploadsDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+app.use("/uploads", express.static(uploadsDir));
 
 // ─── Health Check ────────────────────────────────────────────────────
 app.get("/api/health", (_req, res) => {

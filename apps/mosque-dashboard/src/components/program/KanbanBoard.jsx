@@ -1,8 +1,8 @@
 import React from 'react';
 import { formatCurrency } from '../../lib/utils';
-import { Calendar, User, Edit2, Trash2, ArrowRight } from 'lucide-react';
+import { Calendar, User, Edit2, Trash2, ArrowRight, Eye } from 'lucide-react';
 
-const KanbanCard = ({ program, onEdit, onDelete, onStatusChange, canEdit }) => {
+const KanbanCard = ({ program, onEdit, onDelete, onStatusChange, onViewDetail, canEdit }) => {
   const getNextStatus = (current) => {
     if (current === 'Direncanakan') return 'Sedang Berjalan';
     if (current === 'Sedang Berjalan') return 'Selesai';
@@ -18,10 +18,15 @@ const KanbanCard = ({ program, onEdit, onDelete, onStatusChange, canEdit }) => {
         
         {canEdit && (
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={() => onEdit(program)} className="p-1 rounded bg-surface border border-outline hover:bg-surface-variant text-on-surface-variant transition-colors">
+            {program.status === 'Selesai' && onViewDetail && (
+              <button onClick={() => onViewDetail(program)} className="p-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 transition-colors" title="Lihat Detail">
+                <Eye size={14} />
+              </button>
+            )}
+            <button onClick={() => onEdit(program)} className="p-1 rounded bg-surface border border-outline hover:bg-surface-variant text-on-surface-variant transition-colors" title="Edit">
               <Edit2 size={14} />
             </button>
-            <button onClick={() => onDelete(program)} className="p-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition-colors">
+            <button onClick={() => onDelete(program)} className="p-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition-colors" title="Hapus">
               <Trash2 size={14} />
             </button>
           </div>
@@ -61,7 +66,7 @@ const KanbanCard = ({ program, onEdit, onDelete, onStatusChange, canEdit }) => {
   );
 };
 
-const KanbanBoard = ({ programs, onEdit, onDelete, onStatusChange, canEdit }) => {
+const KanbanBoard = ({ programs, onEdit, onDelete, onStatusChange, onViewDetail, canEdit }) => {
   const columns = [
     { title: 'Direncanakan', status: 'Direncanakan', colorClass: 'bg-blue-500/10 border-blue-500/20', textClass: 'text-blue-600 dark:text-blue-400' },
     { title: 'Sedang Berjalan', status: 'Sedang Berjalan', colorClass: 'bg-amber-500/10 border-amber-500/20', textClass: 'text-amber-600 dark:text-amber-400' },
@@ -89,6 +94,7 @@ const KanbanBoard = ({ programs, onEdit, onDelete, onStatusChange, canEdit }) =>
                   onEdit={onEdit} 
                   onDelete={onDelete} 
                   onStatusChange={onStatusChange}
+                  onViewDetail={onViewDetail}
                   canEdit={canEdit}
                 />
               ))}

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { usePrograms, useCreateProgram, useUpdateProgram, useDeleteProgram, useUpdateProgramStatus } from '../hooks/usePrograms';
+import { usePrograms, useCreateProgram, useUpdateProgram, useDeleteProgram, useUpdateProgramStatus, useCompleteProgram } from '../hooks/usePrograms';
 import { authClient } from '../lib/auth-client';
 import DataTable from '../components/common/DataTable';
 import SearchFilter from '../components/common/SearchFilter';
@@ -7,8 +7,10 @@ import StatusBadge from '../components/common/StatusBadge';
 import ProgramForm from '../components/program/ProgramForm';
 import KanbanBoard from '../components/program/KanbanBoard';
 import ConfirmDialog from '../components/common/ConfirmDialog';
+import ProgramCompletionModal from '../components/program/ProgramCompletionModal';
+import ProgramDetailModal from '../components/program/ProgramDetailModal';
 import { formatCurrency } from '../lib/utils';
-import { LayoutGrid, List, Edit2, Trash2 } from 'lucide-react';
+import { LayoutGrid, List, Edit2, Trash2, CheckCircle, Eye } from 'lucide-react';
 
 const ProgramKerjaPage = () => {
   const [viewMode, setViewMode] = useState('kanban'); // kanban | table
@@ -19,6 +21,7 @@ const ProgramKerjaPage = () => {
   const updateMutation = useUpdateProgram();
   const deleteMutation = useDeleteProgram();
   const statusMutation = useUpdateProgramStatus();
+  const completeMutation = useCompleteProgram();
 
   const { data: session } = authClient.useSession();
   
@@ -27,6 +30,12 @@ const ProgramKerjaPage = () => {
   
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [programToDelete, setProgramToDelete] = useState(null);
+
+  const [isCompletionOpen, setIsCompletionOpen] = useState(false);
+  const [programToComplete, setProgramToComplete] = useState(null);
+
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [programToView, setProgramToView] = useState(null);
 
   // Takmir/Ketua: Full CRUD (previously Read + Approve)
   // Sekretaris: Full CRUD
@@ -68,7 +77,25 @@ const ProgramKerjaPage = () => {
   };
   
   const handleStatusChange = (id, status) => {
-    statusMutation.mutate({ id, status });
+    if (status === 'Selesai') {
+      const p = programs.find(p => p.id === id);
+      setProgramToComplete(p);
+      setIsCompletionOpen(true);
+    } else {
+      statusMutation.mutate({ id, status });
+    }
+  };
+
+  const handleCompleteProgram = async (formData) => {
+    if (programToComplete) {
+      await completeMutation.mutateAsync({ id: programToComplete.id, formData });
+      setProgramToComplete(null);
+    }
+  };
+
+  const handleViewDetail = (program) => {
+    setProgramToView(program);
+    setIsDetailOpen(true);
   };
 
   const columns = [
@@ -82,6 +109,16 @@ const ProgramKerjaPage = () => {
       header: 'Aksi',
       cell: (row) => (
         <div className="flex gap-2">
+          {row.status === 'Selesai' && (
+            <button onClick={() => handleViewDetail(row)} className="p-1.5 rounded-lg hover:bg-emerald-500/20 text-emerald-500 transition-colors" title="Lihat Detail">
+              <Eye size={16} />
+            </button>
+          )}
+          {row.status === 'Sedang Berjalan' && (
+            <button onClick={() => handleStatusChange(row.id, 'Selesai')} className="p-1.5 rounded-lg hover:bg-emerald-500/20 text-emerald-500 transition-colors" title="Selesaikan Program">
+              <CheckCircle size={16} />
+            </button>
+          )}
           <button onClick={() => handleEdit(row)} className="p-1.5 rounded-lg hover:bg-surface-variant text-on-surface-variant transition-colors">
             <Edit2 size={16} />
           </button>
@@ -145,6 +182,7 @@ const ProgramKerjaPage = () => {
           onEdit={handleEdit} 
           onDelete={handleDeleteClick} 
           onStatusChange={handleStatusChange}
+          onViewDetail={handleViewDetail}
           canEdit={canEdit}
         />
       ) : (
@@ -164,6 +202,25 @@ const ProgramKerjaPage = () => {
         onConfirm={confirmDelete}
         title="Hapus Program Kerja"
         message={`Apakah Anda yakin ingin menghapus program "${programToDelete?.name}"? Tindakan ini tidak dapat dibatalkan.`}
+      />
+
+      <ProgramCompletionModal 
+        isOpen={isCompletionOpen}
+        onClose={() => {
+          setIsCompletionOpen(false);
+          setProgramToComplete(null);
+        }}
+        onSubmit={handleCompleteProgram}
+        program={programToComplete}
+      />
+
+      <ProgramDetailModal 
+        isOpen={isDetailOpen}
+        onClose={() => {
+          setIsDetailOpen(false);
+          setProgramToView(null);
+        }}
+        program={programToView}
       />
     </div>
   );

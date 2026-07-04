@@ -57,6 +57,13 @@ export class DashboardService {
   async getUpcomingPrograms(limit = 3) {
     return programService.getUpcoming(limit);
   }
+
+  /**
+   * Completed programs for the landing page widget.
+   */
+  async getCompletedPrograms(limit = 10) {
+    return programService.getCompleted(limit);
+  }
 }
 
 export const dashboardService = new DashboardService();

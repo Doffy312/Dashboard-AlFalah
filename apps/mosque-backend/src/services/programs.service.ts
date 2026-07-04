@@ -93,6 +93,19 @@ export class ProgramService {
     return result[0] ?? null;
   }
 
+  async completeProgram(id: string, reportDocUrl: string | null, documentationUrls: string[]) {
+    const result = await db
+      .update(program)
+      .set({
+        status: "Selesai",
+        reportDocUrl,
+        documentationUrls,
+        updatedAt: new Date(),
+      })
+      .where(eq(program.id, id));
+    return result[0] ?? null;
+  }
+
   async delete(id: string) {
     const result = await db
       .delete(program)
@@ -134,6 +147,22 @@ export class ProgramService {
         sql`${program.status} in ('Direncanakan', 'Sedang Berjalan')`
       )
       .orderBy(asc(program.date))
+      .limit(limit);
+
+    return data;
+  }
+
+  /**
+   * Completed programs for dashboard widget.
+   */
+  async getCompleted(limit = 3) {
+    const data = await db
+      .select()
+      .from(program)
+      .where(
+        eq(program.status, 'Selesai')
+      )
+      .orderBy(desc(program.date))
       .limit(limit);
 
     return data;

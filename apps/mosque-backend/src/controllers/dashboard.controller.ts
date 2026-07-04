@@ -51,6 +51,17 @@ export class DashboardController {
         .json({ error: "Failed to fetch upcoming programs" });
     }
   }
+
+  async getCompletedPrograms(_req: Request, res: Response) {
+    try {
+      const result = await dashboardService.getCompletedPrograms();
+      res.json(result);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: "Failed to fetch completed programs" });
+    }
+  }
 }
 
 export const dashboardController = new DashboardController();

@@ -13,7 +13,14 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        name: initialData.name,
+        quantity: initialData.quantity,
+        date: initialData.date,
+        location: initialData.location,
+        condition: initialData.condition,
+        notes: initialData.notes || ''
+      });
     } else {
       setFormData({
         name: '',

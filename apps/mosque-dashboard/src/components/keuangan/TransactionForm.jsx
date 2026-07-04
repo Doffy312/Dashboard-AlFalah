@@ -13,7 +13,14 @@ const TransactionForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        date: initialData.date,
+        type: initialData.type,
+        category: initialData.category,
+        amount: initialData.amount,
+        description: initialData.description,
+        programId: initialData.programId || ''
+      });
     } else {
       setFormData({
         date: new Date().toISOString().split('T')[0],

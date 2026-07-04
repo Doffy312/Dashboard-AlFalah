@@ -14,7 +14,15 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        name: initialData.name,
+        pic: initialData.pic,
+        budget: initialData.budget,
+        date: initialData.date,
+        status: initialData.status,
+        description: initialData.description,
+        evaluation: initialData.evaluation || ''
+      });
     } else {
       setFormData({
         name: '',
@@ -100,7 +108,9 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             >
               <option value="Direncanakan" className="bg-surface dark:bg-on-surface">Direncanakan</option>
               <option value="Sedang Berjalan" className="bg-surface dark:bg-on-surface">Sedang Berjalan</option>
-              <option value="Selesai" className="bg-surface dark:bg-on-surface">Selesai</option>
+              {formData.status === 'Selesai' && (
+                <option value="Selesai" className="bg-surface dark:bg-on-surface" disabled>Selesai</option>
+              )}
             </select>
           </div>
         </div>

@@ -17,7 +17,7 @@ const KeuanganPage = () => {
     date: filterDate,
   });
   
-  const { data: summaries = { saldoSaatIni: 0, pemasukanBulanIni: 0, pengeluaranBulanIni: 0 } } = useTransactionSummary();
+  const { data: summaries = { saldoSaatIni: 0, pemasukanBulanIni: 0, pengeluaranBulanIni: 0, totalPemasukan: 0, totalPengeluaran: 0 } } = useTransactionSummary();
   
   const createMutation = useCreateTransaction();
   const updateMutation = useUpdateTransaction();
@@ -121,6 +121,28 @@ const KeuanganPage = () => {
           </div>
           <div className="font-headline-lg text-headline-lg text-on-surface relative z-10">{formatCurrency(summaries.pengeluaranBulanIni)}</div>
           <div className="font-body-sm text-body-sm text-on-surface-variant mt-xs relative z-10">Sebagian besar: Operasional</div>
+        </div>
+
+        {/* Total Pemasukan Card */}
+        <div className="glass-panel rounded-xl p-md flex flex-col justify-between relative overflow-hidden group">
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all"></div>
+          <div className="flex items-center justify-between mb-sm relative z-10">
+            <span className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Total Pemasukan</span>
+            <span className="material-symbols-outlined text-emerald-600 bg-emerald-100 p-xs rounded-full">arrow_downward</span>
+          </div>
+          <div className="font-headline-lg text-headline-lg text-on-surface relative z-10">{formatCurrency(summaries.totalPemasukan)}</div>
+          <div className="font-body-sm text-body-sm text-on-surface-variant mt-xs relative z-10">Secara Keseluruhan</div>
+        </div>
+
+        {/* Total Pengeluaran Card */}
+        <div className="glass-panel rounded-xl p-md flex flex-col justify-between relative overflow-hidden group">
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-red-500/10 rounded-full blur-xl group-hover:bg-red-500/20 transition-all"></div>
+          <div className="flex items-center justify-between mb-sm relative z-10">
+            <span className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Total Pengeluaran</span>
+            <span className="material-symbols-outlined text-red-600 bg-red-100 p-xs rounded-full">arrow_upward</span>
+          </div>
+          <div className="font-headline-lg text-headline-lg text-on-surface relative z-10">{formatCurrency(summaries.totalPengeluaran)}</div>
+          <div className="font-body-sm text-body-sm text-on-surface-variant mt-xs relative z-10">Secara Keseluruhan</div>
         </div>
       </div>
 

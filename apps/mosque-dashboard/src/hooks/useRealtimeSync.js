@@ -11,7 +11,7 @@ export function useRealtimeSync() {
     // If your API is at http://localhost:3000/api, the socket is at http://localhost:3000
     const backendUrl = import.meta.env.VITE_API_URL 
       ? new URL(import.meta.env.VITE_API_URL).origin 
-      : 'http://localhost:3000';
+      : undefined;
 
     socketRef.current = io(backendUrl, {
       withCredentials: true,
