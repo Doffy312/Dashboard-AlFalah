@@ -11,9 +11,18 @@ const Dashboard = () => {
 
   // Safe defaults
   const saldo = summary?.finance?.saldoSaatIni ?? 0;
-  const pemasukan = summary?.finance?.pemasukanBulanIni ?? 0;
-  const pengeluaran = summary?.finance?.pengeluaranBulanIni ?? 0;
+  const pemasukan = summary?.finance?.totalPemasukan ?? 0;
+  const pengeluaran = summary?.finance?.totalPengeluaran ?? 0;
   const totalJemaah = summary?.jemaah?.total ?? 0;
+
+  let maxVal = 50000000;
+  if (cashflow) {
+    const maxIn = Math.max(...(cashflow.income ?? [0]));
+    const maxOut = Math.max(...(cashflow.expense ?? [0]));
+    if (Math.max(maxIn, maxOut) > 0) {
+      maxVal = Math.max(maxIn, maxOut) * 1.2;
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6 text-on-surface">
@@ -30,15 +39,17 @@ const Dashboard = () => {
               <span className="material-symbols-outlined text-[18px]">account_balance_wallet</span>
             </div>
           </div>
-          <div className="flex items-center gap-1 z-10 mt-2">
-            <span className="material-symbols-outlined text-primary text-[14px]">trending_up</span>
-            <span className="text-[11px] text-primary font-medium">bulan ini</span>
-          </div>
-          {/* Mini Bar Chart */}
-          <div className="absolute bottom-0 left-0 right-0 h-12 flex items-end justify-between px-5 gap-1 opacity-80">
-            {[40, 50, 45, 60, 55, 70, 85].map((h, i) => (
-              <div key={i} className="flex-1 bg-primary/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
-            ))}
+          <div className="flex-1 flex flex-col justify-end z-10 mt-2">
+            {/* Mini Bar Chart */}
+            <div className="h-10 flex items-end justify-between gap-1 opacity-80 mb-2">
+              {[40, 50, 45, 60, 55, 70, 85].map((h, i) => (
+                <div key={i} className="flex-1 bg-primary/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
+              ))}
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-primary text-[14px]">trending_up</span>
+              <span className="text-[11px] text-primary font-medium">keseluruhan</span>
+            </div>
           </div>
         </div>
 
@@ -53,15 +64,17 @@ const Dashboard = () => {
               <span className="material-symbols-outlined text-[18px]">arrow_downward</span>
             </div>
           </div>
-          <div className="flex items-center gap-1 z-10 mt-2">
-            <span className="material-symbols-outlined text-primary text-[14px]">trending_up</span>
-            <span className="text-[11px] text-primary font-medium">bulan ini</span>
-          </div>
-          {/* Mini Bar Chart */}
-          <div className="absolute bottom-0 left-0 right-0 h-12 flex items-end justify-between px-5 gap-1 opacity-80">
-            {[30, 45, 40, 55, 60, 75, 80].map((h, i) => (
-              <div key={i} className="flex-1 bg-primary/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
-            ))}
+          <div className="flex-1 flex flex-col justify-end z-10 mt-2">
+            {/* Mini Bar Chart */}
+            <div className="h-10 flex items-end justify-between gap-1 opacity-80 mb-2">
+              {[30, 45, 40, 55, 60, 75, 80].map((h, i) => (
+                <div key={i} className="flex-1 bg-primary/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
+              ))}
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-primary text-[14px]">trending_up</span>
+              <span className="text-[11px] text-primary font-medium">keseluruhan</span>
+            </div>
           </div>
         </div>
 
@@ -76,15 +89,17 @@ const Dashboard = () => {
               <span className="material-symbols-outlined text-[18px]">arrow_upward</span>
             </div>
           </div>
-          <div className="flex items-center gap-1 z-10 mt-2">
-            <span className="material-symbols-outlined text-on-surface-variant text-[14px]">trending_down</span>
-            <span className="text-[11px] text-on-surface-variant font-medium">bulan ini</span>
-          </div>
-          {/* Mini Bar Chart */}
-          <div className="absolute bottom-0 left-0 right-0 h-12 flex items-end justify-between px-5 gap-1 opacity-80">
-            {[60, 50, 65, 45, 55, 40, 30].map((h, i) => (
-              <div key={i} className="flex-1 bg-[#d97706]/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
-            ))}
+          <div className="flex-1 flex flex-col justify-end z-10 mt-2">
+            {/* Mini Bar Chart */}
+            <div className="h-10 flex items-end justify-between gap-1 opacity-80 mb-2">
+              {[60, 50, 65, 45, 55, 40, 30].map((h, i) => (
+                <div key={i} className="flex-1 bg-[#d97706]/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
+              ))}
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-on-surface-variant text-[14px]">trending_down</span>
+              <span className="text-[11px] text-on-surface-variant font-medium">keseluruhan</span>
+            </div>
           </div>
         </div>
 
@@ -99,25 +114,27 @@ const Dashboard = () => {
               <span className="material-symbols-outlined text-[18px]">group</span>
             </div>
           </div>
-          <div className="flex items-center gap-1 z-10 mt-2">
-            <span className="material-symbols-outlined text-[#d97706] text-[14px]">person_add</span>
-            <span className="text-[11px] text-[#d97706] font-medium">terdaftar</span>
-          </div>
-          {/* Mini Bar Chart */}
-          <div className="absolute bottom-0 left-0 right-0 h-12 flex items-end justify-between px-5 gap-1 opacity-80">
-            {[20, 20, 30, 30, 40, 40, 55].map((h, i) => (
-              <div key={i} className="flex-1 bg-[#d97706]/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
-            ))}
+          <div className="flex-1 flex flex-col justify-end z-10 mt-2">
+            {/* Mini Bar Chart */}
+            <div className="h-10 flex items-end justify-between gap-1 opacity-80 mb-2">
+              {[20, 20, 30, 30, 40, 40, 55].map((h, i) => (
+                <div key={i} className="flex-1 bg-[#d97706]/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
+              ))}
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-[#d97706] text-[14px]">person_add</span>
+              <span className="text-[11px] text-[#d97706] font-medium">terdaftar</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Middle Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Arus Kas Bulanan Chart */}
+        {/* Arus Kas Total Chart */}
         <div className="lg:col-span-2 bg-[#111a24] rounded-2xl p-6 border border-[#1a2432] flex flex-col">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold text-white">Arus Kas Bulanan</h3>
+            <h3 className="text-lg font-semibold text-white">Arus Kas Total</h3>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-primary"></div>
@@ -133,19 +150,29 @@ const Dashboard = () => {
           <div className="flex-1 relative mt-4 flex flex-col justify-end pb-6">
             {/* Horizontal Grid Lines */}
             <div className="absolute inset-0 flex flex-col justify-between pb-6">
-              {[5, 4, 3, 2, 1, 0].map(i => (
-                <div key={i} className="flex items-center w-full">
-                  <span className="w-6 text-right text-[10px] text-on-surface-variant font-mono">{i === 0 ? '0' : i + 'M'}</span>
-                  <div className="ml-3 flex-1 border-t border-white/5 border-dashed"></div>
-                </div>
-              ))}
+              {[1, 0.8, 0.6, 0.4, 0.2, 0].map((ratio, i) => {
+                const val = maxVal * ratio;
+                let label = "0";
+                if (val >= 1000000) label = `${(val / 1000000).toFixed(1).replace('.0', '')}M`;
+                else if (val >= 1000) label = `${(val / 1000).toFixed(1).replace('.0', '')}K`;
+                else if (val > 0) label = Math.round(val).toString();
+                
+                return (
+                  <div key={i} className="flex items-center w-full">
+                    <span className="w-8 text-right text-[10px] text-on-surface-variant font-mono">{label}</span>
+                    <div className="ml-3 flex-1 border-t border-white/5 border-dashed"></div>
+                  </div>
+                );
+              })}
             </div>
 
-            {/* Bars - use cashflow data if available, else static */}
-            <div className="relative z-10 flex justify-between items-end h-[200px] pl-9 pr-2">
-              {(cashflow?.months ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun']).map((month, i) => {
-                const incomeH = cashflow?.income?.[i] ? Math.min((cashflow.income[i] / 50000000) * 100, 100) : [40, 35, 55, 45, 65, 80][i] || 50;
-                const expenseH = cashflow?.expense?.[i] ? Math.min((cashflow.expense[i] / 50000000) * 100, 100) : [25, 20, 45, 30, 40, 50][i] || 30;
+            {/* Bars - use cashflow data if available */}
+            <div className="relative z-10 flex justify-between items-end h-[200px] pl-11 pr-2">
+              {(cashflow?.months ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des']).map((month, i) => {
+                const inVal = cashflow?.income?.[i] ?? 0;
+                const outVal = cashflow?.expense?.[i] ?? 0;
+                const incomeH = Math.max((inVal / maxVal) * 100, 2);
+                const expenseH = Math.max((outVal / maxVal) * 100, 2);
                 return (
                   <div key={i} className="flex gap-1.5 items-end h-full group">
                     <div className="w-4 sm:w-6 bg-primary rounded-t-sm group-hover:brightness-125 transition-all" style={{ height: `${incomeH}%` }}></div>
@@ -156,9 +183,9 @@ const Dashboard = () => {
             </div>
 
             {/* X-Axis Labels */}
-            <div className="absolute bottom-0 left-0 right-0 flex justify-between pl-9 pr-2">
-              {(cashflow?.months ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun']).map((month, i, arr) => (
-                <span key={i} className={`text-[11px] ${i === arr.length - 1 ? 'text-primary font-bold' : 'text-on-surface-variant'}`}>{month}</span>
+            <div className="absolute bottom-0 left-0 right-0 flex justify-between pl-11 pr-2">
+              {(cashflow?.months ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des']).map((month, i, arr) => (
+                <span key={i} className={`text-[11px] ${i === arr.length - 1 ? 'text-primary font-bold' : 'text-on-surface-variant'} truncate max-w-[20px] sm:max-w-none text-center`}>{month}</span>
               ))}
             </div>
           </div>

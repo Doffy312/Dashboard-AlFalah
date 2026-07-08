@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useTransactions, useTransactionSummary, useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '../hooks/useTransactions';
 import { authClient } from '../lib/auth-client';
 import TransactionForm from '../components/keuangan/TransactionForm';
+import KeuanganCharts from '../components/keuangan/KeuanganCharts';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import { formatCurrency } from '../lib/utils';
 
@@ -146,6 +147,8 @@ const KeuanganPage = () => {
         </div>
       </div>
 
+      <KeuanganCharts transactions={transactions} />
+
       {/* Action Bar & Filter */}
       <div className="glass-panel rounded-xl p-sm mb-lg flex flex-col md:flex-row items-center justify-between gap-sm">
         <div className="flex flex-1 w-full gap-sm">
@@ -160,7 +163,7 @@ const KeuanganPage = () => {
             />
           </div>
           <select 
-            className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-8" 
+            className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-10" 
             style={{ backgroundImage: `url("data:image/svg+xml;utf8,<svg fill='none' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5 7.5L10 12.5L15 7.5' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5'/></svg>")`, backgroundPosition: 'right 8px center', backgroundRepeat: 'no-repeat' }}
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
@@ -172,7 +175,7 @@ const KeuanganPage = () => {
             <option value="pembangunan">Pembangunan</option>
           </select>
           <select 
-            className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-8" 
+            className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-10" 
             style={{ backgroundImage: `url("data:image/svg+xml;utf8,<svg fill='none' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5 7.5L10 12.5L15 7.5' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5'/></svg>")`, backgroundPosition: 'right 8px center', backgroundRepeat: 'no-repeat' }}
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}

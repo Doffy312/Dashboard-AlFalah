@@ -97,7 +97,7 @@ const TransactionForm = ({ isOpen, onClose, onSubmit, initialData }) => {
         <div className="flex flex-col gap-xs">
           <label className="font-label-md text-on-surface-variant dark:text-white/70">Kategori</label>
           <select 
-            className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none"
+            className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none pr-10"
             value={formData.category}
             onChange={(e) => setFormData({...formData, category: e.target.value})}
           >

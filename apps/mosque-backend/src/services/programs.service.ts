@@ -1,6 +1,8 @@
-import { eq, ilike, and, sql, desc, asc } from "drizzle-orm";
+import { eq, ilike, and, sql, desc, asc, isNotNull } from "drizzle-orm";
 import { db } from "../config/db.js";
-import { program } from "../db/schema/index.js";
+import { program, jemaah } from "../db/schema/index.js";
+import { mailService } from "./mail.service.js";
+import { calendarService } from "./calendar.service.js";
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -69,6 +71,27 @@ export class ProgramService {
         createdBy: userId,
       })
       ;
+      
+    // Send email to Jemaah asynchronously
+    try {
+      const icsContent = await calendarService.createProgramEvent(data);
+      const allJemaah = await db.select({ email: jemaah.email }).from(jemaah).where(isNotNull(jemaah.email));
+      const emails = allJemaah.map((j) => j.email).filter(Boolean) as string[];
+      
+      if (emails.length > 0) {
+        const textContent = `Assalamualaikum,\n\nProgram Kerja baru telah ditambahkan:\nNama: ${data.name}\nPIC: ${data.pic}\nTanggal: ${data.date}\n\nSilakan tambahkan ke kalender Anda dengan membuka lampiran .ics berikut.`;
+        
+        mailService.sendICS(
+          emails.join(','), 
+          `[Program Kerja Baru] ${data.name}`, 
+          textContent, 
+          icsContent
+        ).catch(e => console.error("Error sending calendar email in background:", e));
+      }
+    } catch(err) {
+      console.error("Failed to generate/send ICS:", err);
+    }
+    
     return result[0];
   }
 

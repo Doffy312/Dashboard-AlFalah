@@ -6,6 +6,7 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
     name: '',
     address: '',
     phone: '',
+    email: '',
     category: 'Umum',
     skills: '',
     notes: ''
@@ -17,6 +18,7 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
         name: initialData.name,
         address: initialData.address,
         phone: initialData.phone,
+        email: initialData.email || '',
         category: initialData.category,
         skills: initialData.skills || '',
         notes: initialData.notes || ''
@@ -26,6 +28,7 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
         name: '',
         address: '',
         phone: '',
+        email: '',
         category: 'Umum',
         skills: '',
         notes: ''
@@ -63,6 +66,19 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
         <div className="flex flex-col sm:flex-row gap-md">
           <div className="flex flex-col gap-xs flex-1">
+            <label className="font-label-md text-on-surface-variant dark:text-white/70">Email (Opsional)</label>
+            <input 
+              type="email" 
+              className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
+              placeholder="Contoh: budi@email.com"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-md">
+          <div className="flex flex-col gap-xs flex-1">
             <label className="font-label-md text-on-surface-variant dark:text-white/70">Nomor HP/WA</label>
             <input 
               type="tel" 
@@ -76,7 +92,7 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
           <div className="flex flex-col gap-xs flex-1">
             <label className="font-label-md text-on-surface-variant dark:text-white/70">Kategori Jemaah</label>
             <select 
-              className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none cursor-pointer"
+              className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none cursor-pointer pr-10"
               value={formData.category}
               onChange={(e) => setFormData({...formData, category: e.target.value})}
             >

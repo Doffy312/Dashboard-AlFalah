@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { programService } from "../services/programs.service.js";
 import { getSocketIO } from "../lib/socket.js";
+import { calendarService } from "../services/calendar.service.js";
 
 export class ProgramController {
   async findAll(req: Request, res: Response) {
@@ -126,6 +127,20 @@ export class ProgramController {
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Failed to complete program" });
+    }
+  }
+
+  async getFeed(req: Request, res: Response) {
+    try {
+      const programs = await programService.findAll();
+      const icsData = await calendarService.createProgramsFeed(programs);
+      
+      res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="programs-feed.ics"');
+      res.send(icsData);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to generate calendar feed" });
     }
   }
 }

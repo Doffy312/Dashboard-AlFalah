@@ -24,30 +24,35 @@ export function useRealtimeSync() {
     socketRef.current.on('dataUpdate', (payload) => {
       console.log(`🔄 Realtime update received for entity: ${payload.entity}`);
       
-      // Invalidate queries based on the entity that was updated
+      // Always invalidate all dashboard queries on any data update
+      // This prevents bugs where widgets don't update when data changes
+      const invalidateDashboard = () => {
+        queryClient.invalidateQueries({ queryKey: ['dashboardSummary'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboardCashflow'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboardAllocation'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboardRecentActivity'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboardUpcomingPrograms'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboardCompletedPrograms'] });
+      };
+      
+      invalidateDashboard();
+      
+      // Invalidate specific entity list queries
       switch (payload.entity) {
         case 'transactions':
           queryClient.invalidateQueries({ queryKey: ['transactions'] });
-          queryClient.invalidateQueries({ queryKey: ['dashboardCashflow'] });
-          queryClient.invalidateQueries({ queryKey: ['dashboardAllocation'] });
-          queryClient.invalidateQueries({ queryKey: ['dashboardSummary'] });
-          queryClient.invalidateQueries({ queryKey: ['dashboardRecentActivity'] });
           break;
         case 'jemaah':
           queryClient.invalidateQueries({ queryKey: ['jemaah'] });
           queryClient.invalidateQueries({ queryKey: ['jemaahSummary'] });
-          queryClient.invalidateQueries({ queryKey: ['dashboardSummary'] });
           break;
         case 'inventaris':
           queryClient.invalidateQueries({ queryKey: ['inventories'] });
           queryClient.invalidateQueries({ queryKey: ['inventorySummary'] });
-          queryClient.invalidateQueries({ queryKey: ['dashboardSummary'] });
           break;
         case 'programs':
           queryClient.invalidateQueries({ queryKey: ['programs'] });
           queryClient.invalidateQueries({ queryKey: ['programSummary'] });
-          queryClient.invalidateQueries({ queryKey: ['dashboardSummary'] });
-          queryClient.invalidateQueries({ queryKey: ['dashboardUpcomingPrograms'] });
           break;
         default:
           // If entity is unknown or global update, invalidate everything

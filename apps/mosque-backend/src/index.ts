@@ -31,7 +31,20 @@ if (!fs.existsSync(uploadsDir)) {
 }
 app.use("/uploads", express.static(uploadsDir));
 
-// ─── Health Check ────────────────────────────────────────────────────
+// ─── Root & Health Check ─────────────────────────────────────────────
+app.get("/", (_req, res) => {
+  res.send(`
+    <html>
+      <head><title>Al-Falah Backend</title></head>
+      <body style="font-family: sans-serif; padding: 2rem; background: #0f172a; color: white;">
+        <h2>🌙 Al-Falah Backend API</h2>
+        <p>Server is running successfully!</p>
+        <p>Check API health: <a href="/api/health" style="color: #38bdf8;">/api/health</a></p>
+      </body>
+    </html>
+  `);
+});
+
 app.get("/api/health", (_req, res) => {
   res.json({
     status: "ok",

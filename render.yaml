@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: mosque-backend
+    env: node
+    region: singapore
+    rootDir: apps/mosque-backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: BETTER_AUTH_SECRET
+        generateValue: true
+      - key: BETTER_AUTH_URL
+        value: https://mosque-backend.onrender.com
+      - key: FRONTEND_URL
+        sync: false

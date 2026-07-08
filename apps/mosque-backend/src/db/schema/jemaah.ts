@@ -15,6 +15,7 @@ export const jemaah = mysqlTable("jemaah", {
   name: varchar("name", { length: 255 }).notNull(),
   address: text("address").notNull(),
   phone: varchar("phone", { length: 20 }).notNull(),
+  email: varchar("email", { length: 255 }),
   category: text("category").notNull().default("Umum"), // 'Muzakki' | 'Mustahik' | 'Yatim' | 'Lansia' | 'Umum'
   skills: varchar("skills", { length: 255 }),
   notes: text("notes"),

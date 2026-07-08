@@ -90,7 +90,7 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
           <div className="flex flex-col gap-xs flex-1">
             <label className="font-label-md text-on-surface-variant dark:text-white/70">Lokasi</label>
             <select 
-              className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none cursor-pointer"
+              className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none cursor-pointer pr-10"
               value={formData.location}
               onChange={(e) => setFormData({...formData, location: e.target.value})}
             >

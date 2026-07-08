@@ -147,7 +147,7 @@ const TabUsers = ({ setHasUnsavedChanges }) => {
                 <select 
                   value={newUser.role}
                   onChange={e => setNewUser({...newUser, role: e.target.value})}
-                  className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md appearance-none"
+                  className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md appearance-none pr-10"
                   required
                 >
                   {ROLES.map(role => (

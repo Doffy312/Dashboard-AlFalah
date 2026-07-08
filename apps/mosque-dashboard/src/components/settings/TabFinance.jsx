@@ -68,7 +68,7 @@ const TabFinance = ({ setHasUnsavedChanges }) => {
             <select 
               value={newCat.type}
               onChange={e => setNewCat({...newCat, type: e.target.value})}
-              className="glass-input shrink-0 px-3 py-2 rounded-lg text-white font-body-sm appearance-none"
+              className="glass-input shrink-0 px-3 py-2 rounded-lg text-white font-body-sm appearance-none pr-10"
             >
               <option value="income" className="bg-surface">Pemasukan</option>
               <option value="expense" className="bg-surface">Pengeluaran</option>

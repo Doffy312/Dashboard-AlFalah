@@ -29,6 +29,8 @@ export default {
         "surface-bright": "#1a2432",
         "primary-fixed": "#10b981",
         "on-error": "#ffffff",
+        "emerald-deep": "#047857",
+        "light-bg": "#f8fafc",
       },
       borderRadius: {
         DEFAULT: "0.25rem",
@@ -58,7 +60,8 @@ export default {
         headline: ["Inter"],
         display: ["Inter"],
         body: ["Inter"],
-        label: ["Inter"]
+        label: ["Inter"],
+        playfair: ['"Playfair Display"', "serif"],
       },
       fontSize: {
         "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],

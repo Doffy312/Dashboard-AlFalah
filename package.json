@@ -3,5 +3,8 @@
   "private": true,
   "workspaces": [
     "apps/*"
-  ]
+  ],
+  "scripts": {
+    "dev": "npx concurrently \"npm run dev -w mosque-backend\" \"npm run dev -w mosque-dashboard\""
+  }
 }

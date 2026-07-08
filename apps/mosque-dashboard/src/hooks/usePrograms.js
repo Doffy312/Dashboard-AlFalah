@@ -20,6 +20,7 @@ export function useProgramSummary() {
   return useQuery({
     queryKey: ["programSummary"],
     queryFn: () => programApi.getSummary(),
+    refetchInterval: 5000,
   });
 }
 

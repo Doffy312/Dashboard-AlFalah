@@ -6,6 +6,9 @@ import { uploadMiddleware } from "../middlewares/upload.middleware.js";
 
 const router = Router();
 
+// Public Calendar Feed
+router.get("/feed.ics", programController.getFeed);
+
 router.use(requireAuth);
 
 // Read access: All roles

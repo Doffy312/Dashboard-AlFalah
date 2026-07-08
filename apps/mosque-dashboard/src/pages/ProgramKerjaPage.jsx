@@ -10,7 +10,7 @@ import ConfirmDialog from '../components/common/ConfirmDialog';
 import ProgramCompletionModal from '../components/program/ProgramCompletionModal';
 import ProgramDetailModal from '../components/program/ProgramDetailModal';
 import { formatCurrency } from '../lib/utils';
-import { LayoutGrid, List, Edit2, Trash2, CheckCircle, Eye } from 'lucide-react';
+import { LayoutGrid, List, Edit2, Trash2, CheckCircle, Eye, CalendarPlus } from 'lucide-react';
 
 const ProgramKerjaPage = () => {
   const [viewMode, setViewMode] = useState('kanban'); // kanban | table
@@ -167,6 +167,16 @@ const ProgramKerjaPage = () => {
               Tambah Program
             </button>
           )}
+          <a
+            href="http://localhost:3000/api/programs/feed.ics"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-2 px-4 rounded-full bg-surface-variant text-on-surface-variant font-label-md hover:bg-surface transition-all flex items-center gap-2 border border-outline"
+            title="Subscribe Kalender via Ponsel"
+          >
+            <CalendarPlus size={18} />
+            Subscribe
+          </a>
         </div>
       </div>
 

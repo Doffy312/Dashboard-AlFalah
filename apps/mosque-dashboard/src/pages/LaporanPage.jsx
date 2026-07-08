@@ -3,6 +3,7 @@ import { useDashboardSummary, useCashflow, useAllocation } from '../hooks/useDas
 import { useProgramSummary } from '../hooks/usePrograms';
 import { formatCurrency } from '../lib/utils';
 import { transactionApi, programApi, jemaahApi } from '../lib/api';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 const LaporanPage = () => {
   const [activeTab, setActiveTab] = useState('Grafik Keuangan');
@@ -122,11 +123,14 @@ const LaporanPage = () => {
           <div className="flex-1 relative w-full h-full flex items-end justify-between px-4 pb-6 pt-4 border-l border-b border-outline-variant/30">
             {/* Y Axis Labels (Simulated scale) */}
             <div className="absolute left-[-40px] h-full flex flex-col justify-between text-xs text-outline font-label-md py-4">
-              <span>{Math.round(maxVal / 1000000)}M</span>
-              <span>{Math.round((maxVal * 0.75) / 1000000)}M</span>
-              <span>{Math.round((maxVal * 0.5) / 1000000)}M</span>
-              <span>{Math.round((maxVal * 0.25) / 1000000)}M</span>
-              <span>0</span>
+              {[1, 0.75, 0.5, 0.25, 0].map((ratio, i) => {
+                const val = maxVal * ratio;
+                let label = "0";
+                if (val >= 1000000) label = `${(val / 1000000).toFixed(1).replace('.0', '')}M`;
+                else if (val >= 1000) label = `${(val / 1000).toFixed(1).replace('.0', '')}K`;
+                else if (val > 0) label = Math.round(val).toString();
+                return <span key={i} className="text-right w-8">{label}</span>;
+              })}
             </div>
 
             {/* Bars */}
@@ -137,18 +141,14 @@ const LaporanPage = () => {
               const outH = Math.max((outVal / maxVal) * 100, 2);
 
               return (
-                <div key={i} className="flex flex-col items-center gap-2 group cursor-pointer flex-1">
+                <div key={i} className="flex flex-col items-center gap-2 group cursor-pointer flex-1 relative">
+                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-3 py-2 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none flex flex-col gap-1 shadow-lg">
+                    <span className="text-secondary font-medium">Pemasukan: {formatCurrency(inVal)}</span>
+                    <span className="text-error font-medium">Pengeluaran: {formatCurrency(outVal)}</span>
+                  </div>
                   <div className="flex items-end gap-1 h-[200px] w-full justify-center">
-                    <div className="w-2 sm:w-6 bg-secondary/80 rounded-t-sm group-hover:bg-secondary transition-colors relative" style={{ height: `${inH}%` }}>
-                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                        Pemasukan: {formatCurrency(inVal)}
-                      </div>
-                    </div>
-                    <div className="w-2 sm:w-6 bg-error/70 rounded-t-sm group-hover:bg-error transition-colors relative" style={{ height: `${outH}%` }}>
-                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                        Pengeluaran: {formatCurrency(outVal)}
-                      </div>
-                    </div>
+                    <div className="w-2 sm:w-6 bg-secondary/80 rounded-t-sm group-hover:bg-secondary transition-colors" style={{ height: `${inH}%` }}></div>
+                    <div className="w-2 sm:w-6 bg-error/70 rounded-t-sm group-hover:bg-error transition-colors" style={{ height: `${outH}%` }}></div>
                   </div>
                   <span className="font-label-md text-[10px] sm:text-[12px] font-semibold leading-[16px] tracking-[0.05em] text-outline truncate">{month}</span>
                 </div>
@@ -222,7 +222,15 @@ const LaporanPage = () => {
   };
 
   const renderAnalisisProgram = () => {
-    const data = programSummary ?? { total: 0, Direncanakan: 0, "Sedang Berjalan": 0, Selesai: 0 };
+    const data = programSummary ?? { total: 0, direncanakan: 0, berjalan: 0, selesai: 0 };
+    
+    const chartData = [
+      { name: 'Direncanakan', value: data.direncanakan ?? 0 },
+      { name: 'Sedang Berjalan', value: data.berjalan ?? 0 },
+      { name: 'Selesai', value: data.selesai ?? 0 }
+    ].filter(item => item.value > 0);
+
+    const COLORS = ['#f59e0b', '#3b82f6', '#10b981'];
     
     return (
       <div className="w-full glass-panel rounded-xl p-md flex flex-col">
@@ -234,24 +242,51 @@ const LaporanPage = () => {
             <span className="text-xs text-on-surface-variant font-medium">Total Program</span>
           </div>
           <div className="p-4 rounded-xl bg-surface-variant border border-outline/30 flex flex-col items-center justify-center text-center">
-            <span className="text-3xl font-bold text-amber-500 mb-1">{data.Direncanakan}</span>
+            <span className="text-3xl font-bold text-amber-500 mb-1">{data.direncanakan ?? 0}</span>
             <span className="text-xs text-on-surface-variant font-medium">Direncanakan</span>
           </div>
           <div className="p-4 rounded-xl bg-surface-variant border border-outline/30 flex flex-col items-center justify-center text-center">
-            <span className="text-3xl font-bold text-blue-500 mb-1">{data['Sedang Berjalan']}</span>
+            <span className="text-3xl font-bold text-blue-500 mb-1">{data.berjalan ?? 0}</span>
             <span className="text-xs text-on-surface-variant font-medium">Sedang Berjalan</span>
           </div>
           <div className="p-4 rounded-xl bg-surface-variant border border-outline/30 flex flex-col items-center justify-center text-center">
-            <span className="text-3xl font-bold text-emerald-500 mb-1">{data.Selesai}</span>
+            <span className="text-3xl font-bold text-emerald-500 mb-1">{data.selesai ?? 0}</span>
             <span className="text-xs text-on-surface-variant font-medium">Selesai</span>
           </div>
         </div>
 
-        <div className="flex-1 bg-surface-variant/50 rounded-xl p-6 border border-outline/20">
-          <h4 className="text-sm font-semibold text-white mb-4">Informasi Tambahan</h4>
-          <p className="text-sm text-on-surface-variant leading-relaxed">
-            Dari total {data.total} program yang terdaftar, terdapat {data.Selesai} program yang telah berhasil diselesaikan. Fokus saat ini berada pada penyelesaian {data['Sedang Berjalan']} program yang sedang berjalan dan persiapan untuk {data.Direncanakan} program yang akan datang.
-          </p>
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1 h-[250px] bg-surface-variant/30 rounded-xl border border-outline/20 p-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={chartData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={90}
+                  paddingAngle={5}
+                  dataKey="value"
+                  stroke="none"
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{backgroundColor: '#1a2432', borderRadius: '12px', border: '1px solid #2a3644', color: '#fff'}}
+                  itemStyle={{color: '#fff'}}
+                />
+                <Legend verticalAlign="bottom" height={36} iconType="circle" />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex-1 bg-surface-variant/50 rounded-xl p-6 border border-outline/20 flex flex-col justify-center">
+            <h4 className="text-sm font-semibold text-white mb-4">Informasi Tambahan</h4>
+            <p className="text-sm text-on-surface-variant leading-relaxed">
+              Dari total <span className="text-white font-bold">{data.total}</span> program yang terdaftar, terdapat <span className="text-emerald-500 font-bold">{data.selesai ?? 0}</span> program yang telah berhasil diselesaikan. Fokus saat ini berada pada penyelesaian <span className="text-blue-500 font-bold">{data.berjalan ?? 0}</span> program yang sedang berjalan dan persiapan untuk <span className="text-amber-500 font-bold">{data.direncanakan ?? 0}</span> program yang akan datang.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -271,7 +306,7 @@ const LaporanPage = () => {
             <select 
               value={exportType}
               onChange={(e) => setExportType(e.target.value)}
-              className="w-full rounded-lg bg-surface-variant border border-outline p-3 font-body-sm text-[14px] leading-[20px] text-on-surface outline-none focus:border-primary appearance-none cursor-pointer"
+              className="w-full rounded-lg bg-surface-variant border border-outline p-3 font-body-sm text-[14px] leading-[20px] text-on-surface outline-none focus:border-primary appearance-none cursor-pointer pr-10"
             >
               <option value="Arus Kas">Arus Kas (Pemasukan & Pengeluaran)</option>
               <option value="Program Kerja">Laporan Program Kerja</option>
