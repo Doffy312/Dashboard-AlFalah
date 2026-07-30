@@ -1,10 +1,12 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { authClient } from '../lib/auth-client';
+import { useSettings } from '../contexts/SettingsContext';
 
 const Sidebar = () => {
   const { data: session } = authClient.useSession();
   const navigate = useNavigate();
+  const { profile } = useSettings();
   
   const menuItems = [
     { name: 'Dashboard', icon: 'dashboard', path: '/dashboard', roles: ['Ketua', 'Sekretaris', 'Bendahara'] },
@@ -30,7 +32,7 @@ const Sidebar = () => {
           <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>mosque</span>
         </div>
         <div>
-          <h1 className="text-title-md font-title-md text-primary m-0 leading-tight tracking-tight">Al-Falah</h1>
+          <h1 className="text-title-md font-title-md text-primary m-0 leading-tight tracking-tight">{profile.orgName || 'Al-Falah'}</h1>
           <p className="font-body-sm text-[11px] text-on-surface-variant m-0">Mosque Management</p>
         </div>
       </div>

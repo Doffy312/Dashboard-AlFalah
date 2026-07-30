@@ -1,12 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSettings } from '../../contexts/SettingsContext';
 
-const TabSecurity = ({ setHasUnsavedChanges }) => {
+const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
+  const { security } = useSettings();
+
   const [passwords, setPasswords] = useState({
     current: '',
     newPass: '',
     confirmPass: ''
   });
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState(security.theme || 'dark');
+
+  // Sync from context when it changes
+  useEffect(() => {
+    setTheme(security.theme || 'dark');
+  }, [security]);
+
+  // Expose current data to parent via ref
+  useEffect(() => {
+    if (tabDataRef) {
+      tabDataRef.current = () => ({ theme });
+    }
+  }, [theme, tabDataRef]);
 
   const handlePasswordChange = (e) => {
     setPasswords({ ...passwords, [e.target.name]: e.target.value });
@@ -16,8 +31,12 @@ const TabSecurity = ({ setHasUnsavedChanges }) => {
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
     setHasUnsavedChanges(true);
-    // In a real app, this would toggle classes on the HTML element
-    // document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    // Apply theme immediately for live preview
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   };
 
   const handleExportData = () => {
@@ -94,7 +113,7 @@ const TabSecurity = ({ setHasUnsavedChanges }) => {
               Preferensi Tampilan
             </h4>
             <div className="bg-surface-variant/30 rounded-xl p-5 border border-outline-variant">
-              <p className="text-sm text-white mb-4">Pilih tema antarmuka dashboard (Saat ini optimal untuk Mode Gelap)</p>
+              <p className="text-sm text-white mb-4">Pilih tema antarmuka dashboard</p>
               <div className="flex gap-4">
                 <button 
                   onClick={() => handleThemeChange('light')}

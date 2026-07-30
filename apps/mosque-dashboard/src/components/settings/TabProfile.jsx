@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSettings } from '../../contexts/SettingsContext';
 
-const TabProfile = ({ setHasUnsavedChanges }) => {
-  const [formData, setFormData] = useState({
-    orgName: 'Masjid Al-Falah',
-    address: 'Jl. Raya Pendidikan No. 123, Kota Bandung',
-    phone: '081234567890',
-    email: 'info@masjidalfalah.id',
-    ig: '@masjidalfalah',
-    fb: 'Masjid Al-Falah Bandung',
-    yt: 'Al-Falah TV',
-    description: 'Masjid Al-Falah adalah pusat ibadah dan kegiatan sosial kemasyarakatan di Bandung.'
-  });
+const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
+  const { profile } = useSettings();
+  
+  const [formData, setFormData] = useState({ ...profile });
+
+  // When context profile changes (e.g. cancel/reset), sync local state
+  useEffect(() => {
+    setFormData({ ...profile });
+  }, [profile]);
+
+  // Expose current form data to parent via ref
+  useEffect(() => {
+    if (tabDataRef) {
+      tabDataRef.current = () => formData;
+    }
+  }, [formData, tabDataRef]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

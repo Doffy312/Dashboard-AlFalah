@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const MOCK_USERS = [
   { id: 1, name: 'Ahmad Ketua', email: 'ketua@alfalah.id', role: 'Super Admin' },
@@ -8,7 +8,13 @@ const MOCK_USERS = [
 
 const ROLES = ['Super Admin', 'Bendahara', 'Sekretaris', 'Logistik'];
 
-const TabUsers = ({ setHasUnsavedChanges }) => {
+const TabUsers = ({ setHasUnsavedChanges, tabDataRef }) => {
+  // Users tab doesn't persist to localStorage settings, so return null from ref
+  useEffect(() => {
+    if (tabDataRef) {
+      tabDataRef.current = () => null;
+    }
+  }, [tabDataRef]);
   const [users, setUsers] = useState(MOCK_USERS);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'Bendahara' });

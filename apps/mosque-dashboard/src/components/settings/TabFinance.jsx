@@ -1,21 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSettings } from '../../contexts/SettingsContext';
 
-const INITIAL_CATEGORIES = [
-  { id: 1, name: 'Kas Umum', type: 'income' },
-  { id: 2, name: 'Dana Infak', type: 'income' },
-  { id: 3, name: 'Dana Zakat', type: 'income' },
-  { id: 4, name: 'Operasional', type: 'expense' },
-  { id: 5, name: 'Pembangunan', type: 'expense' },
-];
+const TabFinance = ({ setHasUnsavedChanges, tabDataRef }) => {
+  const { finance } = useSettings();
 
-const TabFinance = ({ setHasUnsavedChanges }) => {
-  const [categories, setCategories] = useState(INITIAL_CATEGORIES);
+  const [categories, setCategories] = useState([...finance.categories]);
   const [newCat, setNewCat] = useState({ name: '', type: 'income' });
-  const [bankInfo, setBankInfo] = useState({
-    bankName: 'BSI (Bank Syariah Indonesia)',
-    accountNumber: '7123456789',
-    accountHolder: 'Masjid Al-Falah'
-  });
+  const [bankInfo, setBankInfo] = useState({ ...finance.bankInfo });
+
+  // Sync from context when it changes (e.g. cancel/reset)
+  useEffect(() => {
+    setCategories([...finance.categories]);
+    setBankInfo({ ...finance.bankInfo });
+  }, [finance]);
+
+  // Expose current data to parent via ref
+  useEffect(() => {
+    if (tabDataRef) {
+      tabDataRef.current = () => ({ categories, bankInfo });
+    }
+  }, [categories, bankInfo, tabDataRef]);
 
   const handleAddCategory = (e) => {
     e.preventDefault();

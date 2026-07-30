@@ -1,10 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSettings } from '../../contexts/SettingsContext';
 
-const TabCustomData = ({ setHasUnsavedChanges }) => {
-  const [jemaahStatus, setJemaahStatus] = useState(['Tetap', 'Mustahik', 'Muzakki', 'Pindahan']);
-  const [prokerStatus, setProkerStatus] = useState(['Direncanakan', 'Berjalan', 'Selesai', 'Dibatalkan']);
+const TabCustomData = ({ setHasUnsavedChanges, tabDataRef }) => {
+  const { customData } = useSettings();
+
+  const [jemaahStatus, setJemaahStatus] = useState([...customData.jemaahStatus]);
+  const [prokerStatus, setProkerStatus] = useState([...customData.prokerStatus]);
   const [newJemaah, setNewJemaah] = useState('');
   const [newProker, setNewProker] = useState('');
+
+  // Sync from context when it changes
+  useEffect(() => {
+    setJemaahStatus([...customData.jemaahStatus]);
+    setProkerStatus([...customData.prokerStatus]);
+  }, [customData]);
+
+  // Expose current data to parent via ref
+  useEffect(() => {
+    if (tabDataRef) {
+      tabDataRef.current = () => ({ jemaahStatus, prokerStatus });
+    }
+  }, [jemaahStatus, prokerStatus, tabDataRef]);
 
   const handleAddJemaah = (e) => {
     e.preventDefault();

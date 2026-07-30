@@ -1,10 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, Suspense } from 'react';
 import { useTransactions, useTransactionSummary, useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '../hooks/useTransactions';
 import { authClient } from '../lib/auth-client';
 import TransactionForm from '../components/keuangan/TransactionForm';
-import KeuanganCharts from '../components/keuangan/KeuanganCharts';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import { formatCurrency } from '../lib/utils';
+
+// Lazy-load the charts component — recharts (~400KB) only downloads
+// when this page renders, not on initial app load.
+const KeuanganCharts = React.lazy(() => import('../components/keuangan/KeuanganCharts'));
 
 const KeuanganPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -147,7 +150,13 @@ const KeuanganPage = () => {
         </div>
       </div>
 
-      <KeuanganCharts transactions={transactions} />
+      <Suspense fallback={
+        <div className="glass-panel rounded-xl p-lg mb-lg animate-pulse" style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span className="text-on-surface-variant text-sm">Memuat grafik...</span>
+        </div>
+      }>
+        <KeuanganCharts transactions={transactions} />
+      </Suspense>
 
       {/* Action Bar & Filter */}
       <div className="glass-panel rounded-xl p-sm mb-lg flex flex-col md:flex-row items-center justify-between gap-sm">

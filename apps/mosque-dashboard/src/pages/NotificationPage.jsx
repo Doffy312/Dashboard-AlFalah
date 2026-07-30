@@ -1,14 +1,25 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell, Wallet, Calendar, Package, Check, CheckCheck } from 'lucide-react';
 
 import { formatDistanceToNow } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import { useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead } from '../hooks/useNotifications';
 
+// Map notification type to dashboard route
+const NOTIFICATION_TYPE_ROUTES = {
+  'Keuangan': '/dashboard/keuangan',
+  'Kegiatan': '/dashboard/program-kerja',
+  'Program': '/dashboard/program-kerja',
+  'Inventaris': '/dashboard/inventaris',
+  'Jemaah': '/dashboard/jemaah',
+};
+
 const NotificationPage = () => {
   const { data: notifications = [] } = useNotifications();
   const markAsReadMutation = useMarkNotificationAsRead();
   const markAllAsReadMutation = useMarkAllNotificationsAsRead();
+  const navigate = useNavigate();
   
   const [activeTab, setActiveTab] = useState('Semua');
 
@@ -25,6 +36,18 @@ const NotificationPage = () => {
 
   const markAllAsRead = () => {
     markAllAsReadMutation.mutate();
+  };
+
+  const handleNotificationClick = (notification) => {
+    // Mark as read if not already
+    if (!notification.isRead) {
+      markAsReadMutation.mutate(notification.id);
+    }
+    // Navigate to the relevant page
+    const route = NOTIFICATION_TYPE_ROUTES[notification.type];
+    if (route) {
+      navigate(route);
+    }
   };
 
   const getIconAndColor = (type) => {
@@ -93,10 +116,11 @@ const NotificationPage = () => {
             return (
               <div 
                 key={notification.id} 
-                className={`p-4 rounded-xl border flex gap-4 transition-all ${
+                onClick={() => handleNotificationClick(notification)}
+                className={`p-4 rounded-xl border flex gap-4 transition-all cursor-pointer hover:shadow-md ${
                   notification.isRead 
-                    ? 'bg-surface-variant/40 border-outline/20' 
-                    : 'bg-primary/5 border-primary/30 shadow-sm'
+                    ? 'bg-surface-variant/40 border-outline/20 hover:bg-surface-variant/60' 
+                    : 'bg-primary/5 border-primary/30 shadow-sm hover:bg-primary/10'
                 }`}
               >
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${colorClass}`}>
@@ -120,7 +144,7 @@ const NotificationPage = () => {
                 {!notification.isRead && (
                   <div className="flex items-center">
                     <button 
-                      onClick={() => markAsRead(notification.id)}
+                      onClick={(e) => { e.stopPropagation(); markAsRead(notification.id); }}
                       title="Tandai Sudah Dibaca"
                       className="p-2 rounded-full text-primary hover:bg-primary/10 transition-colors cursor-pointer"
                     >
@@ -138,3 +162,4 @@ const NotificationPage = () => {
 };
 
 export default NotificationPage;
+

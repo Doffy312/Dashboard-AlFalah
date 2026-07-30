@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSettings } from '../contexts/SettingsContext';
 import TabProfile from '../components/settings/TabProfile';
 import TabUsers from '../components/settings/TabUsers';
 import TabFinance from '../components/settings/TabFinance';
@@ -16,7 +17,11 @@ const TABS = [
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [toast, setToast] = useState(null); // { message, type: 'success' | 'error' }
+  const [toast, setToast] = useState(null);
+  const { saveTabSettings } = useSettings();
+  
+  // Ref to get current data from the active tab
+  const tabDataRef = useRef(null);
 
   // Handle Tab Switch with Unsaved Changes Warning
   const handleTabChange = (tabId) => {
@@ -35,11 +40,14 @@ const SettingsPage = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Global Save Handler (Simulated)
+  // Real Save Handler — reads current data from the active tab's ref and persists it
   const handleSave = () => {
-    // In a real app, this might trigger a form submit or an API call depending on the active tab
-    // We'll simulate a successful save. The actual tabs can use context/refs or we can just pass props
-    // For now, we simulate success and clear the unsaved flag.
+    if (tabDataRef.current) {
+      const currentData = tabDataRef.current();
+      if (currentData !== null && currentData !== undefined) {
+        saveTabSettings(activeTab, currentData);
+      }
+    }
     setHasUnsavedChanges(false);
     showToast('Pengaturan berhasil diperbarui!');
   };
@@ -48,7 +56,8 @@ const SettingsPage = () => {
     if (hasUnsavedChanges) {
       if (window.confirm('Batalkan perubahan?')) {
         setHasUnsavedChanges(false);
-        // We'd typically trigger a form reset here.
+        // Force re-render tabs so they re-read from context
+        setActiveTab(prev => prev);
       }
     }
   };
@@ -66,7 +75,7 @@ const SettingsPage = () => {
   }, [hasUnsavedChanges]);
 
   const renderActiveTab = () => {
-    const commonProps = { setHasUnsavedChanges };
+    const commonProps = { setHasUnsavedChanges, tabDataRef };
     switch (activeTab) {
       case 'profile': return <TabProfile {...commonProps} />;
       case 'users': return <TabUsers {...commonProps} />;
@@ -156,3 +165,4 @@ const SettingsPage = () => {
 };
 
 export default SettingsPage;
+

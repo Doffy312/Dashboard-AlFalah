@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDashboardSummary, useCashflow, useAllocation, useRecentActivity, useUpcomingPrograms } from '../hooks/useDashboard';
 import { formatCurrency } from '../lib/utils';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { data: summary } = useDashboardSummary();
   const { data: cashflow } = useCashflow(new Date().getFullYear());
   const { data: allocation } = useAllocation();
@@ -206,7 +208,7 @@ const Dashboard = () => {
                 const d = new Date(prog.date);
                 const colors = ['text-primary', 'text-[#f59e0b]', 'text-tertiary'];
                 return (
-                  <div key={prog.id ?? i} className="flex items-center gap-4 bg-[#1a2432]/50 p-3 rounded-xl border border-white/5 hover:bg-[#1a2432] transition-colors cursor-pointer">
+                  <div key={prog.id ?? i} onClick={() => navigate('/dashboard/program-kerja')} className="flex items-center gap-4 bg-[#1a2432]/50 p-3 rounded-xl border border-white/5 hover:bg-[#1a2432] transition-colors cursor-pointer">
                     <div className="w-12 h-12 rounded-lg bg-[#1a2432] border border-white/10 flex flex-col items-center justify-center shrink-0">
                       <span className={`text-[14px] font-bold ${colors[i % 3]} leading-tight`}>{d.getDate()}</span>
                       <span className="text-[10px] text-on-surface-variant uppercase">{d.toLocaleDateString('id-ID', { month: 'short' })}</span>
@@ -234,7 +236,7 @@ const Dashboard = () => {
             )}
           </div>
 
-          <button className="w-full mt-4 py-2.5 rounded-xl border border-[#1a2432] text-[13px] font-medium text-white hover:bg-[#1a2432] transition-colors">
+          <button onClick={() => navigate('/dashboard/program-kerja')} className="w-full mt-4 py-2.5 rounded-xl border border-[#1a2432] text-[13px] font-medium text-white hover:bg-[#1a2432] transition-colors">
             Lihat Semua Jadwal
           </button>
         </div>
