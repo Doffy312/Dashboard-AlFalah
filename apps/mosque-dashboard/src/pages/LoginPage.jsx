@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authClient } from '../lib/auth-client';
 
@@ -13,7 +13,7 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     
-    const { data, error: loginError } = await authClient.signIn.email({
+    const { error: loginError } = await authClient.signIn.email({
       email,
       password,
     });

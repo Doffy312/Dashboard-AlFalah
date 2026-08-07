@@ -1,7 +1,7 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardSummary, useCashflow, useAllocation, useRecentActivity, useUpcomingPrograms } from '../hooks/useDashboard';
 import { formatCurrency } from '../lib/utils';
+import JadwalSholatWidget from '../components/dashboard/JadwalSholatWidget';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -130,6 +130,9 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Jadwal Sholat Widget */}
+      <JadwalSholatWidget />
 
       {/* Middle Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -304,16 +307,20 @@ const Dashboard = () => {
             {/* Timeline line */}
             <div className="absolute left-[9px] top-4 bottom-4 w-px bg-white/10"></div>
 
-            {(recentActivity ?? []).length > 0 ? (
-              recentActivity.slice(0, 3).map((item, i) => {
-                const isLast = i === Math.min(recentActivity.length, 3) - 1;
+            {(() => {
+              const activityList = Array.isArray(recentActivity)
+                ? recentActivity
+                : (recentActivity?.data ?? []);
+              if (activityList.length === 0) return null;
+              return activityList.slice(0, 3).map((item, i) => {
+                const isLast = i === Math.min(activityList.length, 3) - 1;
                 const dotColor = i % 2 === 0 ? 'border-primary' : 'border-[#f59e0b]';
                 return (
                   <div key={item.id ?? i} className={`relative pl-8 ${!isLast ? 'pb-8' : ''}`}>
                     <div className={`absolute left-0 top-1 w-5 h-5 rounded-full bg-[#111a24] border-[4px] ${dotColor} flex items-center justify-center z-10`}></div>
                     <div className="flex justify-between items-start mb-1">
                       <h4 className="text-[14px] font-semibold text-white">{item.title ?? item.description}</h4>
-                      <span className="text-[11px] text-on-surface-variant font-mono">{item.time ?? ''}</span>
+                      <span className="text-[11px] text-on-surface-variant font-mono">{item.time || item.date || ''}</span>
                     </div>
                     <p className="text-[13px] text-on-surface-variant mb-3">{item.detail ?? item.description}</p>
                     {item.amount && (
@@ -324,8 +331,8 @@ const Dashboard = () => {
                     )}
                   </div>
                 );
-              })
-            ) : (
+              });
+            })() || (
               <>
                 {/* Fallback static items */}
                 <div className="relative pl-8 pb-8">

@@ -1,4 +1,3 @@
-import React from 'react';
 
 const StatusBadge = ({ type, text }) => {
   let bgColor = 'bg-gray-100 dark:bg-gray-800';

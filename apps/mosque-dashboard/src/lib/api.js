@@ -16,7 +16,15 @@ async function request(path, options = {}) {
   
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || `Request failed: ${res.status}`);
+    let errMsg = err.error || err.message || `Request failed: ${res.status}`;
+    
+    // If backend returns Zod validation details
+    if (err.details && Array.isArray(err.details)) {
+      const detailsMap = err.details.map(d => `• ${d.message}`).join("\n");
+      errMsg = `${errMsg}\n${detailsMap}`;
+    }
+    
+    throw new Error(errMsg);
   }
   
   return res.json();
@@ -84,4 +92,52 @@ export const dashboardApi = {
   getRecentActivity: () => request("/dashboard/recent-activity"),
   getUpcomingPrograms: () => request("/dashboard/upcoming-programs"),
   getCompletedPrograms: () => request("/dashboard/completed-programs"),
+};
+
+export const usersApi = {
+  getAll: () => request("/users"),
+  create: (data) => request("/users", { method: "POST", body: JSON.stringify(data) }),
+  resendVerification: (id) => request(`/users/${id}/resend-verification`, { method: "POST" }),
+  verifyAndSetPassword: (data) => request("/users/verify-and-set-password", { method: "POST", body: JSON.stringify(data) }),
+  updateRole: (id, role) => request(`/users/${id}/role`, { method: "PATCH", body: JSON.stringify({ role }) }),
+  delete: (id) => request(`/users/${id}`, { method: "DELETE" }),
+};
+
+export const ziswafApi = {
+  getAll: (filters = {}) => {
+    const params = new URLSearchParams(filters);
+    return request(`/ziswaf?${params.toString()}`);
+  },
+  getById: (id) => request(`/ziswaf/${id}`),
+  create: (data) => request("/ziswaf", { method: "POST", body: JSON.stringify(data) }),
+  update: (id, data) => request(`/ziswaf/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id) => request(`/ziswaf/${id}`, { method: "DELETE" }),
+};
+
+export const qurbanApi = {
+  getAll: (filters = {}) => {
+    const params = new URLSearchParams(filters);
+    return request(`/qurban?${params.toString()}`);
+  },
+  getById: (id) => request(`/qurban/${id}`),
+  create: (data) => request("/qurban", { method: "POST", body: JSON.stringify(data) }),
+  update: (id, data) => request(`/qurban/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id) => request(`/qurban/${id}`, { method: "DELETE" }),
+};
+
+export const jadwalApi = {
+  getAll: (filters = {}) => {
+    const params = new URLSearchParams(filters);
+    return request(`/jadwal?${params.toString()}`);
+  },
+  getById: (id) => request(`/jadwal/${id}`),
+  create: (data) => request("/jadwal", { method: "POST", body: JSON.stringify(data) }),
+  update: (id, data) => request(`/jadwal/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id) => request(`/jadwal/${id}`, { method: "DELETE" }),
+};
+
+export const notificationApi = {
+  getAll: () => request("/notifications"),
+  markAsRead: (id) => request(`/notifications/${id}/read`, { method: "PATCH" }),
+  markAllAsRead: () => request("/notifications/mark-all-read", { method: "PATCH" }),
 };

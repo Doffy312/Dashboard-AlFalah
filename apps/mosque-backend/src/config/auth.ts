@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db.js";
-import { env } from "./env.js";
+import { env, getCorsOrigins } from "./env.js";
 import * as schema from "../db/schema/index.js";
 
 export const auth = betterAuth({
@@ -32,5 +32,5 @@ export const auth = betterAuth({
       },
     },
   },
-  trustedOrigins: [env.FRONTEND_URL],
+  trustedOrigins: getCorsOrigins(),
 });

@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
+import { ZodError } from "zod";
 
 /**
  * Global error handler — catches unhandled errors and returns
@@ -12,6 +13,14 @@ export function errorHandler(
 ): void {
   console.error("🔥 Unhandled error:", err.message);
   console.error(err.stack);
+
+  if (err instanceof ZodError) {
+    res.status(400).json({
+      error: "Validasi data gagal",
+      details: err.errors.map(e => ({ field: e.path.join('.'), message: e.message }))
+    });
+    return;
+  }
 
   res.status(500).json({
     error: "Internal Server Error",

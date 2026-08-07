@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const SettingsContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSettings = () => useContext(SettingsContext);
 
 // Keys for localStorage
@@ -21,6 +22,7 @@ const DEFAULT_PROFILE = {
   fb: 'Masjid Al-Falah Bandung',
   yt: 'Al-Falah TV',
   description: 'Masjid Al-Falah adalah pusat ibadah dan kegiatan sosial kemasyarakatan di Bandung.',
+  logo: '',
 };
 
 const DEFAULT_FINANCE = {
@@ -50,7 +52,12 @@ const DEFAULT_SECURITY = {
 function loadFromStorage(key, defaultValue) {
   try {
     const stored = localStorage.getItem(key);
-    return stored ? JSON.parse(stored) : defaultValue;
+    if (!stored) return defaultValue;
+    const parsed = JSON.parse(stored);
+    if (typeof defaultValue === 'object' && !Array.isArray(defaultValue) && defaultValue !== null) {
+      return { ...defaultValue, ...parsed };
+    }
+    return parsed;
   } catch {
     return defaultValue;
   }
@@ -100,6 +107,21 @@ export const SettingsProvider = ({ children }) => {
     }
   }, []);
 
+  // Reset all settings to defaults
+  const resetAllSettings = useCallback(() => {
+    setProfile(DEFAULT_PROFILE);
+    saveToStorage(STORAGE_KEYS.profile, DEFAULT_PROFILE);
+
+    setFinance(DEFAULT_FINANCE);
+    saveToStorage(STORAGE_KEYS.finance, DEFAULT_FINANCE);
+
+    setCustomData(DEFAULT_CUSTOM_DATA);
+    saveToStorage(STORAGE_KEYS.customData, DEFAULT_CUSTOM_DATA);
+
+    setSecurity(DEFAULT_SECURITY);
+    saveToStorage(STORAGE_KEYS.security, DEFAULT_SECURITY);
+  }, []);
+
   // Apply theme whenever security.theme changes
   useEffect(() => {
     if (security.theme === 'dark') {
@@ -116,6 +138,7 @@ export const SettingsProvider = ({ children }) => {
     security,
     saveAllSettings,
     saveTabSettings,
+    resetAllSettings,
     setProfile,
     setFinance,
     setCustomData,
@@ -128,3 +151,4 @@ export const SettingsProvider = ({ children }) => {
     </SettingsContext.Provider>
   );
 };
+

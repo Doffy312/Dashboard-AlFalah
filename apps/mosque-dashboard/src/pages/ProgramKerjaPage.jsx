@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { usePrograms, useCreateProgram, useUpdateProgram, useDeleteProgram, useUpdateProgramStatus, useCompleteProgram } from '../hooks/usePrograms';
 import { authClient } from '../lib/auth-client';
 import DataTable from '../components/common/DataTable';
@@ -16,7 +16,7 @@ const ProgramKerjaPage = () => {
   const [viewMode, setViewMode] = useState('kanban'); // kanban | table
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data: programs = [], isLoading } = usePrograms({ search: searchTerm });
+  const { data: programs = [] } = usePrograms({ search: searchTerm });
   const createMutation = useCreateProgram();
   const updateMutation = useUpdateProgram();
   const deleteMutation = useDeleteProgram();
@@ -40,7 +40,7 @@ const ProgramKerjaPage = () => {
   // Takmir/Ketua: Full CRUD (previously Read + Approve)
   // Sekretaris: Full CRUD
   // Bendahara: Read only
-  const canEdit = ['Ketua', 'Sekretaris', 'Bendahara'].includes(session?.user?.role);
+  const canEdit = ['Ketua', 'Sekretaris'].includes(session?.user?.role);
 
   const filteredPrograms = useMemo(() => {
     return programs.filter(p => {
@@ -133,7 +133,7 @@ const ProgramKerjaPage = () => {
 
   return (
     <div className="flex flex-col gap-xl">
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <h1 className="text-display-sm font-display-sm text-on-surface dark:text-white m-0">Program Kerja</h1>
           <p className="font-body-md text-on-surface-variant dark:text-white/70 m-0 mt-xs">Manajemen kegiatan dari perencanaan hingga evaluasi.</p>
@@ -161,7 +161,7 @@ const ProgramKerjaPage = () => {
                 setEditingProgram(null);
                 setIsFormOpen(true);
               }}
-              className="py-2 px-4 rounded-full bg-primary text-on-primary font-label-md hover:bg-primary/90 transition-all shadow-md shadow-primary/20 active:scale-95 flex items-center gap-2"
+              className="hidden sm:flex py-2 px-4 rounded-full bg-primary text-on-primary font-label-md hover:bg-primary/90 transition-all shadow-md shadow-primary/20 active:scale-95 items-center gap-2"
             >
               <span className="material-symbols-outlined text-[18px]">add</span>
               Tambah Program
@@ -197,6 +197,20 @@ const ProgramKerjaPage = () => {
         />
       ) : (
         <DataTable columns={columns} data={filteredPrograms} emptyMessage="Tidak ada program kerja yang ditemukan." />
+      )}
+
+      {/* Mobile FAB */}
+      {canEdit && (
+        <button
+          onClick={() => {
+            setEditingProgram(null);
+            setIsFormOpen(true);
+          }}
+          className="mobile-fab md:hidden"
+          aria-label="Tambah Program"
+        >
+          <span className="material-symbols-outlined">add</span>
+        </button>
       )}
 
       <ProgramForm 

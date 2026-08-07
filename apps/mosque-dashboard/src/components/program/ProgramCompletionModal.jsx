@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 
 const ProgramCompletionModal = ({ isOpen, onClose, onSubmit, program }) => {
   const [reportFile, setReportFile] = useState(null);
@@ -63,7 +63,7 @@ const ProgramCompletionModal = ({ isOpen, onClose, onSubmit, program }) => {
       setReportFile(null);
       setPhotoFiles([]);
       onClose();
-    } catch (err) {
+    } catch {
       setError('Terjadi kesalahan saat mengunggah file. Silakan coba lagi.');
       setIsSubmitting(false);
     }

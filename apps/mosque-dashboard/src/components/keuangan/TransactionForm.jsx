@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from '../common/Modal';
 
 const TransactionForm = ({ isOpen, onClose, onSubmit, initialData }) => {
+  const defaultCategories = {
+    Pemasukan: ['Infaq', 'Zakat', 'Wakaf', 'Donasi Khusus'],
+    Pengeluaran: ['Operasional', 'Pembangunan', 'Sosial', 'Kegiatan']
+  };
+
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     type: 'Pemasukan',
@@ -11,16 +16,22 @@ const TransactionForm = ({ isOpen, onClose, onSubmit, initialData }) => {
     programId: ''
   });
 
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [customCategoryInput, setCustomCategoryInput] = useState('');
+
   useEffect(() => {
     if (initialData) {
+      const isCustom = !defaultCategories[initialData.type]?.includes(initialData.category) && initialData.category !== 'Program Kerja';
       setFormData({
         date: initialData.date,
         type: initialData.type,
-        category: initialData.category,
+        category: isCustom ? 'CUSTOM' : initialData.category,
         amount: initialData.amount,
         description: initialData.description,
         programId: initialData.programId || ''
       });
+      setIsCustomCategory(isCustom);
+      setCustomCategoryInput(isCustom ? initialData.category : '');
     } else {
       setFormData({
         date: new Date().toISOString().split('T')[0],
@@ -30,18 +41,45 @@ const TransactionForm = ({ isOpen, onClose, onSubmit, initialData }) => {
         description: '',
         programId: ''
       });
+      setIsCustomCategory(false);
+      setCustomCategoryInput('');
     }
   }, [initialData, isOpen]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(formData);
-    onClose();
+  const handleTypeChange = (newType) => {
+    const defaultCat = defaultCategories[newType][0];
+    setFormData({ ...formData, type: newType, category: defaultCat });
+    setIsCustomCategory(false);
+    setCustomCategoryInput('');
   };
 
-  const categories = {
-    Pemasukan: ['Infaq', 'Zakat', 'Wakaf', 'Donasi Khusus', 'Lainnya'],
-    Pengeluaran: ['Operasional', 'Pembangunan', 'Sosial', 'Kegiatan', 'Lainnya']
+  const handleCategoryChange = (val) => {
+    if (val === 'CUSTOM') {
+      setIsCustomCategory(true);
+      setFormData({ ...formData, category: 'CUSTOM' });
+    } else {
+      setIsCustomCategory(false);
+      setFormData({ ...formData, category: val });
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    let finalCategory = formData.category;
+    if (isCustomCategory || formData.category === 'CUSTOM') {
+      finalCategory = customCategoryInput.trim();
+      if (!finalCategory) {
+        alert('Silakan masukkan nama kategori kustom.');
+        return;
+      }
+    }
+
+    onSubmit({
+      ...formData,
+      category: finalCategory
+    });
+    onClose();
   };
 
   return (
@@ -57,14 +95,14 @@ const TransactionForm = ({ isOpen, onClose, onSubmit, initialData }) => {
           <button
             type="button"
             className={`flex-1 py-2 rounded-lg font-label-md transition-all ${formData.type === 'Pemasukan' ? 'bg-emerald-500 text-white shadow-md' : 'text-on-surface-variant hover:bg-white/10'}`}
-            onClick={() => setFormData({...formData, type: 'Pemasukan', category: 'Infaq'})}
+            onClick={() => handleTypeChange('Pemasukan')}
           >
             Pemasukan
           </button>
           <button
             type="button"
             className={`flex-1 py-2 rounded-lg font-label-md transition-all ${formData.type === 'Pengeluaran' ? 'bg-rose-500 text-white shadow-md' : 'text-on-surface-variant hover:bg-white/10'}`}
-            onClick={() => setFormData({...formData, type: 'Pengeluaran', category: 'Operasional'})}
+            onClick={() => handleTypeChange('Pengeluaran')}
           >
             Pengeluaran
           </button>
@@ -98,14 +136,38 @@ const TransactionForm = ({ isOpen, onClose, onSubmit, initialData }) => {
           <label className="font-label-md text-on-surface-variant dark:text-white/70">Kategori</label>
           <select 
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none pr-10"
-            value={formData.category}
-            onChange={(e) => setFormData({...formData, category: e.target.value})}
+            value={isCustomCategory ? 'CUSTOM' : formData.category}
+            onChange={(e) => handleCategoryChange(e.target.value)}
+            disabled={formData.category === 'Program Kerja'}
           >
-            {categories[formData.type].map(cat => (
-              <option key={cat} value={cat} className="bg-surface dark:bg-on-surface">{cat}</option>
-            ))}
+            {formData.category === 'Program Kerja' ? (
+              <option value="Program Kerja">Program Kerja</option>
+            ) : (
+              <>
+                {(defaultCategories[formData.type] || []).map(cat => (
+                  <option key={cat} value={cat} className="bg-surface dark:bg-surface-variant">{cat}</option>
+                ))}
+                <option value="CUSTOM" className="bg-surface dark:bg-surface-variant font-semibold text-primary">
+                  + Tambah Kategori Baru...
+                </option>
+              </>
+            )}
           </select>
         </div>
+
+        {isCustomCategory && formData.category !== 'Program Kerja' && (
+          <div className="flex flex-col gap-xs animate-in fade-in slide-in-from-top-1 duration-200">
+            <label className="font-label-md text-primary dark:text-primary">Nama Kategori Baru</label>
+            <input 
+              type="text" 
+              required
+              className="w-full px-md py-sm bg-surface border border-primary rounded-xl outline-none text-on-surface font-body-md"
+              placeholder="Contoh: Sedekah Subuh / Renovasi"
+              value={customCategoryInput}
+              onChange={(e) => setCustomCategoryInput(e.target.value)}
+            />
+          </div>
+        )}
 
         <div className="flex flex-col gap-xs">
           <label className="font-label-md text-on-surface-variant dark:text-white/70">Deskripsi</label>
@@ -119,6 +181,12 @@ const TransactionForm = ({ isOpen, onClose, onSubmit, initialData }) => {
           ></textarea>
         </div>
 
+        {initialData?.category === 'Program Kerja' && (
+          <div className="p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-xl text-xs text-indigo-500 dark:text-indigo-300">
+            ℹ️ Transaksi ini dibuat secara otomatis dari <strong>Program Kerja Selesai</strong>. Perubahan nama atau anggaran dapat dilakukan melalui modul Program Kerja.
+          </div>
+        )}
+
         <div className="flex gap-sm mt-md">
           <button 
             type="button" 
@@ -129,7 +197,12 @@ const TransactionForm = ({ isOpen, onClose, onSubmit, initialData }) => {
           </button>
           <button 
             type="submit" 
-            className="flex-1 py-[12px] rounded-xl font-label-md text-white transition-all shadow-md active:scale-95 bg-primary hover:bg-primary/90"
+            disabled={initialData?.category === 'Program Kerja'}
+            className={`flex-1 py-[12px] rounded-xl font-label-md text-white transition-all shadow-md active:scale-95 ${
+              initialData?.category === 'Program Kerja' 
+                ? 'bg-gray-400 cursor-not-allowed opacity-50' 
+                : 'bg-primary hover:bg-primary/90'
+            }`}
           >
             Simpan
           </button>

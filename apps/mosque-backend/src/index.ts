@@ -1,10 +1,11 @@
 import express from "express";
 import cors from "cors";
-import { env } from "./config/env.js";
+import { env, getCorsOrigins } from "./config/env.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import apiRoutes from "./routes/index.js";
 import { createServer } from "http";
 import { initializeSocket } from "./lib/socket.js";
+import { initBackupService } from "./services/backup.service.js";
 import path from "path";
 import fs from "fs";
 
@@ -17,7 +18,7 @@ initializeSocket(httpServer);
 // ─── Global Middleware ───────────────────────────────────────────────
 app.use(
   cors({
-    origin: env.FRONTEND_URL,
+    origin: getCorsOrigins(),
     credentials: true, // Required for Better Auth cookies
   })
 );
@@ -59,8 +60,14 @@ app.use("/api", apiRoutes);
 // ─── Global Error Handler ────────────────────────────────────────────
 app.use(errorHandler);
 
+import { programService } from "./services/programs.service.js";
+
 // ─── Start Server ────────────────────────────────────────────────────
 httpServer.listen(env.PORT, () => {
+  initBackupService();
+  programService.syncAllCompletedPrograms().catch((err) => {
+    console.error("Failed to sync completed programs on startup:", err);
+  });
   console.log(`
   🕌 Mosque Dashboard Backend
   ────────────────────────────

@@ -1,24 +1,29 @@
-import React, { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { authClient } from './lib/auth-client';
 import { SettingsProvider } from './contexts/SettingsContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Lazy-load DashboardLayout — it imports useRealtimeSync (socket.io ~50KB)
 // so deferring it keeps socket.io out of the initial critical bundle.
-const DashboardLayout = React.lazy(() => import('./layouts/DashboardLayout'));
+const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'));
 
 // --- Route-level Code Splitting ---
 // Each page is lazy-loaded as a separate chunk, only fetched when the route is visited.
-const Dashboard = React.lazy(() => import('./pages/Dashboard'));
-const LandingPage = React.lazy(() => import('./pages/LandingPage'));
-const LoginPage = React.lazy(() => import('./pages/LoginPage'));
-const KeuanganPage = React.lazy(() => import('./pages/KeuanganPage'));
-const ProgramKerjaPage = React.lazy(() => import('./pages/ProgramKerjaPage'));
-const JemaahPage = React.lazy(() => import('./pages/JemaahPage'));
-const LaporanPage = React.lazy(() => import('./pages/LaporanPage'));
-const InventarisPage = React.lazy(() => import('./pages/InventarisPage'));
-const NotificationPage = React.lazy(() => import('./pages/NotificationPage'));
-const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'));
+const KeuanganPage = lazy(() => import('./pages/KeuanganPage'));
+const ProgramKerjaPage = lazy(() => import('./pages/ProgramKerjaPage'));
+const JemaahPage = lazy(() => import('./pages/JemaahPage'));
+const LaporanPage = lazy(() => import('./pages/LaporanPage'));
+const InventarisPage = lazy(() => import('./pages/InventarisPage'));
+const NotificationPage = lazy(() => import('./pages/NotificationPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const ZiswafPage = lazy(() => import('./pages/ZiswafPage'));
+const QurbanPage = lazy(() => import('./pages/QurbanPage'));
+const JadwalPage = lazy(() => import('./pages/JadwalPage'));
 
 // Lightweight loading spinner that matches the app's dark theme
 const PageLoadingFallback = () => (
@@ -83,7 +88,8 @@ function App() {
   return (
     <SettingsProvider>
       <Router>
-        <Routes>
+        <ErrorBoundary>
+          <Routes>
           {/* Public Routes — full-page suspense */}
           <Route path="/" element={
             <Suspense fallback={<FullPageLoadingFallback />}>
@@ -93,6 +99,11 @@ function App() {
           <Route path="/login" element={
             <Suspense fallback={<FullPageLoadingFallback />}>
               <LoginPage />
+            </Suspense>
+          } />
+          <Route path="/verify-email" element={
+            <Suspense fallback={<FullPageLoadingFallback />}>
+              <VerifyEmailPage />
             </Suspense>
           } />
           
@@ -111,12 +122,16 @@ function App() {
             <Route path="keuangan" element={<Suspense fallback={<PageLoadingFallback />}><KeuanganPage /></Suspense>} />
             <Route path="inventaris" element={<Suspense fallback={<PageLoadingFallback />}><InventarisPage /></Suspense>} />
             <Route path="analisis" element={<Suspense fallback={<PageLoadingFallback />}><LaporanPage /></Suspense>} />
+            <Route path="ziswaf" element={<Suspense fallback={<PageLoadingFallback />}><ZiswafPage /></Suspense>} />
+            <Route path="qurban" element={<Suspense fallback={<PageLoadingFallback />}><QurbanPage /></Suspense>} />
+            <Route path="jadwal" element={<Suspense fallback={<PageLoadingFallback />}><JadwalPage /></Suspense>} />
             <Route path="notifikasi" element={<Suspense fallback={<PageLoadingFallback />}><NotificationPage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageLoadingFallback />}><SettingsPage /></Suspense>} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </ErrorBoundary>
       </Router>
     </SettingsProvider>
   );

@@ -1,4 +1,3 @@
-import React from 'react';
 import { formatCurrency } from '../../lib/utils';
 import { Calendar, User, Edit2, Trash2, ArrowRight, Eye } from 'lucide-react';
 

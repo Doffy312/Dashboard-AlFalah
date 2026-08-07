@@ -7,8 +7,7 @@ import react from '@vitejs/plugin-react'
 // This plugin removes those hints so the browser only fetches them
 // when React.lazy actually triggers the dynamic import().
 function stripLazyModulePreload() {
-  // Chunks that should NOT be eagerly preloaded
-  const LAZY_CHUNKS = ['vendor-charts', 'vendor-socketio', 'vendor-datefns', 'vendor-icons'];
+// Chunks that should NOT be eagerly preloaded
   return {
     name: 'strip-lazy-modulepreload',
     enforce: 'post',

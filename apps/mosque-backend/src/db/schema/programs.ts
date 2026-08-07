@@ -7,6 +7,7 @@ import {
   decimal,
   timestamp,
   json,
+  index,
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 import { user } from "./auth.js";
@@ -19,7 +20,7 @@ export const program = mysqlTable("programs", {
   name: varchar("name", { length: 255 }).notNull(),
   pic: varchar("pic", { length: 255 }).notNull(), // Person In Charge
   budget: decimal("budget", { precision: 15, scale: 2 }).notNull(),
-  status: text("status").notNull().default("Direncanakan"), // 'Direncanakan' | 'Sedang Berjalan' | 'Selesai'
+  status: varchar("status", { length: 50 }).notNull().default("Direncanakan"), // 'Direncanakan' | 'Sedang Berjalan' | 'Selesai'
   date: date("date", { mode: "string" }).notNull(),
   description: text("description").notNull(),
   evaluation: text("evaluation"), // Only filled when status = 'Selesai'
@@ -30,7 +31,10 @@ export const program = mysqlTable("programs", {
   }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (table) => ({
+  statusIdx: index("status_idx").on(table.status),
+  dateIdx: index("date_idx").on(table.date),
+}));
 
 export const programRelations = relations(program, ({ one, many }) => ({
   creator: one(user, {

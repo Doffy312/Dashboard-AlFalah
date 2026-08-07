@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { eq, desc } from "drizzle-orm";
 import { db } from "../config/db.js";
 import { notification } from "../db/schema/index.js";
@@ -20,37 +21,50 @@ export class NotificationService {
   }
 
   async create(data: CreateNotificationInput) {
-    const result = await db
+    const id = crypto.randomUUID();
+    await db
       .insert(notification)
       .values({
+        id,
         type: data.type,
         title: data.title,
         description: data.description,
       });
 
     // Emit event to connected clients to fetch new notification
-    const io = getSocketIO();
-    if (io) {
+    try {
+      const io = getSocketIO();
       io.emit("notificationUpdated");
+    } catch {
+      // Socket.IO might not be initialized in tests
     }
 
-    return result[0];
+    return this.findById(id);
+  }
+
+  async findById(id: string) {
+    const result = await db
+      .select()
+      .from(notification)
+      .where(eq(notification.id, id))
+      .limit(1);
+    return result[0] ?? null;
   }
 
   async markAsRead(id: string) {
-    const result = await db
+    await db
       .update(notification)
       .set({ isRead: true })
       .where(eq(notification.id, id));
-    return result[0] ?? null;
+    return this.findById(id);
   }
   
   async markAllAsRead() {
-    const result = await db
+    await db
       .update(notification)
       .set({ isRead: true })
       .where(eq(notification.isRead, false));
-    return result[0] ?? null;
+    return { success: true };
   }
 }
 

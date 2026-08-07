@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Navigate } from 'react-router-dom';
+import { authClient } from '../lib/auth-client';
 import { useSettings } from '../contexts/SettingsContext';
 import TabProfile from '../components/settings/TabProfile';
 import TabUsers from '../components/settings/TabUsers';
@@ -20,8 +22,14 @@ const SettingsPage = () => {
   const [toast, setToast] = useState(null);
   const { saveTabSettings } = useSettings();
   
+  const { data: session } = authClient.useSession();
+  
   // Ref to get current data from the active tab
   const tabDataRef = useRef(null);
+
+  if (session?.user?.role !== 'Ketua') {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   // Handle Tab Switch with Unsaved Changes Warning
   const handleTabChange = (tabId) => {
@@ -101,16 +109,16 @@ const SettingsPage = () => {
       )}
 
       {/* Sticky Top Bar */}
-      <div className="flex justify-between items-center mb-6 sticky top-[88px] bg-background/80 backdrop-blur-md z-30 py-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sticky top-[56px] md:top-[88px] bg-background/80 backdrop-blur-md z-30 py-2">
         <div>
           <h2 className="text-title-lg font-bold text-white m-0">Pengaturan</h2>
-          <p className="text-body-sm text-on-surface-variant m-0 mt-1">Kelola konfigurasi sistem dan preferensi organisasi.</p>
+          <p className="text-body-sm text-on-surface-variant m-0 mt-1 hidden sm:block">Kelola konfigurasi sistem dan preferensi organisasi.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex w-full sm:w-auto gap-3">
           <button 
             onClick={handleCancel}
             disabled={!hasUnsavedChanges}
-            className={`px-4 py-2 rounded-lg font-label-md transition-colors ${
+            className={`flex-1 sm:flex-none px-4 py-2 rounded-lg font-label-md transition-colors ${
               hasUnsavedChanges 
                 ? 'bg-surface-variant text-white hover:bg-surface-variant/80' 
                 : 'bg-surface-variant/50 text-on-surface-variant cursor-not-allowed'
@@ -121,29 +129,29 @@ const SettingsPage = () => {
           <button 
             onClick={handleSave}
             disabled={!hasUnsavedChanges}
-            className={`px-4 py-2 rounded-lg font-label-md flex items-center gap-2 transition-colors ${
+            className={`flex-2 sm:flex-none px-4 py-2 rounded-lg font-label-md flex items-center justify-center gap-2 transition-colors ${
               hasUnsavedChanges
                 ? 'bg-primary text-white hover:bg-primary/90'
                 : 'bg-primary/50 text-white/70 cursor-not-allowed'
             }`}
           >
             <span className="material-symbols-outlined text-[18px]">save</span>
-            Simpan Perubahan
+            Simpan
           </button>
         </div>
       </div>
 
       {/* Split Screen Layout */}
       <div className="flex flex-col md:flex-row gap-6 flex-1 min-h-0">
-        {/* Sidebar Navigation */}
-        <div className="w-full md:w-64 shrink-0 glass-panel p-2 flex flex-col gap-1 overflow-y-auto h-fit md:max-h-full">
+        {/* Navigation Tabs */}
+        <div className="w-full md:w-64 shrink-0 glass-panel p-2 flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto h-fit md:max-h-full hide-scrollbar">
           {TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
+              className={`flex items-center gap-2 md:gap-3 px-4 py-3 rounded-lg text-left transition-all duration-200 whitespace-nowrap shrink-0 md:shrink ${
                 activeTab === tab.id 
-                  ? 'bg-primary/20 text-primary font-bold shadow-[inset_3px_0_0_0_rgba(16,185,129,1)]' 
+                  ? 'bg-primary/20 text-primary font-bold shadow-[0_3px_0_0_rgba(16,185,129,1)] md:shadow-[inset_3px_0_0_0_rgba(16,185,129,1)]' 
                   : 'text-on-surface-variant hover:text-white hover:bg-surface-variant/50'
               }`}
             >

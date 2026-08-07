@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { db } from "../config/db.js";
 import { transaction } from "./schema/transactions.js";
 import { program } from "./schema/programs.js";
@@ -11,12 +12,22 @@ import { inventaris } from "./schema/inventaris.js";
 async function seed() {
   console.log("🌱 Seeding database...");
 
+  // Generate IDs beforehand
+  const programIds = [
+    crypto.randomUUID(),
+    crypto.randomUUID(),
+    crypto.randomUUID(),
+    crypto.randomUUID(),
+    crypto.randomUUID()
+  ];
+
   // ─── Programs ────────────────────────────────────────────────
   console.log("  → Seeding programs...");
-  const programs = await db
+  await db
     .insert(program)
     .values([
       {
+        id: programIds[0],
         name: "Kajian Akbar Akhir Tahun",
         pic: "Ust. Ahmad Zain",
         budget: "5000000",
@@ -27,6 +38,7 @@ async function seed() {
         evaluation: null,
       },
       {
+        id: programIds[1],
         name: "Santunan Yatim Rutin",
         pic: "Bpk. Budi Santoso",
         budget: "5000000",
@@ -37,6 +49,7 @@ async function seed() {
         evaluation: null,
       },
       {
+        id: programIds[2],
         name: "Renovasi Tempat Wudu",
         pic: "Hj. Siti",
         budget: "15000000",
@@ -47,6 +60,7 @@ async function seed() {
         evaluation: null,
       },
       {
+        id: programIds[3],
         name: "Peringatan Maulid Nabi",
         pic: "Ust. Hasan",
         budget: "8000000",
@@ -58,6 +72,7 @@ async function seed() {
           "Acara berjalan lancar, kehadiran jemaah melebih target (500 orang).",
       },
       {
+        id: programIds[4],
         name: "TPA Sore Harian",
         pic: "Ust. Umar",
         budget: "2000000",
@@ -67,8 +82,7 @@ async function seed() {
           "Kegiatan belajar mengaji untuk anak-anak setiap sore hari.",
         evaluation: null,
       },
-    ])
-    .returning();
+    ]);
 
   // ─── Transactions ────────────────────────────────────────────
   console.log("  → Seeding transactions...");
@@ -127,7 +141,7 @@ async function seed() {
       category: "Sosial",
       amount: "5000000",
       description: "Santunan Anak Yatim Rutin",
-      programId: programs[1]?.id ?? null, // Link to Santunan Yatim Rutin
+      programId: programIds[1], // Link to Santunan Yatim Rutin
     },
     {
       date: "2026-05-15",

@@ -1,4 +1,3 @@
-import React from 'react';
 
 const DataTable = ({ columns, data, emptyMessage = "Tidak ada data yang ditemukan" }) => {
   if (!data || data.length === 0) {

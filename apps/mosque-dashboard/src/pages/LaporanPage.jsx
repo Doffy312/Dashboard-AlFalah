@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import { useDashboardSummary, useCashflow, useAllocation } from '../hooks/useDashboard';
 import { useProgramSummary } from '../hooks/usePrograms';
 import { formatCurrency } from '../lib/utils';
@@ -6,7 +6,7 @@ import { transactionApi, programApi, jemaahApi } from '../lib/api';
 
 // Lazy-load the recharts-based analysis component — recharts (~412KB) only
 // downloads when the user switches to the "Analisis Program" tab.
-const LaporanCharts = React.lazy(() => import('../components/laporan/LaporanCharts'));
+const LaporanCharts = lazy(() => import('../components/laporan/LaporanCharts'));
 
 const LaporanPage = () => {
   const [activeTab, setActiveTab] = useState('Grafik Keuangan');
@@ -59,7 +59,8 @@ const LaporanPage = () => {
     setIsExporting(true);
     try {
       if (exportType === 'Arus Kas') {
-        const transactions = await transactionApi.getAll({ limit: 1000 });
+        const result = await transactionApi.getAll({ limit: 1000 });
+        const transactions = result?.data ?? result;
         const data = transactions.map(t => ({
           ID: t.id,
           Tanggal: t.date,
@@ -245,7 +246,7 @@ const LaporanPage = () => {
 
   const renderExportLaporan = () => {
     return (
-      <div className="w-full lg:w-1/2 glass-panel rounded-xl p-md">
+      <div className="w-full lg:w-1/2 xl:w-1/3 glass-panel rounded-xl p-md">
         <h3 className="font-title-md text-[20px] font-semibold leading-[28px] text-on-surface mb-1 flex items-center gap-2">
           <span className="material-symbols-outlined text-primary">download</span> Export Data
         </h3>

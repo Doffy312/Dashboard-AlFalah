@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { X } from 'lucide-react';
 
 const Modal = ({ isOpen, onClose, title, children }) => {
@@ -30,7 +30,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
       
       {/* Modal Card */}
       <div 
-        className="relative w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col bg-surface/90 dark:bg-on-surface/90 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-[24px] shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col bg-surface/90 dark:bg-surface-variant/90 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-[24px] shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-200"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-lg border-b border-white/20 dark:border-white/10 shrink-0">

@@ -1,21 +1,30 @@
 import nodemailer from 'nodemailer';
 
 export class MailService {
-  private transporter: nodemailer.Transporter;
+  private transporter: nodemailer.Transporter | null;
 
   constructor() {
-    // Gunakan Ethereal Email (dummy SMTP) untuk testing jika env vars tidak ada
-    this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.ethereal.email',
-      port: Number(process.env.SMTP_PORT) || 587,
-      auth: {
-        user: process.env.SMTP_USER || 'bertha.mayer61@ethereal.email',
-        pass: process.env.SMTP_PASS || 'd1k64FWhfH3V1Bq8j2'
-      }
-    });
+    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+      this.transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT) || 587,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+    } else {
+      console.warn('⚠️ SMTP not configured (SMTP_HOST, SMTP_USER, SMTP_PASS). Email sending is disabled.');
+      this.transporter = null;
+    }
   }
 
   async sendICS(to: string, subject: string, text: string, icsContent: string, filename: string = 'event.ics') {
+    if (!this.transporter) {
+      console.warn(`📧 Email to ${to} skipped — SMTP not configured.`);
+      return null;
+    }
+
     try {
       const info = await this.transporter.sendMail({
         from: '"Sistem Pengingat" <noreply@masjid.id>',
@@ -31,9 +40,6 @@ export class MailService {
         ]
       });
       console.log(`Email terkirim ke ${to}: ${info.messageId}`);
-      if (process.env.SMTP_HOST === undefined || process.env.SMTP_HOST.includes('ethereal')) {
-        console.log(`Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
-      }
       return info;
     } catch (error) {
       console.error(`Gagal mengirim email ke ${to}:`, error);

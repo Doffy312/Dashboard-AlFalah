@@ -1,4 +1,3 @@
-import React from 'react';
 import Modal from '../common/Modal';
 import { formatCurrency } from '../../lib/utils';
 import { FileText, Download, ExternalLink } from 'lucide-react';

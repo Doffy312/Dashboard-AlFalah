@@ -1,4 +1,3 @@
-import React from 'react';
 
 const SummaryWidget = ({ title, value, icon, trend, trendUp }) => {
   return (

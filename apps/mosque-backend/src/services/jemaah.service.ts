@@ -1,4 +1,5 @@
-import { eq, ilike, and, sql, desc } from "drizzle-orm";
+import crypto from "crypto";
+import { eq, like, and, sql, desc, or } from "drizzle-orm";
 import { db } from "../config/db.js";
 import { jemaah } from "../db/schema/index.js";
 
@@ -8,6 +9,7 @@ export interface CreateJemaahInput {
   name: string;
   address: string;
   phone: string;
+  email?: string | null;
   category?: string;
   skills?: string | null;
   notes?: string | null;
@@ -27,7 +29,10 @@ export class JemaahService {
 
     if (search) {
       conditions.push(
-        sql`(${ilike(jemaah.name, `%${search}%`)} OR ${jemaah.phone} LIKE ${`%${search}%`})`
+        or(
+          like(jemaah.name, `%${search}%`),
+          like(jemaah.phone, `%${search}%`)
+        )!
       );
     }
     if (category && category !== "Semua") {
@@ -55,39 +60,48 @@ export class JemaahService {
   }
 
   async create(data: CreateJemaahInput, userId: string) {
-    const result = await db
+    const id = crypto.randomUUID();
+    await db
       .insert(jemaah)
       .values({
+        id,
         name: data.name,
         address: data.address,
         phone: data.phone,
+        email: data.email ?? null,
         category: data.category ?? "Umum",
         skills: data.skills ?? null,
         notes: data.notes ?? null,
         createdBy: userId,
-      })
-      ;
-    return result[0];
+      });
+
+    return this.findById(id);
   }
 
   async update(id: string, data: Partial<CreateJemaahInput>) {
-    const result = await db
+    const existing = await this.findById(id);
+    if (!existing) return null;
+
+    await db
       .update(jemaah)
       .set({
         ...data,
         updatedAt: new Date(),
       })
-      .where(eq(jemaah.id, id))
-      ;
-    return result[0] ?? null;
+      .where(eq(jemaah.id, id));
+
+    return this.findById(id);
   }
 
   async delete(id: string) {
-    const result = await db
+    const existing = await this.findById(id);
+    if (!existing) return null;
+
+    await db
       .delete(jemaah)
-      .where(eq(jemaah.id, id))
-      ;
-    return result[0] ?? null;
+      .where(eq(jemaah.id, id));
+
+    return existing;
   }
 
   /**

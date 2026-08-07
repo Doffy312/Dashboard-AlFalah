@@ -48,7 +48,7 @@ export class DashboardService {
    */
   async getRecentActivity(limit = 5) {
     const recentTransactions = await transactionService.findAll({ page: 1, limit });
-    return recentTransactions;
+    return recentTransactions.data;
   }
 
   /**

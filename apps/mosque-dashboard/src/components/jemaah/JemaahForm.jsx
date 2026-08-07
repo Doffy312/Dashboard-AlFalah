@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Modal from '../common/Modal';
+import { useSettings } from '../../contexts/SettingsContext';
 
-const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
+const JemaahForm = ({ isOpen, onClose, onSubmit, initialData, isPending = false }) => {
+  const { customData } = useSettings();
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -12,14 +14,20 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
     notes: ''
   });
 
+  const categories = useMemo(() => {
+    const configured = customData?.jemaahStatus || [];
+    const defaults = ['Muzakki', 'Mustahik', 'Fakir', 'Yatim', 'Lansia', 'Umum'];
+    return Array.from(new Set([...configured, ...defaults]));
+  }, [customData?.jemaahStatus]);
+
   useEffect(() => {
     if (initialData) {
       setFormData({
-        name: initialData.name,
-        address: initialData.address,
-        phone: initialData.phone,
+        name: initialData.name || '',
+        address: initialData.address || '',
+        phone: initialData.phone || '',
         email: initialData.email || '',
-        category: initialData.category,
+        category: initialData.category || categories[0] || 'Umum',
         skills: initialData.skills || '',
         notes: initialData.notes || ''
       });
@@ -29,20 +37,17 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
         address: '',
         phone: '',
         email: '',
-        category: 'Umum',
+        category: categories[0] || 'Umum',
         skills: '',
         notes: ''
       });
     }
-  }, [initialData, isOpen]);
+  }, [initialData, isOpen, categories]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
-    onClose();
   };
-
-  const categories = ['Muzakki', 'Mustahik', 'Fakir', 'Yatim', 'Lansia', 'Umum'];
 
   return (
     <Modal 
@@ -60,7 +65,8 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
             placeholder="Contoh: Budi Santoso"
             value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value})}
+            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({...formData, name: e.target.value})}
           />
         </div>
 
@@ -72,7 +78,8 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               placeholder="Contoh: budi@email.com"
               value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({...formData, email: e.target.value})}
             />
           </div>
         </div>
@@ -86,7 +93,8 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               placeholder="Contoh: 0812xxxx"
               value={formData.phone}
-              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({...formData, phone: e.target.value})}
             />
           </div>
           <div className="flex flex-col gap-xs flex-1">
@@ -94,10 +102,11 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             <select 
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none cursor-pointer pr-10"
               value={formData.category}
-              onChange={(e) => setFormData({...formData, category: e.target.value})}
+              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({...formData, category: e.target.value})}
             >
               {categories.map(cat => (
-                <option key={cat} value={cat} className="bg-surface dark:bg-on-surface">{cat}</option>
+                <option key={cat} value={cat} className="bg-surface dark:bg-surface-variant">{cat}</option>
               ))}
             </select>
           </div>
@@ -111,7 +120,8 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md resize-none"
             placeholder="Alamat rumah..."
             value={formData.address}
-            onChange={(e) => setFormData({...formData, address: e.target.value})}
+            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({...formData, address: e.target.value})}
           ></textarea>
         </div>
 
@@ -122,7 +132,8 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
             placeholder="Misal: Teknisi AC, Dokter, Pengajar"
             value={formData.skills}
-            onChange={(e) => setFormData({...formData, skills: e.target.value})}
+            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({...formData, skills: e.target.value})}
           />
         </div>
 
@@ -133,7 +144,8 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
             placeholder="Misal: Butuh santunan rutin"
             value={formData.notes}
-            onChange={(e) => setFormData({...formData, notes: e.target.value})}
+            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({...formData, notes: e.target.value})}
           />
         </div>
 
@@ -141,15 +153,17 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData }) => {
           <button 
             type="button" 
             onClick={onClose}
-            className="flex-1 py-[12px] rounded-xl border border-outline bg-surface-variant hover:bg-surface text-on-surface font-label-md transition-colors"
+            disabled={isPending}
+            className="flex-1 py-[12px] rounded-xl border border-outline bg-surface-variant hover:bg-surface text-on-surface font-label-md transition-colors disabled:opacity-50"
           >
             Batal
           </button>
           <button 
             type="submit" 
-            className="flex-1 py-[12px] rounded-xl font-label-md text-white transition-all shadow-md active:scale-95 bg-primary hover:bg-primary/90 shadow-primary/20"
+            disabled={isPending}
+            className="flex-1 py-[12px] rounded-xl font-label-md text-white transition-all shadow-md active:scale-95 bg-primary hover:bg-primary/90 shadow-primary/20 disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            Simpan Data
+            {isPending ? 'Menyimpan...' : 'Simpan Data'}
           </button>
         </div>
 

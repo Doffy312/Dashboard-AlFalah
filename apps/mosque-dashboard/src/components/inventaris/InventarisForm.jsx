@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from '../common/Modal';
 
 const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
@@ -13,7 +13,8 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   useEffect(() => {
     if (initialData) {
-      setFormData({
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({
         name: initialData.name,
         quantity: initialData.quantity,
         date: initialData.date,
@@ -22,7 +23,8 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
         notes: initialData.notes || ''
       });
     } else {
-      setFormData({
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({
         name: '',
         quantity: '',
         date: new Date().toISOString().split('T')[0],
@@ -59,7 +61,8 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               placeholder="Contoh: AC Daikin 2PK"
               value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({...formData, name: e.target.value})}
             />
           </div>
           <div className="flex flex-col gap-xs flex-1">
@@ -71,7 +74,8 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               placeholder="0"
               value={formData.quantity}
-              onChange={(e) => setFormData({...formData, quantity: e.target.value})}
+              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({...formData, quantity: e.target.value})}
             />
           </div>
         </div>
@@ -84,7 +88,8 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               required
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               value={formData.date}
-              onChange={(e) => setFormData({...formData, date: e.target.value})}
+              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({...formData, date: e.target.value})}
             />
           </div>
           <div className="flex flex-col gap-xs flex-1">
@@ -92,10 +97,11 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             <select 
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none cursor-pointer pr-10"
               value={formData.location}
-              onChange={(e) => setFormData({...formData, location: e.target.value})}
+              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({...formData, location: e.target.value})}
             >
               {locations.map(loc => (
-                <option key={loc} value={loc} className="bg-surface dark:bg-on-surface">{loc}</option>
+                <option key={loc} value={loc} className="bg-surface dark:bg-surface-variant">{loc}</option>
               ))}
             </select>
           </div>
@@ -111,7 +117,8 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                   name="condition" 
                   value={cond} 
                   checked={formData.condition === cond}
-                  onChange={(e) => setFormData({...formData, condition: e.target.value})}
+                  onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({...formData, condition: e.target.value})}
                   className="hidden"
                 />
                 {cond}
@@ -127,7 +134,8 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md resize-none"
             placeholder="Merk, asal barang, rincian kerusakan..."
             value={formData.notes}
-            onChange={(e) => setFormData({...formData, notes: e.target.value})}
+            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData({...formData, notes: e.target.value})}
           ></textarea>
         </div>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Clock, MapPin } from 'lucide-react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth, isSameDay, addDays } from 'date-fns';
 
@@ -58,11 +58,9 @@ const CalendarWidget = () => {
     const rows = [];
     let days = [];
     let day = startDate;
-    let formattedDate = '';
-
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
-        formattedDate = format(day, 'd');
+        const formattedDate = format(day, 'd');
         const cloneDay = day;
         
         // Check if there are events on this day

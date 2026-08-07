@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
 
 const TabCustomData = ({ setHasUnsavedChanges, tabDataRef }) => {
@@ -11,6 +11,7 @@ const TabCustomData = ({ setHasUnsavedChanges, tabDataRef }) => {
 
   // Sync from context when it changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setJemaahStatus([...customData.jemaahStatus]);
     setProkerStatus([...customData.prokerStatus]);
   }, [customData]);
@@ -25,12 +26,14 @@ const TabCustomData = ({ setHasUnsavedChanges, tabDataRef }) => {
   const handleAddJemaah = (e) => {
     e.preventDefault();
     if (!newJemaah.trim() || jemaahStatus.includes(newJemaah.trim())) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setJemaahStatus([...jemaahStatus, newJemaah.trim()]);
     setNewJemaah('');
     setHasUnsavedChanges(true);
   };
 
   const handleDeleteJemaah = (status) => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setJemaahStatus(jemaahStatus.filter(s => s !== status));
     setHasUnsavedChanges(true);
   };

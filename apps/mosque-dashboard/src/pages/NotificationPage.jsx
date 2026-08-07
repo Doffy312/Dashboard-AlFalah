@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, Wallet, Calendar, Package, Check, CheckCheck } from 'lucide-react';
 
@@ -62,22 +62,22 @@ const NotificationPage = () => {
   return (
     <div className="flex flex-col gap-xl">
       <div className="flex justify-between items-end">
-        <div>
-          <h1 className="text-display-sm font-display-sm text-on-surface dark:text-white m-0 flex items-center gap-3">
-            <Bell size={36} className="text-primary" />
-            Pusat Notifikasi
+        <div className="flex-1">
+          <h1 className="text-title-lg sm:text-display-sm font-title-lg sm:font-display-sm text-on-surface dark:text-white m-0 flex items-center gap-2 sm:gap-3">
+            <Bell size={28} className="text-primary sm:w-9 sm:h-9" />
+            Notifikasi
           </h1>
-          <p className="font-body-md text-on-surface-variant dark:text-white/70 m-0 mt-xs">
+          <p className="font-body-sm sm:font-body-md text-on-surface-variant dark:text-white/70 m-0 mt-xs hidden sm:block">
             Kelola pemberitahuan dan aktivitas terbaru masjid.
           </p>
         </div>
         {unreadCount > 0 && (
           <button 
             onClick={markAllAsRead}
-            className="hidden sm:flex py-2 px-4 rounded-full bg-surface-variant text-on-surface hover:bg-surface-variant/80 transition-all items-center gap-2 border border-outline/30 cursor-pointer"
+            className="flex py-2 px-3 sm:px-4 rounded-full bg-surface-variant text-on-surface hover:bg-surface-variant/80 transition-all items-center gap-1 sm:gap-2 border border-outline/30 cursor-pointer"
           >
             <CheckCheck size={18} />
-            <span className="font-label-md">Tandai Semua Dibaca</span>
+            <span className="font-label-md text-xs sm:text-sm">Tandai Dibaca</span>
           </button>
         )}
       </div>

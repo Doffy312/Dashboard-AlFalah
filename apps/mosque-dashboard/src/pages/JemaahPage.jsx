@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useJemaahList, useJemaahSummary, useCreateJemaah, useUpdateJemaah, useDeleteJemaah } from '../hooks/useJemaah';
 import { authClient } from '../lib/auth-client';
 import DataTable from '../components/common/DataTable';
@@ -12,7 +12,7 @@ const JemaahPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('Semua');
 
-  const { data: jemaah = [], isLoading } = useJemaahList({ search: searchTerm, category: filterCategory === 'Semua' ? '' : filterCategory });
+  const { data: jemaah = [] } = useJemaahList({ search: searchTerm, category: filterCategory === 'Semua' ? '' : filterCategory });
   const { data: summaries = { total: 0, Muzakki: 0, Mustahik: 0, Yatim: 0, Lansia: 0, Umum: 0, Fakir: 0 } } = useJemaahSummary();
   
   const createMutation = useCreateJemaah();
@@ -58,11 +58,17 @@ const JemaahPage = () => {
 
   const handleSubmit = (data) => {
     if (editingJemaah) {
-      updateMutation.mutate({ id: editingJemaah.id, data });
+      updateMutation.mutate(
+        { id: editingJemaah.id, data },
+        {
+          onSuccess: () => setIsFormOpen(false),
+        }
+      );
     } else {
-      createMutation.mutate(data);
+      createMutation.mutate(data, {
+        onSuccess: () => setIsFormOpen(false),
+      });
     }
-    setIsFormOpen(false);
   };
 
   const columns = [
@@ -177,11 +183,26 @@ const JemaahPage = () => {
         <DataTable columns={columns} data={filteredJemaah} emptyMessage="Tidak ada data jemaah yang cocok dengan filter Anda." />
       </div>
 
+      {/* Mobile FAB */}
+      {canEdit && (
+        <button
+          onClick={() => {
+            setEditingJemaah(null);
+            setIsFormOpen(true);
+          }}
+          className="mobile-fab md:hidden"
+          aria-label="Tambah Data Jemaah"
+        >
+          <span className="material-symbols-outlined">add</span>
+        </button>
+      )}
+
       <JemaahForm 
         isOpen={isFormOpen} 
         onClose={() => setIsFormOpen(false)} 
         onSubmit={handleSubmit}
         initialData={editingJemaah}
+        isPending={createMutation.isPending || updateMutation.isPending}
       />
 
       <ConfirmDialog 

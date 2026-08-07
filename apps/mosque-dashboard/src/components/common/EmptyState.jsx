@@ -1,4 +1,3 @@
-import React from 'react';
 import { PackageOpen } from 'lucide-react';
 
 const EmptyState = ({ title, description, actionText, onAction, icon }) => {

@@ -47,8 +47,8 @@ export function useRealtimeSync() {
           queryClient.invalidateQueries({ queryKey: ['jemaahSummary'] });
           break;
         case 'inventaris':
-          queryClient.invalidateQueries({ queryKey: ['inventories'] });
-          queryClient.invalidateQueries({ queryKey: ['inventorySummary'] });
+          queryClient.invalidateQueries({ queryKey: ['inventaris'] });
+          queryClient.invalidateQueries({ queryKey: ['inventarisSummary'] });
           break;
         case 'programs':
           queryClient.invalidateQueries({ queryKey: ['programs'] });

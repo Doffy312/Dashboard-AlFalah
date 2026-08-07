@@ -1,8 +1,10 @@
-import { eq, ilike, and, sql, desc, asc, isNotNull } from "drizzle-orm";
+import crypto from "crypto";
+import { eq, like, and, sql, desc, asc, isNotNull } from "drizzle-orm";
 import { db } from "../config/db.js";
-import { program, jemaah } from "../db/schema/index.js";
+import { program, user, transaction } from "../db/schema/index.js";
 import { mailService } from "./mail.service.js";
 import { calendarService } from "./calendar.service.js";
+import { transactionService } from "./transactions.service.js";
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -30,7 +32,7 @@ export class ProgramService {
 
     if (search) {
       conditions.push(
-        sql`(${ilike(program.name, `%${search}%`)} OR ${ilike(program.pic, `%${search}%`)})`
+        sql`(${like(program.name, `%${search}%`)} OR ${like(program.pic, `%${search}%`)})`
       );
     }
     if (status) {
@@ -57,10 +59,78 @@ export class ProgramService {
     return result[0] ?? null;
   }
 
+  async syncProgramTransaction(programData: {
+    id: string;
+    name: string;
+    budget: string;
+    status: string;
+    date: string;
+    createdBy?: string | null;
+  }) {
+    try {
+      const existing = await db
+        .select()
+        .from(transaction)
+        .where(eq(transaction.programId, programData.id))
+        .limit(1);
+
+      const existingTx = existing[0] ?? null;
+
+      if (programData.status === "Selesai") {
+        if (existingTx) {
+          await transactionService.update(
+            existingTx.id,
+            {
+              date: programData.date,
+              type: "Pengeluaran",
+              category: "Program Kerja",
+              amount: String(programData.budget),
+              description: programData.name,
+              programId: programData.id,
+            },
+            true
+          );
+        } else {
+          await transactionService.create(
+            {
+              date: programData.date,
+              type: "Pengeluaran",
+              category: "Program Kerja",
+              amount: String(programData.budget),
+              description: programData.name,
+              programId: programData.id,
+            },
+            programData.createdBy || null,
+            true
+          );
+        }
+      } else {
+        if (existingTx) {
+          await transactionService.delete(existingTx.id, true);
+        }
+      }
+    } catch (err) {
+      console.error(`Error syncing transaction for program ${programData.id}:`, err);
+    }
+  }
+
+  async syncAllCompletedPrograms() {
+    try {
+      const allPrograms = await db.select().from(program);
+      for (const p of allPrograms) {
+        await this.syncProgramTransaction(p);
+      }
+    } catch (err) {
+      console.error("Error in syncAllCompletedPrograms:", err);
+    }
+  }
+
   async create(data: CreateProgramInput, userId: string) {
-    const result = await db
+    const id = crypto.randomUUID();
+    await db
       .insert(program)
       .values({
+        id,
         name: data.name,
         pic: data.pic,
         budget: data.budget,
@@ -69,14 +139,18 @@ export class ProgramService {
         description: data.description,
         evaluation: data.evaluation ?? null,
         createdBy: userId,
-      })
-      ;
+      });
+
+    const created = await this.findById(id);
+    if (created) {
+      await this.syncProgramTransaction(created);
+    }
       
-    // Send email to Jemaah asynchronously
+    // Send email to Takmir asynchronously
     try {
       const icsContent = await calendarService.createProgramEvent(data);
-      const allJemaah = await db.select({ email: jemaah.email }).from(jemaah).where(isNotNull(jemaah.email));
-      const emails = allJemaah.map((j) => j.email).filter(Boolean) as string[];
+      const allTakmir = await db.select({ email: user.email }).from(user).where(isNotNull(user.email));
+      const emails = allTakmir.map((u) => u.email).filter(Boolean) as string[];
       
       if (emails.length > 0) {
         const textContent = `Assalamualaikum,\n\nProgram Kerja baru telah ditambahkan:\nNama: ${data.name}\nPIC: ${data.pic}\nTanggal: ${data.date}\n\nSilakan tambahkan ke kalender Anda dengan membuka lampiran .ics berikut.`;
@@ -92,32 +166,51 @@ export class ProgramService {
       console.error("Failed to generate/send ICS:", err);
     }
     
-    return result[0];
+    return created;
   }
 
   async update(id: string, data: Partial<CreateProgramInput>) {
-    const result = await db
+    const existing = await this.findById(id);
+    if (!existing) return null;
+
+    await db
       .update(program)
       .set({
         ...data,
         updatedAt: new Date(),
       })
-      .where(eq(program.id, id))
-      ;
-    return result[0] ?? null;
+      .where(eq(program.id, id));
+
+    const updated = await this.findById(id);
+    if (updated) {
+      await this.syncProgramTransaction(updated);
+    }
+
+    return updated;
   }
 
   async updateStatus(id: string, status: string) {
-    const result = await db
+    const existing = await this.findById(id);
+    if (!existing) return null;
+
+    await db
       .update(program)
       .set({ status, updatedAt: new Date() })
-      .where(eq(program.id, id))
-      ;
-    return result[0] ?? null;
+      .where(eq(program.id, id));
+
+    const updated = await this.findById(id);
+    if (updated) {
+      await this.syncProgramTransaction(updated);
+    }
+
+    return updated;
   }
 
   async completeProgram(id: string, reportDocUrl: string | null, documentationUrls: string[]) {
-    const result = await db
+    const existing = await this.findById(id);
+    if (!existing) return null;
+
+    await db
       .update(program)
       .set({
         status: "Selesai",
@@ -126,15 +219,27 @@ export class ProgramService {
         updatedAt: new Date(),
       })
       .where(eq(program.id, id));
-    return result[0] ?? null;
+
+    const updated = await this.findById(id);
+    if (updated) {
+      await this.syncProgramTransaction(updated);
+    }
+
+    return updated;
   }
 
   async delete(id: string) {
-    const result = await db
+    const existing = await this.findById(id);
+    if (!existing) return null;
+
+    // Delete associated auto-generated transaction first
+    await this.syncProgramTransaction({ ...existing, status: "Deleted" });
+
+    await db
       .delete(program)
-      .where(eq(program.id, id))
-      ;
-    return result[0] ?? null;
+      .where(eq(program.id, id));
+
+    return existing;
   }
 
   /**

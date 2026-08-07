@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
 
 const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
   const { profile } = useSettings();
   
   const [formData, setFormData] = useState({ ...profile });
+  const fileInputRef = useRef(null);
 
   // When context profile changes (e.g. cancel/reset), sync local state
   useEffect(() => {
@@ -24,6 +25,30 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
     setHasUnsavedChanges(true);
   };
 
+  const handleLogoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Ukuran file logo terlalu besar. Maksimal 2MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({ ...prev, logo: reader.result }));
+      setHasUnsavedChanges(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveLogo = (e) => {
+    e.stopPropagation();
+    setFormData(prev => ({ ...prev, logo: '' }));
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    setHasUnsavedChanges(true);
+  };
+
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-300">
       <div className="border-b border-outline-variant pb-4 mb-2">
@@ -37,14 +62,40 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
         {/* Logo Upload Section */}
         <div className="col-span-1 flex flex-col gap-4">
           <label className="font-label-md text-white">Logo Organisasi</label>
-          <div className="border-2 border-dashed border-outline-variant rounded-xl p-6 flex flex-col items-center justify-center text-center gap-3 hover:border-primary transition-colors cursor-pointer bg-surface-variant/30">
-            <div className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
-              <span className="material-symbols-outlined text-[40px] text-primary">image</span>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleLogoUpload} 
+            accept="image/png, image/jpeg, image/svg+xml, image/webp" 
+            className="hidden" 
+          />
+          <div 
+            onClick={() => fileInputRef.current?.click()}
+            className="border-2 border-dashed border-outline-variant rounded-xl p-6 flex flex-col items-center justify-center text-center gap-3 hover:border-primary transition-colors cursor-pointer bg-surface-variant/30 relative group"
+          >
+            <div className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30 shrink-0">
+              {formData.logo ? (
+                <img src={formData.logo} alt="Logo Organisasi" className="w-full h-full object-cover" />
+              ) : (
+                <span className="material-symbols-outlined text-[40px] text-primary">image</span>
+              )}
             </div>
             <div>
-              <p className="text-body-sm font-bold text-white m-0">Klik untuk unggah</p>
+              <p className="text-body-sm font-bold text-white m-0">
+                {formData.logo ? 'Klik untuk mengganti logo' : 'Klik untuk unggah logo'}
+              </p>
               <p className="text-[11px] text-on-surface-variant m-0 mt-1">SVG, PNG, JPG (Maks. 2MB)</p>
             </div>
+            {formData.logo && (
+              <button
+                type="button"
+                onClick={handleRemoveLogo}
+                className="mt-1 px-3 py-1 bg-error/20 hover:bg-error/30 text-error border border-error/30 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-[14px]">delete</span>
+                Hapus Logo
+              </button>
+            )}
           </div>
         </div>
 

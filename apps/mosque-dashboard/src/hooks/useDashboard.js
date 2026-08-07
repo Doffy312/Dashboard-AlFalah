@@ -1,15 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { dashboardApi } from "../lib/api";
 
-export function useDashboardSummary() {
+export function useDashboardSummary(options = {}) {
   return useQuery({
     queryKey: ["dashboardSummary"],
     queryFn: () => dashboardApi.getSummary(),
-    refetchInterval: 5000,
+    ...options,
   });
 }
 
-export function useCashflow(year) {
+export function useCashflow(year, options = {}) {
   return useQuery({
     queryKey: ["dashboardCashflow", year],
     queryFn: async () => {
@@ -29,11 +29,11 @@ export function useCashflow(year) {
       }
       return { months, income, expense };
     },
-    refetchInterval: 5000,
+    ...options,
   });
 }
 
-export function useAllocation() {
+export function useAllocation(options = {}) {
   return useQuery({
     queryKey: ["dashboardAllocation"],
     queryFn: async () => {
@@ -48,30 +48,31 @@ export function useAllocation() {
         percentage: Math.round((Number(item.total) / totalSum) * 100)
       }));
     },
-    refetchInterval: 5000,
+    ...options,
   });
 }
 
-export function useRecentActivity() {
+export function useRecentActivity(options = {}) {
   return useQuery({
     queryKey: ["dashboardRecentActivity"],
     queryFn: () => dashboardApi.getRecentActivity(),
-    refetchInterval: 5000,
+    ...options,
   });
 }
 
-export function useUpcomingPrograms() {
+export function useUpcomingPrograms(options = {}) {
   return useQuery({
     queryKey: ["dashboardUpcomingPrograms"],
     queryFn: () => dashboardApi.getUpcomingPrograms(),
-    refetchInterval: 5000,
+    ...options,
   });
 }
 
-export function useCompletedPrograms() {
+export function useCompletedPrograms(options = {}) {
   return useQuery({
     queryKey: ["dashboardCompletedPrograms"],
     queryFn: () => dashboardApi.getCompletedPrograms(),
-    refetchInterval: 5000,
+    ...options,
   });
 }
+

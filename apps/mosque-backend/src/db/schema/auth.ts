@@ -15,7 +15,7 @@ export const user = mysqlTable("user", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
   image: text("image"),
-  role: text("role").notNull().default("Ketua"), // 'Ketua' | 'Sekretaris' | 'Bendahara'
+  role: text("role").notNull().default("Ketua"), // 'Ketua' | 'Sekretaris' | 'Bendahara' | 'Pengurus'
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

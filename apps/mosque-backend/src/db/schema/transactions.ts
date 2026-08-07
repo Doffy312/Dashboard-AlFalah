@@ -6,6 +6,7 @@ import {
   varchar,
   decimal,
   timestamp,
+  index,
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 import { user } from "./auth.js";
@@ -16,7 +17,7 @@ import { program } from "./programs.js";
 export const transaction = mysqlTable("transactions", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   date: date("date", { mode: "string" }).notNull(),
-  type: text("type").notNull(), // 'Pemasukan' | 'Pengeluaran'
+  type: varchar("type", { length: 50 }).notNull(), // 'Pemasukan' | 'Pengeluaran'
   category: varchar("category", { length: 50 }).notNull(),
   amount: decimal("amount", { precision: 15, scale: 2 }).notNull(),
   description: text("description").notNull(),
@@ -28,7 +29,11 @@ export const transaction = mysqlTable("transactions", {
   }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (table) => ({
+  dateIdx: index("date_idx").on(table.date),
+  typeIdx: index("type_idx").on(table.type),
+  categoryIdx: index("category_idx").on(table.category),
+}));
 
 export const transactionRelations = relations(transaction, ({ one }) => ({
   program: one(program, {

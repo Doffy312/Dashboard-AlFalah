@@ -12,6 +12,7 @@ export class CalendarService {
       
       const event: ics.EventAttributes = {
         start: [year, month, day], // format: [YYYY, MM, DD] untuk all-day event
+        duration: { days: 1 },
         title: `[Program Kerja] ${program.name}`,
         description: `PIC: ${program.pic}\nStatus: ${program.status}\nAnggaran: Rp ${program.budget}\n\n${program.description}`,
         location: 'Masjid',
@@ -52,6 +53,7 @@ export class CalendarService {
         const [year, month, day] = (typeof p.date === 'string' ? p.date : p.date.toISOString().split('T')[0]).split('-').map(Number);
         return {
           start: [year, month, day],
+          duration: { days: 1 },
           title: `[Program Kerja] ${p.name}`,
           description: `PIC: ${p.pic}\nStatus: ${p.status}\n\n${p.description}`,
           location: 'Masjid',

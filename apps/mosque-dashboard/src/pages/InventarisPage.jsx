@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useInventarisList, useInventarisSummary, useCreateInventaris, useUpdateInventaris, useDeleteInventaris } from '../hooks/useInventaris';
 import { authClient } from '../lib/auth-client';
 import DataTable from '../components/common/DataTable';
@@ -13,7 +13,7 @@ const InventarisPage = () => {
   const [filterCondition, setFilterCondition] = useState('Semua');
   const [filterLocation, setFilterLocation] = useState('Semua');
 
-  const { data: inventaris = [], isLoading } = useInventarisList({ search: searchTerm, condition: filterCondition === 'Semua' ? '' : filterCondition, location: filterLocation === 'Semua' ? '' : filterLocation });
+  const { data: inventaris = [] } = useInventarisList({ search: searchTerm, condition: filterCondition === 'Semua' ? '' : filterCondition, location: filterLocation === 'Semua' ? '' : filterLocation });
   const { data: summaries = { total: 0, Baik: 0, 'Rusak Ringan': 0, 'Rusak Berat': 0 } } = useInventarisSummary();
   
   const createMutation = useCreateInventaris();
@@ -28,7 +28,7 @@ const InventarisPage = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [inventarisToDelete, setInventarisToDelete] = useState(null);
 
-  const canEdit = ['Ketua', 'Sekretaris', 'Bendahara'].includes(session?.user?.role);
+  const canEdit = ['Ketua', 'Sekretaris'].includes(session?.user?.role);
 
   const filteredInventaris = useMemo(() => {
     return inventaris.filter(i => {
@@ -188,6 +188,20 @@ const InventarisPage = () => {
 
         <DataTable columns={columns} data={filteredInventaris} emptyMessage="Tidak ada inventaris yang cocok dengan filter Anda." />
       </div>
+
+      {/* Mobile FAB */}
+      {canEdit && (
+        <button
+          onClick={() => {
+            setEditingInventaris(null);
+            setIsFormOpen(true);
+          }}
+          className="mobile-fab md:hidden"
+          aria-label="Tambah Barang"
+        >
+          <span className="material-symbols-outlined">add</span>
+        </button>
+      )}
 
       <InventarisForm 
         isOpen={isFormOpen} 

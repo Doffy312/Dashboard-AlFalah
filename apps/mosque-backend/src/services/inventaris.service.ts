@@ -1,4 +1,5 @@
-import { eq, ilike, and, sql, desc } from "drizzle-orm";
+import crypto from "crypto";
+import { eq, like, and, sql, desc } from "drizzle-orm";
 import { db } from "../config/db.js";
 import { inventaris } from "../db/schema/index.js";
 
@@ -27,7 +28,7 @@ export class InventarisService {
     const conditions = [];
 
     if (search) {
-      conditions.push(ilike(inventaris.name, `%${search}%`));
+      conditions.push(like(inventaris.name, `%${search}%`));
     }
     if (condition && condition !== "Semua") {
       conditions.push(eq(inventaris.condition, condition));
@@ -57,9 +58,11 @@ export class InventarisService {
   }
 
   async create(data: CreateInventarisInput, userId: string) {
-    const result = await db
+    const id = crypto.randomUUID();
+    await db
       .insert(inventaris)
       .values({
+        id,
         name: data.name,
         quantity: data.quantity,
         date: data.date,
@@ -67,29 +70,35 @@ export class InventarisService {
         condition: data.condition ?? "Baik",
         notes: data.notes ?? null,
         createdBy: userId,
-      })
-      ;
-    return result[0];
+      });
+
+    return this.findById(id);
   }
 
   async update(id: string, data: Partial<CreateInventarisInput>) {
-    const result = await db
+    const existing = await this.findById(id);
+    if (!existing) return null;
+
+    await db
       .update(inventaris)
       .set({
         ...data,
         updatedAt: new Date(),
       })
-      .where(eq(inventaris.id, id))
-      ;
-    return result[0] ?? null;
+      .where(eq(inventaris.id, id));
+
+    return this.findById(id);
   }
 
   async delete(id: string) {
-    const result = await db
+    const existing = await this.findById(id);
+    if (!existing) return null;
+
+    await db
       .delete(inventaris)
-      .where(eq(inventaris.id, id))
-      ;
-    return result[0] ?? null;
+      .where(eq(inventaris.id, id));
+
+    return existing;
   }
 
   /**

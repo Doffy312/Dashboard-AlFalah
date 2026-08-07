@@ -5,6 +5,7 @@ export function useTransactions(filters) {
   return useQuery({
     queryKey: ["transactions", filters],
     queryFn: () => transactionApi.getAll(filters),
+    select: (result) => result?.data ?? result,
   });
 }
 

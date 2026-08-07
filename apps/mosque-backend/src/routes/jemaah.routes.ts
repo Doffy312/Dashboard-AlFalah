@@ -2,6 +2,9 @@ import { Router } from "express";
 import { requireAuth } from "../middlewares/auth.middleware.js";
 import { requireRole } from "../middlewares/rbac.middleware.js";
 import { jemaahController } from "../controllers/jemaah.controller.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import { sanitizeBody } from "../middlewares/sanitize.middleware.js";
+import { createJemaahSchema } from "../validations/jemaah.validation.js";
 
 const router = Router();
 
@@ -16,11 +19,15 @@ router.get("/:id", jemaahController.findById);
 router.post(
   "/",
   requireRole("Ketua", "Sekretaris"),
+  sanitizeBody,
+  validate(createJemaahSchema),
   jemaahController.create
 );
 router.put(
   "/:id",
   requireRole("Ketua", "Sekretaris"),
+  sanitizeBody,
+  validate(createJemaahSchema),
   jemaahController.update
 );
 router.delete(

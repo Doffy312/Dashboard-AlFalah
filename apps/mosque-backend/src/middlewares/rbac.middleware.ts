@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 
-type Role = "Ketua" | "Sekretaris" | "Bendahara";
+type Role = "Ketua" | "Sekretaris" | "Bendahara" | "Pengurus";
 
 /**
  * Creates a middleware that restricts access to specific roles.

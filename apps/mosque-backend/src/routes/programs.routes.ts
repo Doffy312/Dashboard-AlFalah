@@ -3,6 +3,9 @@ import { requireAuth } from "../middlewares/auth.middleware.js";
 import { requireRole } from "../middlewares/rbac.middleware.js";
 import { programController } from "../controllers/programs.controller.js";
 import { uploadMiddleware } from "../middlewares/upload.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import { sanitizeBody } from "../middlewares/sanitize.middleware.js";
+import { createProgramSchema } from "../validations/programs.validation.js";
 
 const router = Router();
 
@@ -19,25 +22,29 @@ router.get("/:id", programController.findById);
 // Write access: Ketua, Sekretaris, Bendahara (all roles per ProgramKerjaPage canEdit)
 router.post(
   "/",
-  requireRole("Ketua", "Sekretaris", "Bendahara"),
+  requireRole("Ketua", "Sekretaris"),
+  sanitizeBody,
+  validate(createProgramSchema),
   programController.create
 );
 router.put(
   "/:id",
-  requireRole("Ketua", "Sekretaris", "Bendahara"),
+  requireRole("Ketua", "Sekretaris"),
+  sanitizeBody,
+  validate(createProgramSchema),
   programController.update
 );
 
 // Status-only update (Kanban drag) — all roles
 router.patch(
   "/:id/status",
-  requireRole("Ketua", "Sekretaris", "Bendahara"),
+  requireRole("Ketua", "Sekretaris"),
   programController.updateStatus
 );
 
 router.patch(
   "/:id/complete",
-  requireRole("Ketua", "Sekretaris", "Bendahara"),
+  requireRole("Ketua", "Sekretaris"),
   uploadMiddleware.fields([
     { name: 'report', maxCount: 1 },
     { name: 'photos', maxCount: 3 }
@@ -47,7 +54,7 @@ router.patch(
 
 router.delete(
   "/:id",
-  requireRole("Ketua", "Sekretaris", "Bendahara"),
+  requireRole("Ketua", "Sekretaris"),
   programController.delete
 );
 

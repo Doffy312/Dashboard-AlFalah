@@ -1,4 +1,5 @@
-import { eq, ilike, and, sql, desc } from "drizzle-orm";
+import crypto from "crypto";
+import { eq, like, and, sql, desc } from "drizzle-orm";
 import { db } from "../config/db.js";
 import { transaction } from "../db/schema/index.js";
 
@@ -25,11 +26,11 @@ export interface TransactionFilters {
 
 export class TransactionService {
   async findAll(filters: TransactionFilters = {}) {
-    const { search, category, month, page = 1, limit = 20 } = filters;
+    const { search, category, month, page = 1, limit = 1000 } = filters;
     const conditions = [];
 
     if (search) {
-      conditions.push(ilike(transaction.description, `%${search}%`));
+      conditions.push(like(transaction.description, `%${search}%`));
     }
     if (category) {
       conditions.push(eq(transaction.category, category));
@@ -58,7 +59,8 @@ export class TransactionService {
         .where(where),
     ]);
 
-    return data;
+    const total = countResult[0]?.count ?? 0;
+    return { data, total, page, limit };
   }
 
   async findById(id: string) {
@@ -70,20 +72,26 @@ export class TransactionService {
     return result[0] ?? null;
   }
 
-  async create(data: CreateTransactionInput, userId: string) {
-    const result = await db
+  async create(data: CreateTransactionInput, userId?: string | null, isSystemSync = false) {
+    if (!isSystemSync && data.category === "Program Kerja") {
+      throw new Error("Kategori 'Program Kerja' hanya ditambahkan secara otomatis ketika Program Kerja berstatus Selesai.");
+    }
+
+    const id = crypto.randomUUID();
+    await db
       .insert(transaction)
       .values({
+        id,
         date: data.date,
         type: data.type,
         category: data.category,
         amount: data.amount,
         description: data.description,
         programId: data.programId || null,
-        createdBy: userId,
+        createdBy: userId || null,
       });
 
-    const newTransaction = result[0];
+    const newTransaction = await this.findById(id);
 
     import("./notifications.service.js").then((ns) => {
       ns.notificationService.create({
@@ -96,25 +104,43 @@ export class TransactionService {
     return newTransaction;
   }
 
-  async update(id: string, data: Partial<CreateTransactionInput>) {
-    const result = await db
+  async update(id: string, data: Partial<CreateTransactionInput>, isSystemSync = false) {
+    const existing = await this.findById(id);
+    if (!existing) return null;
+
+    if (!isSystemSync) {
+      if (existing.category === "Program Kerja" || data.category === "Program Kerja") {
+        throw new Error("Transaksi dengan kategori 'Program Kerja' dikelola secara otomatis dari Program Kerja.");
+      }
+    }
+
+    await db
       .update(transaction)
       .set({
         ...data,
         programId: data.programId || null,
         updatedAt: new Date(),
       })
-      .where(eq(transaction.id, id))
-      ;
-    return result[0] ?? null;
+      .where(eq(transaction.id, id));
+
+    return this.findById(id);
   }
 
-  async delete(id: string) {
-    const result = await db
+  async delete(id: string, isSystemSync = false) {
+    const existing = await this.findById(id);
+    if (!existing) return null;
+
+    if (!isSystemSync) {
+      if (existing.category === "Program Kerja") {
+        throw new Error("Transaksi dengan kategori 'Program Kerja' dikelola secara otomatis dari Program Kerja.");
+      }
+    }
+
+    await db
       .delete(transaction)
-      .where(eq(transaction.id, id))
-      ;
-    return result[0] ?? null;
+      .where(eq(transaction.id, id));
+
+    return existing;
   }
 
   /**

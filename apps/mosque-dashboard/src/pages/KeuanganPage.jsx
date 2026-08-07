@@ -1,4 +1,4 @@
-import React, { useState, useMemo, Suspense } from 'react';
+import { useState, useMemo, Suspense, lazy } from 'react';
 import { useTransactions, useTransactionSummary, useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '../hooks/useTransactions';
 import { authClient } from '../lib/auth-client';
 import TransactionForm from '../components/keuangan/TransactionForm';
@@ -7,19 +7,15 @@ import { formatCurrency } from '../lib/utils';
 
 // Lazy-load the charts component — recharts (~400KB) only downloads
 // when this page renders, not on initial app load.
-const KeuanganCharts = React.lazy(() => import('../components/keuangan/KeuanganCharts'));
+const KeuanganCharts = lazy(() => import('../components/keuangan/KeuanganCharts'));
 
 const KeuanganPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [filterDate, setFilterDate] = useState('');
 
-  // Fetch data with TanStack Query
-  const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactions({
-    search: searchTerm,
-    category: filterCategory,
-    date: filterDate,
-  });
+  // Fetch full transactions list so KeuanganCharts always receives complete real-time data
+  const { data: transactions = [] } = useTransactions();
   
   const { data: summaries = { saldoSaatIni: 0, pemasukanBulanIni: 0, pengeluaranBulanIni: 0, totalPemasukan: 0, totalPengeluaran: 0 } } = useTransactionSummary();
   
@@ -37,15 +33,29 @@ const KeuanganPage = () => {
 
   const canEdit = ['Ketua', 'Bendahara'].includes(session?.user?.role);
 
-  // We can still keep the frontend filtering if the backend doesn't support all filters yet,
-  // but ideally the query hook already passes the filters. We'll keep the local filter for now to be safe.
+  // Compute list of categories dynamically from transactions + standard defaults
+  const availableCategories = useMemo(() => {
+    const defaults = ['Infaq', 'Operasional', 'Wakaf', 'Pembangunan', 'Program Kerja', 'Zakat', 'Sosial', 'Kegiatan'];
+    const customCats = (transactions || []).map(t => {
+      if (!t.category) return '';
+      const trimmed = t.category.trim();
+      return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+    }).filter(Boolean);
+    const uniqueSet = new Set([...defaults, ...customCats]);
+    return Array.from(uniqueSet).sort((a, b) => a.localeCompare(b, 'id'));
+  }, [transactions]);
+
+  // Client-side filtering for the data table
   const filteredTransactions = useMemo(() => {
-    return transactions.filter(t => {
-      const matchSearch = t.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          t.id.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchCategory = filterCategory === '' || t.category.toLowerCase() === filterCategory.toLowerCase();
-      // Simple date filter for demo purposes (assuming format allows)
+    return (transactions || []).filter(t => {
+      const desc = (t.description || '').toLowerCase();
+      const id = (t.id || '').toLowerCase();
+      const search = searchTerm.toLowerCase();
+
+      const matchSearch = searchTerm === '' || desc.includes(search) || id.includes(search);
+      const matchCategory = filterCategory === '' || (t.category || '').toLowerCase() === filterCategory.toLowerCase();
       const matchDate = filterDate === '' || new Date(t.date).toISOString().includes(filterDate);
+      
       return matchSearch && matchCategory && matchDate;
     });
   }, [transactions, searchTerm, filterCategory, filterDate]);
@@ -77,13 +87,22 @@ const KeuanganPage = () => {
     setIsFormOpen(false);
   };
 
+  const resetFilters = () => {
+    setSearchTerm('');
+    setFilterCategory('');
+    setFilterDate('');
+  };
+
   // Helper for status colors based on category or type
   const getCategoryColor = (category) => {
     switch (category?.toLowerCase()) {
       case 'infaq': return 'bg-primary/10 text-primary';
-      case 'operasional': return 'bg-slate-500/10 text-slate-700';
+      case 'operasional': return 'bg-slate-500/10 text-slate-700 dark:text-slate-300';
       case 'wakaf': return 'bg-tertiary/10 text-tertiary';
-      case 'pembangunan': return 'bg-amber-500/10 text-amber-700';
+      case 'pembangunan': return 'bg-amber-500/10 text-amber-700 dark:text-amber-300';
+      case 'program kerja': return 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300';
+      case 'zakat': return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300';
+      case 'sosial': return 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300';
       default: return 'bg-surface-variant text-on-surface-variant';
     }
   };
@@ -112,7 +131,7 @@ const KeuanganPage = () => {
           </div>
           <div className="font-headline-lg text-headline-lg text-on-surface relative z-10">{formatCurrency(summaries.pemasukanBulanIni)}</div>
           <div className="font-body-sm text-body-sm text-emerald-600 mt-xs flex items-center gap-1 relative z-10">
-            <span className="material-symbols-outlined text-[16px]">trending_up</span> +12% dari bulan lalu
+            <span className="material-symbols-outlined text-[16px]">trending_up</span> Real-time ter-update
           </div>
         </div>
 
@@ -124,7 +143,7 @@ const KeuanganPage = () => {
             <span className="material-symbols-outlined text-red-600 bg-red-100 p-xs rounded-full">arrow_upward</span>
           </div>
           <div className="font-headline-lg text-headline-lg text-on-surface relative z-10">{formatCurrency(summaries.pengeluaranBulanIni)}</div>
-          <div className="font-body-sm text-body-sm text-on-surface-variant mt-xs relative z-10">Sebagian besar: Operasional</div>
+          <div className="font-body-sm text-body-sm text-on-surface-variant mt-xs relative z-10">Bulan {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</div>
         </div>
 
         {/* Total Pemasukan Card */}
@@ -160,8 +179,8 @@ const KeuanganPage = () => {
 
       {/* Action Bar & Filter */}
       <div className="glass-panel rounded-xl p-sm mb-lg flex flex-col md:flex-row items-center justify-between gap-sm">
-        <div className="flex flex-1 w-full gap-sm">
-          <div className="relative flex-1 max-w-md">
+        <div className="flex flex-1 w-full gap-sm flex-wrap md:flex-nowrap">
+          <div className="relative flex-1 min-w-[200px] max-w-md">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
             <input 
               className="glass-input w-full pl-10 pr-4 py-2 rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant" 
@@ -171,30 +190,45 @@ const KeuanganPage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+
+          {/* Dynamic Categories Dropdown */}
           <select 
-            className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-10" 
+            className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-10 min-w-[150px]" 
             style={{ backgroundImage: `url("data:image/svg+xml;utf8,<svg fill='none' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5 7.5L10 12.5L15 7.5' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5'/></svg>")`, backgroundPosition: 'right 8px center', backgroundRepeat: 'no-repeat' }}
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
           >
             <option value="">Semua Kategori</option>
-            <option value="infaq">Infaq</option>
-            <option value="operasional">Operasional</option>
-            <option value="wakaf">Wakaf</option>
-            <option value="pembangunan">Pembangunan</option>
+            {availableCategories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
           </select>
+
           <select 
-            className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-10" 
+            className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-10 min-w-[130px]" 
             style={{ backgroundImage: `url("data:image/svg+xml;utf8,<svg fill='none' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5 7.5L10 12.5L15 7.5' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5'/></svg>")`, backgroundPosition: 'right 8px center', backgroundRepeat: 'no-repeat' }}
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
           >
             <option value="">Semua Waktu</option>
+            <option value="2026-07">Jul 2026</option>
+            <option value="2026-06">Jun 2026</option>
+            <option value="2026-05">Mei 2026</option>
             <option value="2024-10">Okt 2024</option>
             <option value="2024-09">Sep 2024</option>
-            <option value="2024-08">Agt 2024</option>
           </select>
+
+          {(searchTerm || filterCategory || filterDate) && (
+            <button
+              onClick={resetFilters}
+              className="px-3 py-2 text-xs text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 shrink-0"
+              title="Reset Filter"
+            >
+              <span className="material-symbols-outlined text-[16px]">restart_alt</span> Reset
+            </button>
+          )}
         </div>
+
         {canEdit && (
           <button 
             onClick={() => {
@@ -272,18 +306,32 @@ const KeuanganPage = () => {
         {/* Pagination simple */}
         <div className="px-md py-sm border-t border-outline flex items-center justify-between bg-surface-variant">
           <span className="font-body-sm text-body-sm text-on-surface-variant">
-            Menampilkan {filteredTransactions.length > 0 ? 1 : 0}-{Math.min(5, filteredTransactions.length)} dari {filteredTransactions.length} transaksi
+            Menampilkan {filteredTransactions.length > 0 ? 1 : 0}-{filteredTransactions.length} dari {filteredTransactions.length} transaksi
           </span>
           <div className="flex gap-2">
             <button className="p-1 rounded text-on-surface-variant hover:bg-surface-variant disabled:opacity-50" disabled>
               <span className="material-symbols-outlined text-sm">chevron_left</span>
             </button>
-            <button className="p-1 rounded text-on-surface-variant hover:bg-surface-variant disabled:opacity-50" disabled={filteredTransactions.length <= 5}>
+            <button className="p-1 rounded text-on-surface-variant hover:bg-surface-variant disabled:opacity-50" disabled>
               <span className="material-symbols-outlined text-sm">chevron_right</span>
             </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile FAB for adding transaction */}
+      {canEdit && (
+        <button
+          onClick={() => {
+            setEditingTransaction(null);
+            setIsFormOpen(true);
+          }}
+          className="mobile-fab md:hidden"
+          aria-label="Tambah Transaksi"
+        >
+          <span className="material-symbols-outlined">add</span>
+        </button>
+      )}
 
       <TransactionForm 
         isOpen={isFormOpen} 

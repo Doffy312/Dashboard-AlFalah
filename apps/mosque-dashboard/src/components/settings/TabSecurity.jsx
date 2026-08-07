@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
 
 const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
-  const { security } = useSettings();
+  const { security, profile, finance, customData, resetAllSettings } = useSettings();
 
   const [passwords, setPasswords] = useState({
     current: '',
@@ -19,9 +19,21 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
   // Expose current data to parent via ref
   useEffect(() => {
     if (tabDataRef) {
-      tabDataRef.current = () => ({ theme });
+      tabDataRef.current = () => {
+        if (passwords.newPass || passwords.confirmPass || passwords.current) {
+          if (passwords.newPass.length < 8) {
+            alert('Kata sandi baru minimal 8 karakter.');
+            return null;
+          }
+          if (passwords.newPass !== passwords.confirmPass) {
+            alert('Konfirmasi kata sandi baru tidak cocok.');
+            return null;
+          }
+        }
+        return { theme };
+      };
     }
-  }, [theme, tabDataRef]);
+  }, [theme, passwords, tabDataRef]);
 
   const handlePasswordChange = (e) => {
     setPasswords({ ...passwords, [e.target.name]: e.target.value });
@@ -40,12 +52,34 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
   };
 
   const handleExportData = () => {
-    alert("Proses export data ke Excel/CSV sedang berjalan...");
+    try {
+      const exportPayload = {
+        exportedAt: new Date().toISOString(),
+        profile,
+        finance,
+        customData,
+        security: { theme }
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `mosque_settings_backup_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    } catch (err) {
+      console.error('Export failed:', err);
+      alert('Gagal mengeksport data pengaturan.');
+    }
   };
 
   const handleResetView = () => {
-    if (window.confirm('Yakin ingin mengembalikan pengaturan tampilan ke default?')) {
-      alert("Pengaturan tampilan berhasil di-reset.");
+    if (window.confirm('Yakin ingin mengembalikan seluruh pengaturan ke default?')) {
+      resetAllSettings();
+      setTheme('dark');
+      setHasUnsavedChanges(false);
+      alert("Seluruh pengaturan tampilan dan preferensi berhasil di-reset ke default.");
     }
   };
 
@@ -150,7 +184,7 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
               >
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-primary">download</span>
-                  <span className="font-body-md text-sm">Export Data Sistem (Excel)</span>
+                  <span className="font-body-md text-sm">Export Data Konfigurasi Sistem (JSON)</span>
                 </div>
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">chevron_right</span>
               </button>
@@ -161,7 +195,7 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
               >
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined">restart_alt</span>
-                  <span className="font-body-md text-sm font-bold">Reset Pengaturan Tampilan</span>
+                  <span className="font-body-md text-sm font-bold">Reset Pengaturan ke Default</span>
                 </div>
               </button>
             </div>
@@ -174,3 +208,4 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
 };
 
 export default TabSecurity;
+

@@ -4,6 +4,7 @@ import {
   text,
   varchar,
   timestamp,
+  index,
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 import { user } from "./auth.js";
@@ -16,7 +17,7 @@ export const jemaah = mysqlTable("jemaah", {
   address: text("address").notNull(),
   phone: varchar("phone", { length: 20 }).notNull(),
   email: varchar("email", { length: 255 }),
-  category: text("category").notNull().default("Umum"), // 'Muzakki' | 'Mustahik' | 'Yatim' | 'Lansia' | 'Umum'
+  category: varchar("category", { length: 50 }).notNull().default("Umum"), // 'Muzakki' | 'Mustahik' | 'Yatim' | 'Lansia' | 'Umum'
   skills: varchar("skills", { length: 255 }),
   notes: text("notes"),
   createdBy: varchar("created_by", { length: 255 }).references(() => user.id, {
@@ -24,7 +25,10 @@ export const jemaah = mysqlTable("jemaah", {
   }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (table) => ({
+  nameIdx: index("name_idx").on(table.name),
+  categoryIdx: index("category_idx").on(table.category),
+}));
 
 export const jemaahRelations = relations(jemaah, ({ one }) => ({
   creator: one(user, {
