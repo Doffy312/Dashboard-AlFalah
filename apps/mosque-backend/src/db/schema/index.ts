@@ -60,3 +60,8 @@ export {
 export {
   contactMessages,
 } from "./contactMessages.js";
+
+export {
+  auditLog,
+} from "./auditLogs.js";
+

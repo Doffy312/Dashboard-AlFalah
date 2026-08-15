@@ -1,7 +1,10 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import { env, getCorsOrigins, isLocalNetworkOrigin } from "./config/env.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
+import { globalRateLimiter } from "./middlewares/rateLimiter.middleware.js";
+import { sanitizeBody, sanitizeQuery } from "./middlewares/sanitize.middleware.js";
 import apiRoutes from "./routes/index.js";
 import { createServer } from "http";
 import { initializeSocket } from "./lib/socket.js";
@@ -15,6 +18,14 @@ const httpServer = createServer(app);
 
 // ─── Socket.IO Setup ───────────────────────────────────────────────────
 initializeSocket(httpServer);
+
+// ─── HTTP Security Headers (Helmet) ───────────────────────────────────
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // Agar static files/uploads bisa dimuat frontend dari port berbeda
+    contentSecurityPolicy: false, // Non-aktifkan CSP bawaan agar tidak memblokir Socket.IO/assets lokal
+  })
+);
 
 // ─── Global Middleware ───────────────────────────────────────────────
 app.use(
@@ -33,6 +44,10 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+// ─── Input Sanitization (Anti Stored XSS) ────────────────────────────
+app.use(sanitizeBody);
+app.use(sanitizeQuery);
+
 // ─── Static Files ────────────────────────────────────────────────────
 const uploadsDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadsDir)) {
@@ -47,7 +62,7 @@ app.get("/", (_req, res) => {
       <head><title>Al-Falah Backend</title></head>
       <body style="font-family: sans-serif; padding: 2rem; background: #0f172a; color: white;">
         <h2>🌙 Al-Falah Backend API</h2>
-        <p>Server is running successfully!</p>
+        <p>Server is running successfully with Instant Security Hardening (Helmet & Rate Limiter)!</p>
         <p>Check API health: <a href="/api/health" style="color: #38bdf8;">/api/health</a></p>
       </body>
     </html>
@@ -59,11 +74,16 @@ app.get("/api/health", (_req, res) => {
     status: "ok",
     timestamp: new Date().toISOString(),
     environment: env.NODE_ENV,
+    security: {
+      rateLimiter: "active",
+      helmetHeaders: "active",
+      sanitizer: "active",
+    },
   });
 });
 
-// ─── API Routes ──────────────────────────────────────────────────────
-app.use("/api", apiRoutes);
+// ─── API Routes (Protected by Global Rate Limiter) ───────────────────
+app.use("/api", globalRateLimiter, apiRoutes);
 
 // ─── Global Error Handler ────────────────────────────────────────────
 app.use(errorHandler);

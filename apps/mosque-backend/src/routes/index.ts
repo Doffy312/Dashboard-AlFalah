@@ -13,6 +13,7 @@ import jadwalRoutes from "./jadwal.routes.js";
 import settingsRoutes from "./settings.routes.js";
 import articlesRoutes from "./articles.routes.js";
 import contactMessagesRoutes from "./contactMessages.routes.js";
+import auditLogRoutes from "./auditLog.routes.js";
 
 const router = Router();
 
@@ -31,6 +32,8 @@ router.use("/jadwal", jadwalRoutes);
 router.use("/settings", settingsRoutes);
 router.use("/articles", articlesRoutes);
 router.use("/contact-messages", contactMessagesRoutes);
+router.use("/audit-logs", auditLogRoutes);
 
 export default router;
+
 

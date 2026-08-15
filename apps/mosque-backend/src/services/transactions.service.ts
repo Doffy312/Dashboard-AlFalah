@@ -101,6 +101,16 @@ export class TransactionService {
       });
     });
 
+    import("./auditLog.service.js").then((als) => {
+      als.auditLogService.logActivity({
+        userId: userId || null,
+        action: "CREATE_TRANSACTION",
+        entity: "transaction",
+        entityId: id,
+        details: { type: data.type, category: data.category, amount: data.amount, description: data.description },
+      });
+    });
+
     return newTransaction;
   }
 
@@ -123,6 +133,15 @@ export class TransactionService {
       })
       .where(eq(transaction.id, id));
 
+    import("./auditLog.service.js").then((als) => {
+      als.auditLogService.logActivity({
+        action: "UPDATE_TRANSACTION",
+        entity: "transaction",
+        entityId: id,
+        details: { before: existing, updated: data },
+      });
+    });
+
     return this.findById(id);
   }
 
@@ -139,6 +158,15 @@ export class TransactionService {
     await db
       .delete(transaction)
       .where(eq(transaction.id, id));
+
+    import("./auditLog.service.js").then((als) => {
+      als.auditLogService.logActivity({
+        action: "DELETE_TRANSACTION",
+        entity: "transaction",
+        entityId: id,
+        details: { deletedRecord: existing },
+      });
+    });
 
     return existing;
   }
