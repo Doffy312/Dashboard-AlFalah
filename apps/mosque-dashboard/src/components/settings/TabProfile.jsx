@@ -74,7 +74,7 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-300">
       <div className="border-b border-outline-variant pb-4 mb-2">
-        <h3 className="text-title-md font-bold text-white m-0">Profil Organisasi</h3>
+        <h3 className="text-title-md font-bold text-on-surface m-0">Profil Organisasi</h3>
         <p className="text-body-sm text-on-surface-variant m-0 mt-1">
           Informasi ini akan ditampilkan pada Landing Page dan header laporan.
         </p>
@@ -83,7 +83,7 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Logo Upload Section */}
         <div className="col-span-1 flex flex-col gap-4">
-          <label className="font-label-md text-white">Logo Organisasi</label>
+          <label className="font-label-md text-on-surface">Logo Organisasi</label>
           <input 
             type="file" 
             ref={fileInputRef} 
@@ -103,7 +103,7 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
               )}
             </div>
             <div>
-              <p className="text-body-sm font-bold text-white m-0">
+              <p className="text-body-sm font-bold text-on-surface m-0">
                 {formData.logo ? 'Klik untuk mengganti logo' : 'Klik untuk unggah logo'}
               </p>
               <p className="text-[11px] text-on-surface-variant m-0 mt-1">SVG, PNG, JPG (Maks. 2MB)</p>
@@ -124,52 +124,52 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
         {/* Form Fields Section */}
         <div className="col-span-1 lg:col-span-2 flex flex-col gap-5">
           <div className="flex flex-col gap-1.5">
-            <label className="font-label-md text-white">Nama Organisasi <span className="text-error">*</span></label>
+            <label className="font-label-md text-on-surface">Nama Organisasi <span className="text-error">*</span></label>
             <input 
               type="text" 
               name="orgName"
               value={formData.orgName}
               onChange={handleChange}
-              className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md"
+              className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md"
               placeholder="Masukkan nama organisasi"
               required
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="font-label-md text-white">Deskripsi Singkat</label>
+            <label className="font-label-md text-on-surface">Deskripsi Singkat</label>
             <textarea 
               name="description"
               value={formData.description}
               onChange={handleChange}
               rows={3}
-              className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md resize-none"
+              className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md resize-none"
               placeholder="Tuliskan deskripsi singkat..."
             />
           </div>
 
           {/* Visi & Misi Section */}
           <div className="pt-4 border-t border-outline-variant flex flex-col gap-5">
-            <h4 className="font-label-lg font-bold text-white m-0 flex items-center gap-2">
+            <h4 className="font-label-lg font-bold text-on-surface m-0 flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px] text-amber-400">auto_awesome</span>
               Visi &amp; Misi Masjid (Ditampilkan di Landing Page)
             </h4>
 
             <div className="flex flex-col gap-1.5">
-              <label className="font-label-md text-white">Visi Masjid</label>
+              <label className="font-label-md text-on-surface">Visi Masjid</label>
               <textarea 
                 name="vision"
                 value={formData.vision || ''}
                 onChange={handleChange}
                 rows={3}
-                className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md resize-none"
+                className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md resize-none"
                 placeholder="Masukkan visi utama masjid..."
               />
             </div>
 
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
-                <label className="font-label-md text-white">Misi Pelayanan</label>
+                <label className="font-label-md text-on-surface">Misi Pelayanan</label>
                 <button
                   type="button"
                   onClick={handleAddMission}
@@ -190,7 +190,7 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
                     value={item}
                     onChange={(e) => handleMissionChange(idx, e.target.value)}
                     placeholder={`Masukkan poin misi ke-${idx + 1}...`}
-                    className="glass-input flex-1 px-4 py-2 rounded-lg text-white font-body-md text-sm"
+                    className="glass-input flex-1 px-4 py-2 rounded-lg text-on-surface font-body-md text-sm"
                   />
                   <button
                     type="button"
@@ -210,43 +210,43 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="flex flex-col gap-1.5">
-              <label className="font-label-md text-white">Nomor Telepon</label>
+              <label className="font-label-md text-on-surface">Nomor Telepon</label>
               <input 
                 type="tel" 
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md"
+                className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md"
                 placeholder="08..."
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="font-label-md text-white">Email</label>
+              <label className="font-label-md text-on-surface">Email</label>
               <input 
                 type="email" 
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md"
+                className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md"
                 placeholder="email@contoh.com"
               />
             </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="font-label-md text-white">Alamat Lengkap</label>
+            <label className="font-label-md text-on-surface">Alamat Lengkap</label>
             <textarea 
               name="address"
               value={formData.address}
               onChange={handleChange}
               rows={2}
-              className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md resize-none"
+              className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md resize-none"
               placeholder="Alamat lengkap masjid..."
             />
           </div>
 
           <div className="pt-4 border-t border-outline-variant">
-            <h4 className="font-label-lg font-bold text-white mb-1 flex items-center gap-2">
+            <h4 className="font-label-lg font-bold text-on-surface mb-1 flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px] text-primary">location_on</span>
               Koordinat GPS Masjid (Peta Landing Page)
             </h4>
@@ -255,26 +255,26 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="font-label-md text-white">Latitude (Lintang)</label>
+                <label className="font-label-md text-on-surface">Latitude (Lintang)</label>
                 <input 
                   type="number"
                   step="any"
                   name="lat"
                   value={formData.lat ?? ''}
                   onChange={handleChange}
-                  className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md"
+                  className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md"
                   placeholder="-6.91746"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="font-label-md text-white">Longitude (Bujur)</label>
+                <label className="font-label-md text-on-surface">Longitude (Bujur)</label>
                 <input 
                   type="number"
                   step="any"
                   name="lng"
                   value={formData.lng ?? ''}
                   onChange={handleChange}
-                  className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md"
+                  className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md"
                   placeholder="107.61912"
                 />
               </div>
@@ -282,7 +282,7 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
           </div>
 
           <div className="pt-4 border-t border-outline-variant">
-            <h4 className="font-label-lg font-bold text-white mb-4">Media Sosial</h4>
+            <h4 className="font-label-lg font-bold text-on-surface mb-4">Media Sosial</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-md text-on-surface-variant flex items-center gap-2">
@@ -293,7 +293,7 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
                   name="ig"
                   value={formData.ig}
                   onChange={handleChange}
-                  className="glass-input w-full px-4 py-2 rounded-lg text-white text-sm"
+                  className="glass-input w-full px-4 py-2 rounded-lg text-on-surface text-sm"
                   placeholder="@username"
                 />
               </div>
@@ -306,7 +306,7 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
                   name="fb"
                   value={formData.fb}
                   onChange={handleChange}
-                  className="glass-input w-full px-4 py-2 rounded-lg text-white text-sm"
+                  className="glass-input w-full px-4 py-2 rounded-lg text-on-surface text-sm"
                   placeholder="Nama Halaman"
                 />
               </div>
@@ -319,7 +319,7 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
                   name="yt"
                   value={formData.yt}
                   onChange={handleChange}
-                  className="glass-input w-full px-4 py-2 rounded-lg text-white text-sm"
+                  className="glass-input w-full px-4 py-2 rounded-lg text-on-surface text-sm"
                   placeholder="Nama Channel"
                 />
               </div>

@@ -103,7 +103,7 @@ export class JemaahService {
         phone: data.phone && data.phone.trim() !== "" ? data.phone : "-",
         email: data.email ?? null,
         category: data.category ?? "Umum",
-        notes: "Pendaftaran Mandiri Landing Page (Scan QR)",
+        notes: "Pendaftaran Mandiri Landing Page",
         lat: data.lat ?? null,
         lng: data.lng ?? null,
         createdBy: null,

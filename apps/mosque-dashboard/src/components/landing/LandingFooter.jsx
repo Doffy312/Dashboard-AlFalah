@@ -1,6 +1,17 @@
+import { Link, useLocation } from 'react-router-dom';
+import { Moon, MapPin, Phone } from 'lucide-react';
 import { useSettings } from '../../contexts/SettingsContext';
 
+const FOOTER_NAV = [
+  { label: 'Beranda', path: '/' },
+  { label: 'Profil', path: '/profil' },
+  { label: 'Transparansi Keuangan', path: '/transparansi-keuangan' },
+  { label: 'Berita & Kegiatan', path: '/berita-kegiatan' },
+  { label: 'Kontak', path: '/#kontak' },
+];
+
 const LandingFooter = ({ orgName: customOrgName, logo: customLogo }) => {
+  const location = useLocation();
   const { profile } = useSettings();
   const year = new Date().getFullYear();
 
@@ -8,38 +19,53 @@ const LandingFooter = ({ orgName: customOrgName, logo: customLogo }) => {
   const logo = customLogo || profile?.logo;
 
   return (
-    <footer className="border-t border-white/5 py-16 sm:py-24 bg-[#0b0f10]/30 lp-reveal">
-      <div className="max-w-[1200px] mx-auto px-6 sm:px-8 flex flex-col items-center gap-8 sm:gap-12">
+    <footer className="border-t border-white/10 py-12 px-6 lg:px-12 bg-slate-950/60">
+      <div className="max-w-7xl mx-auto flex flex-col items-center gap-8">
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#adc6ff]/10 rounded-lg flex items-center justify-center lp-border overflow-hidden shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center overflow-hidden shrink-0">
             {logo ? (
-              <img src={logo} alt={orgName} className="w-full h-full object-cover" />
+              <img src={logo} alt={orgName} width="36" height="36" loading="lazy" decoding="async" className="w-full h-full object-cover" />
             ) : (
-              <span className="material-symbols-outlined text-[#adc6ff]">mosque</span>
+              <Moon size={22} className="text-amber-400" />
             )}
           </div>
-          <span className="text-xl sm:text-2xl font-bold tracking-tight text-[#e0e3e5]">
-            {orgName}
+          <span className="font-bold text-lg text-white">{orgName}</span>
+        </div>
+
+        {/* Navigation Links */}
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-xs uppercase tracking-widest text-slate-400">
+          {FOOTER_NAV.map((item) => (
+            <Link 
+              key={item.path} 
+              to={item.path}
+              onClick={() => {
+                if (location.pathname === item.path && !item.path.includes('#')) {
+                  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                }
+              }}
+              className="hover:text-amber-400 transition-colors"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+
+        {/* Contact Info */}
+        <div className="flex flex-wrap justify-center gap-6 text-xs text-slate-400">
+          <span className="flex items-center gap-1.5">
+            <MapPin size={14} className="text-amber-400" /> 
+            {profile?.address || 'Jl. Raya Pendidikan No. 123, Bandung'}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Phone size={14} className="text-amber-400" /> 
+            {profile?.phone || '081234567890'}
           </span>
         </div>
 
-        {/* Links */}
-        <div className="flex flex-wrap justify-center gap-x-8 sm:gap-x-12 gap-y-4 sm:gap-y-6 text-sm uppercase tracking-[0.15em] text-[#c2c6d6]">
-          <button onClick={(e) => e.preventDefault()} className="hover:text-[#adc6ff] transition-colors cursor-pointer">
-            Kebijakan Privasi
-          </button>
-          <button onClick={(e) => e.preventDefault()} className="hover:text-[#adc6ff] transition-colors cursor-pointer">
-            Syarat &amp; Ketentuan
-          </button>
-          <button onClick={(e) => e.preventDefault()} className="hover:text-[#adc6ff] transition-colors cursor-pointer">
-            Pusat Bantuan
-          </button>
-        </div>
-
         {/* Copyright */}
-        <p className="text-[#c2c6d6]/40 text-[13px] text-center">
-          © {year} {orgName}. All rights reserved.
+        <p className="text-xs text-slate-500">
+          © {year} Dashboard Takmir {orgName}. All rights reserved.
         </p>
       </div>
     </footer>

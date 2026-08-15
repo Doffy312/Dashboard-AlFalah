@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, 
   PieChart, Pie, Cell 
@@ -39,12 +39,12 @@ const getCategoryColor = (name, index) => {
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-surface border border-outline p-sm rounded-lg shadow-lg">
-        <p className="font-label-md text-on-surface mb-2">{label}</p>
+      <div className="bg-surface/95 backdrop-blur-md border border-outline p-2.5 sm:p-sm rounded-lg shadow-xl text-xs z-30">
+        <p className="font-label-md text-on-surface mb-1.5 border-b border-outline/30 pb-1 font-semibold">{label}</p>
         {payload.map((entry, index) => (
-          <p key={index} className="font-body-sm flex justify-between gap-md" style={{ color: entry.color }}>
+          <p key={index} className="font-body-sm flex items-center justify-between gap-3 my-0.5" style={{ color: entry.color }}>
             <span>{entry.name}:</span>
-            <span className="font-semibold">{formatCurrency(entry.value)}</span>
+            <span className="font-semibold font-mono">{formatCurrency(entry.value)}</span>
           </p>
         ))}
       </div>
@@ -58,18 +58,18 @@ const CustomPieTooltip = ({ active, payload, totalSum }) => {
     const data = payload[0];
     const percentage = totalSum > 0 ? ((data.value / totalSum) * 100).toFixed(1) : '0';
     return (
-      <div className="bg-surface border border-outline p-sm rounded-lg shadow-lg">
+      <div className="bg-surface/95 backdrop-blur-md border border-outline p-2.5 sm:p-sm rounded-lg shadow-xl text-xs z-30">
         <div className="flex items-center gap-2 mb-1">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: data.payload.fill || data.color }}></span>
-          <span className="font-label-md text-on-surface font-semibold">{data.name}</span>
+          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: data.payload.fill || data.color }}></span>
+          <span className="font-label-md text-on-surface font-semibold truncate">{data.name}</span>
         </div>
-        <div className="font-body-sm text-on-surface flex justify-between gap-md">
+        <div className="font-body-sm text-on-surface flex justify-between gap-md my-0.5">
           <span className="text-on-surface-variant">Nominal:</span>
-          <span className="font-semibold">{formatCurrency(data.value)}</span>
+          <span className="font-semibold font-mono">{formatCurrency(data.value)}</span>
         </div>
-        <div className="font-body-sm text-on-surface flex justify-between gap-md">
+        <div className="font-body-sm text-on-surface flex justify-between gap-md my-0.5">
           <span className="text-on-surface-variant">Porsi:</span>
-          <span className="font-semibold text-primary">{percentage}%</span>
+          <span className="font-semibold text-primary font-mono">{percentage}%</span>
         </div>
       </div>
     );
@@ -81,18 +81,18 @@ const CategoryBreakdownList = ({ data, totalSum }) => {
   if (!data || data.length === 0) return null;
 
   return (
-    <div className="mt-md pt-sm border-t border-outline/30 flex flex-col gap-xs max-h-[160px] overflow-y-auto hide-scrollbar">
+    <div className="mt-sm pt-sm border-t border-outline/30 flex flex-col gap-xs max-h-[160px] overflow-y-auto hide-scrollbar">
       {data.map((item, idx) => {
         const percentage = totalSum > 0 ? ((item.value / totalSum) * 100).toFixed(1) : '0';
         return (
-          <div key={idx} className="flex items-center justify-between py-1 px-2 rounded-lg hover:bg-surface-variant/50 transition-colors text-xs">
-            <div className="flex items-center gap-2 min-w-0">
+          <div key={idx} className="flex items-center justify-between py-1 px-1.5 rounded-lg hover:bg-surface-variant/50 transition-colors text-xs">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
               <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }}></span>
               <span className="text-on-surface font-medium truncate" title={item.name}>{item.name}</span>
             </div>
-            <div className="flex items-center gap-3 shrink-0 ml-2">
-              <span className="text-on-surface-variant font-mono">{percentage}%</span>
-              <span className="text-on-surface font-semibold">{formatCurrency(item.value)}</span>
+            <div className="flex items-center gap-2 shrink-0 ml-2">
+              <span className="text-on-surface-variant font-mono text-[11px]">{percentage}%</span>
+              <span className="text-on-surface font-semibold font-mono">{formatCurrency(item.value)}</span>
             </div>
           </div>
         );
@@ -102,6 +102,17 @@ const CategoryBreakdownList = ({ data, totalSum }) => {
 };
 
 const KeuanganCharts = ({ transactions }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const chartData = useMemo(() => {
     const monthlyDataMap = new Map();
     const incomeByCategory = new Map();
@@ -152,6 +163,30 @@ const KeuanganCharts = ({ transactions }) => {
 
     const monthlyTrend = Array.from(monthlyDataMap.values()).sort((a, b) => a.monthKey.localeCompare(b.monthKey));
     
+    // Calculate dynamic Y-axis step scale (Base 10 Juta, doubles to 20 Juta, 40 Juta... if peak exceeds box height)
+    let peak = 0;
+    monthlyTrend.forEach(item => {
+      if (item.Pemasukan > peak) peak = item.Pemasukan;
+      if (item.Pengeluaran > peak) peak = item.Pengeluaran;
+    });
+
+    const BASE_STEP = 10000000; // 10 Juta base step
+    const MAX_INTERVALS = 5; // Maximum 5 ticks in box
+
+    let step = BASE_STEP;
+    if (peak > 0) {
+      while (Math.ceil(peak / step) > MAX_INTERVALS) {
+        step *= 2;
+      }
+    }
+
+    const maxVal = Math.max(step, Math.ceil(peak / step) * step);
+
+    const yTicks = [];
+    for (let val = 0; val <= maxVal; val += step) {
+      yTicks.push(val);
+    }
+
     const incomePie = Array.from(incomeByCategory.entries())
       .map(([name, value], idx) => ({ 
         name, 
@@ -168,57 +203,99 @@ const KeuanganCharts = ({ transactions }) => {
       }))
       .sort((a, b) => b.value - a.value);
 
-    return { monthlyTrend, incomePie, expensePie, totalIncomeSum, totalExpenseSum };
+    return { monthlyTrend, incomePie, expensePie, totalIncomeSum, totalExpenseSum, yTicks, maxVal };
   }, [transactions]);
 
   if (!transactions || transactions.length === 0) {
     return (
-      <div className="glass-panel p-lg rounded-xl mb-lg text-center text-on-surface-variant">
+      <div className="glass-panel p-md rounded-xl mb-lg text-center text-on-surface-variant text-sm">
         Belum ada data transaksi untuk menampilkan grafik.
       </div>
     );
   }
 
+  // Calculate dynamic minimum width if there are many months on mobile
+  const minChartWidth = isMobile && chartData.monthlyTrend.length > 4
+    ? Math.max(340, chartData.monthlyTrend.length * 75)
+    : '100%';
+
   return (
-    <div className="flex flex-col gap-lg mb-lg">
+    <div className="flex flex-col gap-md sm:gap-lg mb-lg">
       {/* Monthly Cashflow Bar Chart */}
-      <div className="glass-panel p-md rounded-xl">
-        <h3 className="font-label-lg text-on-surface mb-md flex items-center justify-between">
-          <span>Tren Kas Bulanan</span>
-          <span className="text-xs font-normal text-on-surface-variant">Real-time Data</span>
-        </h3>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData.monthlyTrend} margin={{ top: 10, right: 10, left: 20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-              <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickMargin={10} />
-              <YAxis 
-                stroke="#94a3b8" 
-                fontSize={12} 
-                tickFormatter={(value) => `Rp ${value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : value >= 1000 ? (value / 1000).toFixed(0) + 'K' : value}`}
-                width={80}
-              />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
-              <Legend wrapperStyle={{ paddingTop: '20px' }} />
-              <Bar dataKey="Pemasukan" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={50} />
-              <Bar dataKey="Pengeluaran" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={50} />
-            </BarChart>
-          </ResponsiveContainer>
+      <div className="glass-panel p-3.5 sm:p-md rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between mb-sm sm:mb-md">
+          <h3 className="font-label-lg sm:text-base font-semibold text-on-surface">Tren Kas Bulanan</h3>
+          <span className="text-[11px] sm:text-xs font-normal text-on-surface-variant bg-surface-variant/40 px-2 py-0.5 rounded-md border border-outline/20">
+            Real-time Data
+          </span>
+        </div>
+
+        {/* Scrollable Container for Mobile to Prevent Clipping */}
+        <div className="w-full overflow-x-auto hide-scrollbar">
+          <div className="h-[280px] sm:h-[320px]" style={{ width: minChartWidth, minWidth: isMobile && chartData.monthlyTrend.length > 4 ? '340px' : '100%' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart 
+                data={chartData.monthlyTrend} 
+                margin={isMobile ? { top: 10, right: 10, left: -10, bottom: 0 } : { top: 10, right: 15, left: 10, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                <XAxis 
+                  dataKey="name" 
+                  stroke="#94a3b8" 
+                  fontSize={isMobile ? 11 : 12} 
+                  tickMargin={8}
+                  interval={0}
+                />
+                <YAxis 
+                  stroke="#94a3b8" 
+                  fontSize={isMobile ? 10 : 12} 
+                  domain={[0, chartData.maxVal || 10000000]}
+                  ticks={chartData.yTicks || [0, 10000000]}
+                  tickFormatter={(value) => {
+                    if (value === 0) return '0';
+                    if (value >= 1000000000) {
+                      const miliar = value / 1000000000;
+                      const numStr = Number.isInteger(miliar) ? miliar : miliar.toFixed(1);
+                      return isMobile ? `${numStr}M` : `${numStr} Miliar`;
+                    }
+                    if (value >= 1000000) {
+                      const juta = value / 1000000;
+                      const numStr = Number.isInteger(juta) ? juta : juta.toFixed(1);
+                      return isMobile ? `${numStr}Jt` : `${numStr} Juta`;
+                    }
+                    if (value >= 1000) {
+                      const ribu = value / 1000;
+                      const numStr = Number.isInteger(ribu) ? ribu : ribu.toFixed(0);
+                      return isMobile ? `${numStr}rb` : `${numStr} Ribu`;
+                    }
+                    return `${value}`;
+                  }}
+                  width={isMobile ? 50 : 75}
+                />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
+                <Legend 
+                  wrapperStyle={{ paddingTop: isMobile ? '10px' : '18px', fontSize: isMobile ? '11px' : '12px' }} 
+                />
+                <Bar dataKey="Pemasukan" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={45} />
+                <Bar dataKey="Pengeluaran" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={45} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 
       {/* Category Pie Charts Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md sm:gap-lg">
         {/* Income by Category */}
-        <div className="glass-panel p-md rounded-xl flex flex-col justify-between">
+        <div className="glass-panel p-3.5 sm:p-md rounded-xl flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-sm">
-              <h3 className="font-label-lg text-on-surface">Pemasukan Berdasarkan Kategori</h3>
-              <span className="text-xs font-semibold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+              <h3 className="font-label-lg sm:text-base font-semibold text-on-surface">Pemasukan Berdasarkan Kategori</h3>
+              <span className="text-[11px] sm:text-xs font-semibold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                 {chartData.incomePie.length} Kategori
               </span>
             </div>
-            <div className="h-[220px] w-full flex items-center justify-center relative">
+            <div className="h-[200px] sm:h-[220px] w-full flex items-center justify-center relative">
               {chartData.incomePie.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -226,8 +303,8 @@ const KeuanganCharts = ({ transactions }) => {
                       data={chartData.incomePie}
                       cx="50%"
                       cy="50%"
-                      innerRadius={55}
-                      outerRadius={85}
+                      innerRadius={isMobile ? 40 : 55}
+                      outerRadius={isMobile ? 70 : 85}
                       paddingAngle={4}
                       dataKey="value"
                     >
@@ -239,7 +316,7 @@ const KeuanganCharts = ({ transactions }) => {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="text-on-surface-variant text-sm">Tidak ada data pemasukan</div>
+                <div className="text-on-surface-variant text-xs sm:text-sm">Tidak ada data pemasukan</div>
               )}
             </div>
           </div>
@@ -247,15 +324,15 @@ const KeuanganCharts = ({ transactions }) => {
         </div>
 
         {/* Expense by Category */}
-        <div className="glass-panel p-md rounded-xl flex flex-col justify-between">
+        <div className="glass-panel p-3.5 sm:p-md rounded-xl flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-sm">
-              <h3 className="font-label-lg text-on-surface">Pengeluaran Berdasarkan Kategori</h3>
-              <span className="text-xs font-semibold text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-full">
+              <h3 className="font-label-lg sm:text-base font-semibold text-on-surface">Pengeluaran Berdasarkan Kategori</h3>
+              <span className="text-[11px] sm:text-xs font-semibold text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
                 {chartData.expensePie.length > 0 ? `${chartData.expensePie.length} Kategori` : '0 Kategori'}
               </span>
             </div>
-            <div className="h-[220px] w-full flex items-center justify-center relative">
+            <div className="h-[200px] sm:h-[220px] w-full flex items-center justify-center relative">
               {chartData.expensePie.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -263,8 +340,8 @@ const KeuanganCharts = ({ transactions }) => {
                       data={chartData.expensePie}
                       cx="50%"
                       cy="50%"
-                      innerRadius={55}
-                      outerRadius={85}
+                      innerRadius={isMobile ? 40 : 55}
+                      outerRadius={isMobile ? 70 : 85}
                       paddingAngle={4}
                       dataKey="value"
                     >
@@ -276,7 +353,7 @@ const KeuanganCharts = ({ transactions }) => {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="text-on-surface-variant text-sm">Tidak ada data pengeluaran</div>
+                <div className="text-on-surface-variant text-xs sm:text-sm">Tidak ada data pengeluaran</div>
               )}
             </div>
           </div>
@@ -288,3 +365,4 @@ const KeuanganCharts = ({ transactions }) => {
 };
 
 export default KeuanganCharts;
+

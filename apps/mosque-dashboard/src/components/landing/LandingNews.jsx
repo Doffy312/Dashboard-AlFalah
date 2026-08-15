@@ -40,7 +40,7 @@ const LandingNews = ({ programs = [] }) => {
   if (Array.isArray(programs) && programs.length > 0) {
     cards = programs.slice(0, 3).map((prog, i) => {
       let statusLabel = 'Kegiatan';
-      if (prog.status === 'Berjalan') statusLabel = 'Program Berjalan';
+      if (prog.status === 'Berjalan' || prog.status === 'Sedang Berjalan') statusLabel = 'Program Berjalan';
       else if (prog.status === 'Direncanakan') statusLabel = 'Mendatang';
       else if (prog.status === 'Selesai') statusLabel = 'Terlaksana';
       else if (prog.category) statusLabel = prog.category;

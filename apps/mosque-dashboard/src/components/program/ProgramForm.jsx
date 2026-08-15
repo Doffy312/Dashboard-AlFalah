@@ -25,7 +25,7 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
         evaluation: initialData.evaluation || ''
       });
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
     setFormData({
         name: '',
         pic: '',
@@ -60,7 +60,7 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
             placeholder="Contoh: Kajian Rutin Mingguan"
             value={formData.name}
-            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+            onChange={(e) =>  
     setFormData({...formData, name: e.target.value})}
           />
         </div>
@@ -74,7 +74,7 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                 className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               placeholder="Contoh: Bpk. Ahmad"
               value={formData.pic}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, pic: e.target.value})}
             />
           </div>
@@ -87,7 +87,7 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                 className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               placeholder="Contoh: 1500000"
               value={formData.budget}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, budget: e.target.value})}
             />
           </div>
@@ -101,7 +101,7 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               required
                 className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               value={formData.date}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, date: e.target.value})}
             />
           </div>
@@ -110,7 +110,7 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             <select 
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none cursor-pointer pr-10"
               value={formData.status}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, status: e.target.value})}
             >
               <option value="Direncanakan" className="bg-surface dark:bg-surface-variant">Direncanakan</option>
@@ -130,7 +130,7 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md resize-none"
             placeholder="Jelaskan tujuan dan detail program..."
             value={formData.description}
-            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+            onChange={(e) =>  
     setFormData({...formData, description: e.target.value})}
           ></textarea>
         </div>
@@ -143,7 +143,7 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               className="w-full px-md py-sm bg-surface-variant border border-emerald-500/30 rounded-xl outline-none focus:border-emerald-500 text-on-surface font-body-md resize-none"
               placeholder="Catatan hasil pelaksanaan, kendala, dll..."
               value={formData.evaluation}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, evaluation: e.target.value})}
             ></textarea>
           </div>

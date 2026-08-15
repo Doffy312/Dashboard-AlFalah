@@ -122,7 +122,7 @@ const KeuanganPage = () => {
   return (
     <>
       {/* Summary Cards Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-lg mb-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-lg mb-lg">
         {/* Saldo Card */}
         <div className="glass-panel rounded-xl p-md flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-xl group-hover:bg-primary/20 transition-all"></div>
@@ -190,9 +190,9 @@ const KeuanganPage = () => {
       </Suspense>
 
       {/* Action Bar & Filter */}
-      <div className="glass-panel rounded-xl p-sm mb-lg flex flex-col md:flex-row items-center justify-between gap-sm">
-        <div className="flex flex-1 w-full gap-sm flex-wrap md:flex-nowrap">
-          <div className="relative flex-1 min-w-[200px] max-w-md">
+      <div className="glass-panel rounded-xl p-3 sm:p-sm mb-lg flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-1 w-full gap-2 sm:gap-sm md:flex-nowrap">
+          <div className="relative flex-1 min-w-0 sm:min-w-[200px] max-w-md col-span-1 sm:col-span-2 md:col-span-1">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
             <input 
               className="glass-input w-full pl-10 pr-4 py-2 rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant" 
@@ -205,7 +205,7 @@ const KeuanganPage = () => {
 
           {/* Dynamic Categories Dropdown */}
           <select 
-            className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-10 min-w-[150px]" 
+            className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-10 min-w-0 sm:min-w-[150px]" 
             style={{ backgroundImage: `url("data:image/svg+xml;utf8,<svg fill='none' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5 7.5L10 12.5L15 7.5' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5'/></svg>")`, backgroundPosition: 'right 8px center', backgroundRepeat: 'no-repeat' }}
             value={filterCategory}
             onChange={(e) => handleCategoryChange(e.target.value)}
@@ -217,7 +217,7 @@ const KeuanganPage = () => {
           </select>
 
           <select 
-            className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-10 min-w-[130px]" 
+            className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-10 min-w-0 sm:min-w-[130px]" 
             style={{ backgroundImage: `url("data:image/svg+xml;utf8,<svg fill='none' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5 7.5L10 12.5L15 7.5' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5'/></svg>")`, backgroundPosition: 'right 8px center', backgroundRepeat: 'no-repeat' }}
             value={filterDate}
             onChange={(e) => handleDateChange(e.target.value)}
@@ -323,9 +323,9 @@ const KeuanganPage = () => {
         </div>
         
         {/* Pagination active controls */}
-        <div className="px-md py-sm border-t border-outline flex items-center justify-between bg-surface-variant">
-          <span className="font-body-sm text-body-sm text-on-surface-variant">
-            Menampilkan {startIndex}-{endIndex} dari {filteredTransactions.length} transaksi (Halaman {currentPage} dari {totalPages})
+        <div className="px-3 sm:px-md py-sm border-t border-outline flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 bg-surface-variant">
+          <span className="font-body-sm text-body-sm text-on-surface-variant text-xs sm:text-sm">
+            Menampilkan {startIndex}-{endIndex} dari {filteredTransactions.length} transaksi
           </span>
           <div className="flex gap-2">
             <button 

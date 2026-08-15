@@ -21,7 +21,7 @@ const ZiswafForm = ({ isOpen, onClose, onSubmit, initialData }) => {
         description: initialData.description || ''
       });
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setFormData({
         date: new Date().toISOString().split('T')[0],
         type: 'Zakat Fitrah',
@@ -51,7 +51,7 @@ const ZiswafForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               type="date" required
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               value={formData.date}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, date: e.target.value})}
             />
           </div>
@@ -60,7 +60,7 @@ const ZiswafForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             <select 
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none cursor-pointer"
               value={formData.type}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, type: e.target.value})}
             >
               {types.map(t => <option key={t} value={t} className="bg-surface">{t}</option>)}
@@ -75,7 +75,7 @@ const ZiswafForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
             placeholder="Contoh: Hamba Allah"
             value={formData.donorName}
-            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+            onChange={(e) =>  
     setFormData({...formData, donorName: e.target.value})}
           />
         </div>
@@ -87,7 +87,7 @@ const ZiswafForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
             placeholder="0"
             value={formData.amount}
-            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+            onChange={(e) =>  
     setFormData({...formData, amount: e.target.value})}
           />
         </div>
@@ -99,7 +99,7 @@ const ZiswafForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md resize-none"
             placeholder="Catatan tambahan..."
             value={formData.description}
-            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+            onChange={(e) =>  
     setFormData({...formData, description: e.target.value})}
           ></textarea>
         </div>

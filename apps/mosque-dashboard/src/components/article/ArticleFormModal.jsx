@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Modal from '../common/Modal';
 import toast from 'react-hot-toast';
-import { UploadCloud, Image as ImageIcon, Link as LinkIcon, Trash2, CheckCircle2 } from 'lucide-react';
+import { UploadCloud, Link as LinkIcon, Trash2, CheckCircle2 } from 'lucide-react';
 
 const CATEGORY_OPTIONS = [
   { label: 'Kegiatan Terlaksana', type: 'terlaksana' },
@@ -9,7 +9,7 @@ const CATEGORY_OPTIONS = [
   { label: 'Agenda Mendatang', type: 'mendatang' },
 ];
 
-const ArticleFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
+const ArticleFormModal = ({ isOpen, onClose, onSubmit, initialData, isSubmitting = false }) => {
   const [formData, setFormData] = useState({
     title: '',
     category: 'Kegiatan Terlaksana',
@@ -26,6 +26,7 @@ const ArticleFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   useEffect(() => {
     if (initialData) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Legitimate form reset on modal open
       setFormData({
         title: initialData.title || '',
         category: initialData.category || 'Kegiatan Terlaksana',
@@ -94,7 +95,6 @@ const ArticleFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
-    onClose();
   };
 
   return (
@@ -210,7 +210,7 @@ const ArticleFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                     alt="Preview Berita"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                  <div className="absolute inset-0 bg-black/50 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
@@ -304,15 +304,24 @@ const ArticleFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
           <button
             type="button"
             onClick={onClose}
-            className="px-lg py-sm rounded-xl border border-outline text-on-surface-variant dark:text-white/70 hover:bg-surface-variant transition-colors"
+            disabled={isSubmitting}
+            className="px-lg py-sm rounded-xl border border-outline text-on-surface-variant dark:text-white/70 hover:bg-surface-variant transition-colors disabled:opacity-50"
           >
             Batal
           </button>
           <button
             type="submit"
-            className="px-lg py-sm rounded-xl bg-primary text-on-primary font-medium hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
+            disabled={isSubmitting}
+            className="px-lg py-sm rounded-xl bg-primary text-on-primary font-medium hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20 flex items-center gap-2 disabled:opacity-50"
           >
-            {initialData ? "Simpan Perubahan" : "Publikasikan Berita"}
+            {isSubmitting ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>Menyimpan...</span>
+              </>
+            ) : (
+              initialData ? "Simpan Perubahan" : "Publikasikan Berita"
+            )}
           </button>
         </div>
       </form>

@@ -14,12 +14,13 @@ const Sidebar = () => {
     { name: 'Dashboard', icon: 'dashboard', path: '/dashboard', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
     { name: 'Keuangan', icon: 'payments', path: '/dashboard/keuangan', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
     { name: 'Program Kerja', icon: 'view_kanban', path: '/dashboard/program-kerja', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
-    { name: 'Berita & Artikel', icon: 'newspaper', path: '/dashboard/berita', roles: ['Ketua', 'Sekretaris', 'Pengurus'] },
+    { name: 'Berita & Artikel', icon: 'newspaper', path: '/dashboard/berita', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
     { name: 'Database Jemaah', icon: 'group', path: '/dashboard/jemaah', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
     { name: 'Inventaris', icon: 'inventory_2', path: '/dashboard/inventaris', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
-    { name: 'ZISWAF', icon: 'volunteer_activism', path: '/dashboard/ziswaf', roles: ['Ketua', 'Bendahara', 'Pengurus'] },
+    { name: 'ZISWAF', icon: 'volunteer_activism', path: '/dashboard/ziswaf', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
     { name: 'Qurban', icon: 'cruelty_free', path: '/dashboard/qurban', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
-    { name: 'Jadwal Petugas', icon: 'event_note', path: '/dashboard/jadwal', roles: ['Ketua', 'Sekretaris', 'Pengurus'] },
+    { name: 'Jadwal Petugas', icon: 'event_note', path: '/dashboard/jadwal', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
+    { name: 'Pesan Jemaah', icon: 'mark_email_unread', path: '/dashboard/pesan', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
     { name: 'Laporan', icon: 'analytics', path: '/dashboard/analisis', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
   ];
 
@@ -48,19 +49,26 @@ const Sidebar = () => {
   return (
     <>
       {/* ===== DESKTOP SIDEBAR (hidden on mobile, visible md+) ===== */}
-      <nav className="hidden md:flex flex-col p-md h-screen fixed left-0 top-0 w-[280px] bg-[#0b131a] border-r border-outline-variant shadow-sm z-40">
+      <nav className="hidden md:flex flex-col p-md h-screen fixed left-0 top-0 w-[280px] bg-surface border-r border-outline-variant shadow-sm z-40">
         {/* Brand/Header */}
-        <div className="flex items-center gap-sm mb-xl px-xs">
-          <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden shadow-lg shadow-primary/20">
+        <div className="flex items-center gap-3 mb-xl px-xs min-w-0">
+          <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-primary/20">
             {profile.logo ? (
-              <img src={profile.logo} alt="Logo" className="w-full h-full object-cover" />
+              <img src={profile.logo} alt={profile.orgName || 'Logo'} className="w-full h-full object-cover" />
             ) : (
-              <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>mosque</span>
+              <span className="material-symbols-outlined text-primary text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>mosque</span>
             )}
           </div>
-          <div className="overflow-hidden">
-            <h1 className="text-title-md font-title-md text-primary m-0 leading-tight tracking-tight truncate">{profile.orgName || 'Al-Falah'}</h1>
-            <p className="font-body-sm text-[11px] text-on-surface-variant m-0">Mosque Management</p>
+          <div className="flex-1 min-w-0 flex flex-col justify-center">
+            <h1 
+              className="text-base font-bold text-primary m-0 leading-snug tracking-tight line-clamp-2 break-words"
+              title={profile.orgName || 'Masjid Al-Falah'}
+            >
+              {profile.orgName || 'Masjid Al-Falah'}
+            </h1>
+            <p className="text-[11px] font-medium text-on-surface-variant/80 m-0 leading-tight">
+              Sistem Manajemen Masjid
+            </p>
           </div>
         </div>
         
@@ -71,7 +79,7 @@ const Sidebar = () => {
               <li key={index}>
                 <NavLink 
                   to={item.path}
-                  className={({ isActive }) => `flex items-center gap-sm px-sm py-3 font-label-md text-label-md transition-all duration-200 rounded-lg ${isActive ? 'text-primary font-bold bg-primary/10 shadow-[inset_3px_0_0_0_rgba(16,185,129,1)]' : 'text-on-surface-variant hover:text-white hover:bg-surface-variant'}`}
+                  className={({ isActive }) => `flex items-center gap-sm px-sm py-3 font-label-md text-label-md transition-all duration-200 rounded-lg ${isActive ? 'text-primary font-bold bg-primary/10 shadow-[inset_3px_0_0_0_rgba(16,185,129,1)]' : 'text-on-surface-variant hover:text-primary hover:bg-surface-variant'}`}
                   end={item.path === '/dashboard'}
                 >
                   {({ isActive }) => (
@@ -93,7 +101,7 @@ const Sidebar = () => {
               <li>
                 <NavLink 
                   to="/dashboard/settings" 
-                  className={({ isActive }) => `flex items-center gap-sm px-sm py-3 transition-all duration-200 rounded-lg ${isActive ? 'text-primary font-bold bg-primary/10 shadow-[inset_3px_0_0_0_rgba(16,185,129,1)]' : 'text-on-surface-variant hover:text-white hover:bg-surface-variant'}`}
+                  className={({ isActive }) => `flex items-center gap-sm px-sm py-3 transition-all duration-200 rounded-lg ${isActive ? 'text-primary font-bold bg-primary/10 shadow-[inset_3px_0_0_0_rgba(16,185,129,1)]' : 'text-on-surface-variant hover:text-primary hover:bg-surface-variant'}`}
                 >
                   <span className="material-symbols-outlined">settings</span>
                   <span className="font-label-md text-label-md">Settings</span>
@@ -101,7 +109,7 @@ const Sidebar = () => {
               </li>
             )}
             <li>
-              <button onClick={handleLogout} className="flex items-center gap-sm px-sm py-3 text-error hover:text-white hover:bg-error/20 transition-all duration-200 rounded-lg w-full text-left">
+              <button onClick={handleLogout} className="flex items-center gap-sm px-sm py-3 text-error hover:bg-error/20 transition-all duration-200 rounded-lg w-full text-left">
                 <span className="material-symbols-outlined">logout</span>
                 <span className="font-label-md text-label-md">Keluar</span>
               </button>

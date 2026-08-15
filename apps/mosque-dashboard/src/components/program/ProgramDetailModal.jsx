@@ -89,7 +89,7 @@ const ProgramDetailModal = ({ isOpen, onClose, program }) => {
                     alt={`Dokumentasi ${idx + 1}`} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                  <div className="absolute inset-0 bg-black/40 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
                     <span className="text-white flex items-center gap-2 font-medium text-sm">
                       <ExternalLink size={16} /> Lihat Penuh
                     </span>

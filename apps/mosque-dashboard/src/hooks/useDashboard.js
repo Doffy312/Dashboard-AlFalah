@@ -33,11 +33,14 @@ export function useCashflow(year, options = {}) {
   });
 }
 
-export function useAllocation(options = {}) {
+export function useAllocation(typeOrOptions = "Pengeluaran", options = {}) {
+  const type = typeof typeOrOptions === 'string' ? typeOrOptions : "Pengeluaran";
+  const queryOptions = typeof typeOrOptions === 'object' ? typeOrOptions : options;
+
   return useQuery({
-    queryKey: ["dashboardAllocation"],
+    queryKey: ["dashboardAllocation", type],
     queryFn: async () => {
-      const data = await dashboardApi.getAllocation();
+      const data = await dashboardApi.getAllocation(type);
       if (!Array.isArray(data) || data.length === 0) return [];
       
       const totalSum = data.reduce((sum, item) => sum + Number(item.total), 0);
@@ -48,7 +51,7 @@ export function useAllocation(options = {}) {
         percentage: Math.round((Number(item.total) / totalSum) * 100)
       }));
     },
-    ...options,
+    ...queryOptions,
   });
 }
 

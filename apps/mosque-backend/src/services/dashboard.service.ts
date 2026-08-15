@@ -37,10 +37,10 @@ export class DashboardService {
   }
 
   /**
-   * Expense category distribution for donut chart.
+   * Category distribution for donut chart.
    */
-  async getAllocation() {
-    return transactionService.getCategoryDistribution();
+  async getAllocation(type: string = "Pengeluaran") {
+    return transactionService.getCategoryDistribution(type);
   }
 
   /**

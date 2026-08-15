@@ -1,0 +1,7 @@
+# http://www.robotstxt.org
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+
+Sitemap: https://masjid-alfalah.org/sitemap.xml

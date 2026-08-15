@@ -10,9 +10,23 @@ export interface CreateArticleInput {
   date: string;
   author: string;
   readTime?: string;
-  image: string;
-  summary: string;
+  image?: string;
+  summary?: string;
   content: string;
+}
+
+function calculateReadTime(content: string): string {
+  if (!content) return "1 min baca";
+  const words = content.trim().split(/\s+/).filter(Boolean).length;
+  const minutes = Math.max(1, Math.ceil(words / 200));
+  return `${minutes} min baca`;
+}
+
+function deriveTypeFromCategory(category: string): string {
+  const catLower = (category || "").toLowerCase();
+  if (catLower.includes("edukasi") || catLower.includes("artikel")) return "edukasi";
+  if (catLower.includes("mendatang") || catLower.includes("agenda")) return "mendatang";
+  return "terlaksana";
 }
 
 export class ArticlesService {
@@ -34,18 +48,30 @@ export class ArticlesService {
 
   async create(data: CreateArticleInput) {
     const id = crypto.randomUUID();
+
+    const cleanSummary = (data.summary && data.summary.trim().length > 0)
+      ? data.summary.trim()
+      : (data.content ? (data.content.trim().slice(0, 150) + (data.content.length > 150 ? "..." : "")) : "");
+
+    const cleanReadTime = (data.readTime && data.readTime.trim().length > 0)
+      ? data.readTime.trim()
+      : calculateReadTime(data.content || "");
+
+    const cleanType = data.type || deriveTypeFromCategory(data.category);
+
     await db.insert(article).values({
       id,
-      title: data.title,
-      category: data.category,
-      type: data.type ?? "terlaksana",
+      title: data.title.trim(),
+      category: data.category.trim(),
+      type: cleanType,
       date: data.date,
-      author: data.author,
-      readTime: data.readTime ?? "3 min baca",
-      image: data.image,
-      summary: data.summary,
-      content: data.content,
+      author: data.author.trim(),
+      readTime: cleanReadTime,
+      image: data.image ?? "",
+      summary: cleanSummary,
+      content: data.content.trim(),
     });
+
     return this.findById(id);
   }
 
@@ -53,12 +79,32 @@ export class ArticlesService {
     const existing = await this.findById(id);
     if (!existing) return null;
 
+    const updatePayload: Record<string, any> = {
+      updatedAt: new Date(),
+    };
+
+    if (data.title !== undefined) updatePayload.title = data.title.trim();
+    if (data.category !== undefined) {
+      updatePayload.category = data.category.trim();
+      if (!data.type) updatePayload.type = deriveTypeFromCategory(data.category);
+    }
+    if (data.type !== undefined) updatePayload.type = data.type;
+    if (data.date !== undefined) updatePayload.date = data.date;
+    if (data.author !== undefined) updatePayload.author = data.author.trim();
+    if (data.image !== undefined) updatePayload.image = data.image;
+    if (data.content !== undefined) {
+      updatePayload.content = data.content.trim();
+      if (!data.readTime) updatePayload.readTime = calculateReadTime(data.content);
+      if (data.summary === undefined && (!existing.summary || existing.summary.trim() === "")) {
+        updatePayload.summary = data.content.trim().slice(0, 150) + (data.content.length > 150 ? "..." : "");
+      }
+    }
+    if (data.summary !== undefined) updatePayload.summary = data.summary.trim();
+    if (data.readTime !== undefined) updatePayload.readTime = data.readTime.trim();
+
     await db
       .update(article)
-      .set({
-        ...data,
-        updatedAt: new Date(),
-      })
+      .set(updatePayload)
       .where(eq(article.id, id));
 
     return this.findById(id);
@@ -74,3 +120,4 @@ export class ArticlesService {
 }
 
 export const articlesService = new ArticlesService();
+

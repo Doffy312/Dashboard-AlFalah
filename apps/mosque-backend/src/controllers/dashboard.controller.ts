@@ -15,8 +15,9 @@ export class DashboardController {
     res.json(result);
   }
 
-  async getAllocation(_req: Request, res: Response) {
-    const result = await dashboardService.getAllocation();
+  async getAllocation(req: Request, res: Response) {
+    const type = (req.query.type as string) || "Pengeluaran";
+    const result = await dashboardService.getAllocation(type);
     res.json(result);
   }
 

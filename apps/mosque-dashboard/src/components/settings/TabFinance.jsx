@@ -12,7 +12,7 @@ const TabFinance = ({ setHasUnsavedChanges, tabDataRef }) => {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCategories([...finance.categories]);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setBankInfo({ ...finance.bankInfo });
   }, [finance]);
 
@@ -26,7 +26,7 @@ const TabFinance = ({ setHasUnsavedChanges, tabDataRef }) => {
   const handleAddCategory = (e) => {
     e.preventDefault();
     if (!newCat.name.trim()) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setCategories([...categories, { id: Date.now(), ...newCat }]);
     setNewCat({ name: '', type: 'income' });
     setHasUnsavedChanges(true);
@@ -34,7 +34,7 @@ const TabFinance = ({ setHasUnsavedChanges, tabDataRef }) => {
 
   const handleDeleteCategory = (id) => {
     if (window.confirm('Hapus kategori ini?')) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
     setCategories(categories.filter(c => c.id !== id));
       setHasUnsavedChanges(true);
     }
@@ -51,7 +51,7 @@ const TabFinance = ({ setHasUnsavedChanges, tabDataRef }) => {
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-300">
       <div className="border-b border-outline-variant pb-4 mb-2">
-        <h3 className="text-title-md font-bold text-white m-0">Konfigurasi Keuangan</h3>
+        <h3 className="text-title-md font-bold text-on-surface m-0">Konfigurasi Keuangan</h3>
         <p className="text-body-sm text-on-surface-variant m-0 mt-1">
           Atur kategori transaksi dan informasi rekening bank.
         </p>
@@ -60,7 +60,7 @@ const TabFinance = ({ setHasUnsavedChanges, tabDataRef }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Kategori Transaksi */}
         <div className="flex flex-col gap-4">
-          <h4 className="font-label-lg font-bold text-white flex items-center gap-2">
+          <h4 className="font-label-lg font-bold text-on-surface flex items-center gap-2">
             <span className="material-symbols-outlined text-primary">category</span>
             Kategori Transaksi
           </h4>
@@ -70,16 +70,16 @@ const TabFinance = ({ setHasUnsavedChanges, tabDataRef }) => {
               type="text" 
               value={newCat.name}
               onChange={e => setNewCat({...newCat, name: e.target.value})}
-              className="glass-input flex-1 min-w-[140px] px-3 py-2 rounded-lg text-white font-body-sm"
+              className="glass-input flex-1 min-w-[140px] px-3 py-2 rounded-lg text-on-surface font-body-sm"
               placeholder="Nama kategori baru..."
             />
             <select 
               value={newCat.type}
               onChange={e => setNewCat({...newCat, type: e.target.value})}
-              className="glass-input shrink-0 px-3 py-2 rounded-lg text-white font-body-sm appearance-none pr-10"
+              className="glass-input shrink-0 px-3 py-2 rounded-lg text-on-surface font-body-sm appearance-none pr-10"
             >
-              <option value="income" className="bg-surface">Pemasukan</option>
-              <option value="expense" className="bg-surface">Pengeluaran</option>
+              <option value="income" className="bg-surface text-on-surface">Pemasukan</option>
+              <option value="expense" className="bg-surface text-on-surface">Pengeluaran</option>
             </select>
             <button type="submit" className="bg-primary shrink-0 hover:bg-primary/90 text-white px-3 py-2 rounded-lg transition-colors">
               Tambah
@@ -96,10 +96,10 @@ const TabFinance = ({ setHasUnsavedChanges, tabDataRef }) => {
               <ul className="space-y-2 m-0 p-0 list-none">
                 {incomeCategories.map(cat => (
                   <li key={cat.id} className="flex justify-between items-center bg-surface-variant/50 px-3 py-2 rounded-lg group">
-                    <span className="text-sm text-white">{cat.name}</span>
+                    <span className="text-sm text-on-surface">{cat.name}</span>
                     <button 
                       onClick={() => handleDeleteCategory(cat.id)}
-                      className="text-on-surface-variant hover:text-error opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="text-on-surface-variant hover:text-error opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                     >
                       <span className="material-symbols-outlined text-[16px]">close</span>
                     </button>
@@ -120,10 +120,10 @@ const TabFinance = ({ setHasUnsavedChanges, tabDataRef }) => {
               <ul className="space-y-2 m-0 p-0 list-none">
                 {expenseCategories.map(cat => (
                   <li key={cat.id} className="flex justify-between items-center bg-surface-variant/50 px-3 py-2 rounded-lg group">
-                    <span className="text-sm text-white">{cat.name}</span>
+                    <span className="text-sm text-on-surface">{cat.name}</span>
                     <button 
                       onClick={() => handleDeleteCategory(cat.id)}
-                      className="text-on-surface-variant hover:text-error opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="text-on-surface-variant hover:text-error opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                     >
                       <span className="material-symbols-outlined text-[16px]">close</span>
                     </button>
@@ -139,41 +139,41 @@ const TabFinance = ({ setHasUnsavedChanges, tabDataRef }) => {
 
         {/* Informasi Rekening */}
         <div className="flex flex-col gap-4">
-          <h4 className="font-label-lg font-bold text-white flex items-center gap-2">
+          <h4 className="font-label-lg font-bold text-on-surface flex items-center gap-2">
             <span className="material-symbols-outlined text-primary">account_balance</span>
             Informasi Rekening Bank
           </h4>
           <div className="bg-surface-variant/30 rounded-xl p-5 border border-outline-variant flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="font-label-md text-white">Nama Bank</label>
+              <label className="font-label-md text-on-surface">Nama Bank</label>
               <input 
                 type="text" 
                 name="bankName"
                 value={bankInfo.bankName}
                 onChange={handleBankChange}
-                className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md"
+                className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md"
                 placeholder="Misal: Bank Syariah Indonesia (BSI)"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="font-label-md text-white">Nomor Rekening</label>
+              <label className="font-label-md text-on-surface">Nomor Rekening</label>
               <input 
                 type="text" 
                 name="accountNumber"
                 value={bankInfo.accountNumber}
                 onChange={handleBankChange}
-                className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md"
+                className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md"
                 placeholder="Masukkan nomor rekening"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="font-label-md text-white">Atas Nama (Pemilik Rekening)</label>
+              <label className="font-label-md text-on-surface">Atas Nama (Pemilik Rekening)</label>
               <input 
                 type="text" 
                 name="accountHolder"
                 value={bankInfo.accountHolder}
                 onChange={handleBankChange}
-                className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md"
+                className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md"
                 placeholder="Misal: Masjid Al-Falah"
               />
             </div>

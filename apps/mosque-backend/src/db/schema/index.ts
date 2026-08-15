@@ -56,3 +56,7 @@ export {
 export {
   article,
 } from "./articles.js";
+
+export {
+  contactMessages,
+} from "./contactMessages.js";

@@ -102,78 +102,138 @@ const LaporanPage = () => {
   };
 
   const renderGrafikKeuangan = () => {
-    const cashflowMonths = cashflow?.months ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'];
+    const cashflowMonths = cashflow?.months ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
     
-    // Find max value for scaling
-    let maxVal = 50000000;
-    if (cashflow) {
-      const maxIn = Math.max(...(cashflow.income ?? [0]));
-      const maxOut = Math.max(...(cashflow.expense ?? [0]));
-      if (Math.max(maxIn, maxOut) > 0) {
-        maxVal = Math.max(maxIn, maxOut) * 1.2;
+    // Base step size is 10 Juta (10,000,000)
+    const BASE_STEP = 10000000; // 10 Juta
+    const MAX_INTERVALS = 5; // Maksimal 5 interval tick agar teks tidak menumpuk di dalam box
+
+    const maxIn = cashflow?.income?.length ? Math.max(...cashflow.income) : 0;
+    const maxOut = cashflow?.expense?.length ? Math.max(...cashflow.expense) : 0;
+    const peak = Math.max(maxIn, maxOut);
+
+    // Langkah (step) dimulai dari 10 Juta.
+    // Jika nilai grafik melebihi kapasitas box (peak / step > MAX_INTERVALS),
+    // kelipatan langkah otomatis dilipatgandakan x2 (10 Juta -> 20 Juta -> 40 Juta -> 80 Juta...)
+    let step = BASE_STEP;
+    if (peak > 0) {
+      while (Math.ceil(peak / step) > MAX_INTERVALS) {
+        step *= 2;
       }
     }
 
+    // Hitung batas atas skala (maxVal) sebagai kelipatan dari step yang dihasilkan (minimal 10 Juta)
+    const maxVal = Math.max(step, Math.ceil(peak / step) * step);
+
+    // Hasil tick nilai dari maxVal turun hingga 0
+    const ticks = [];
+    for (let val = maxVal; val >= 0; val -= step) {
+      ticks.push(val);
+    }
+
+    const formatYLabel = (val) => {
+      if (val === 0) return '0';
+      const juta = val / 1000000;
+      return `${juta} Juta`;
+    };
+
     return (
-      <div className="grid grid-cols-12 gap-gutter w-full">
-        <div className="col-span-12 lg:col-span-8 glass-panel rounded-xl p-md flex flex-col h-[400px]">
+      <div className="grid grid-cols-12 gap-4 sm:gap-gutter w-full">
+        <div className="col-span-12 lg:col-span-8 glass-panel rounded-xl p-3 sm:p-md flex flex-col h-[380px] sm:h-[420px]">
           <div className="flex justify-between items-center mb-6">
             <div>
               <h3 className="font-title-md text-[20px] font-semibold leading-[28px] text-on-surface">Perbandingan Pemasukan & Pengeluaran</h3>
-              <p className="font-body-sm text-[14px] leading-[20px] text-outline">Tahun {new Date().getFullYear()}</p>
+              <p className="font-body-sm text-[14px] leading-[20px] text-on-surface-variant font-medium">Tahun {new Date().getFullYear()}</p>
             </div>
           </div>
           
-          <div className="flex-1 relative w-full h-full flex items-end justify-between px-4 pb-6 pt-4 border-l border-b border-outline-variant/30">
-            {/* Y Axis Labels (Simulated scale) */}
-            <div className="absolute left-[-40px] h-full flex flex-col justify-between text-xs text-outline font-label-md py-4">
-              {[1, 0.75, 0.5, 0.25, 0].map((ratio, i) => {
-                const val = maxVal * ratio;
-                let label = "0";
-                if (val >= 1000000) label = `${(val / 1000000).toFixed(1).replace('.0', '')}M`;
-                else if (val >= 1000) label = `${(val / 1000).toFixed(1).replace('.0', '')}K`;
-                else if (val > 0) label = Math.round(val).toString();
-                return <span key={i} className="text-right w-8">{label}</span>;
+          <div className="overflow-x-auto hide-scrollbar flex-1 flex flex-col">
+            <div className="min-w-[640px] sm:min-w-full flex-1 relative w-full h-full flex items-end justify-between pl-16 sm:pl-20 pr-2 sm:pr-4 pb-6 pt-4">
+              
+              {/* Vertical Y-Axis Border Line */}
+              <div className="absolute left-16 sm:left-20 top-4 bottom-6 border-l border-outline-variant/30 pointer-events-none z-10" />
+
+              {/* Horizontal Grid Lines */}
+              <div className="absolute top-4 bottom-6 left-16 sm:left-20 right-2 sm:right-4 pointer-events-none flex flex-col justify-between z-0">
+                {ticks.map((_, i) => (
+                  <div key={i} className="w-full border-b border-outline-variant/15 border-dashed" />
+                ))}
+              </div>
+
+              {/* Y Axis Labels */}
+              <div className="absolute left-1 sm:left-2 top-4 bottom-6 flex flex-col justify-between text-xs text-on-surface-variant font-semibold font-label-md pointer-events-none z-10">
+                {ticks.map((val, i) => (
+                  <span key={i} className="text-right w-12 sm:w-14 leading-none select-none">{formatYLabel(val)}</span>
+                ))}
+              </div>
+
+              {/* Horizontal X-Axis Border Line */}
+              <div className="absolute left-16 sm:left-20 right-2 sm:right-4 bottom-6 border-b border-outline-variant/30 pointer-events-none z-10" />
+
+              {/* Bars */}
+              {cashflowMonths.map((month, i, arr) => {
+                const inVal = cashflow?.income?.[i] ?? 0;
+                const outVal = cashflow?.expense?.[i] ?? 0;
+                const inH = Math.max((inVal / maxVal) * 100, 2);
+                const outH = Math.max((outVal / maxVal) * 100, 2);
+                const currentYear = new Date().getFullYear();
+
+                let tooltipPos = 'left-1/2 -translate-x-1/2';
+                if (i <= 1) {
+                  tooltipPos = 'left-0';
+                } else if (i >= arr.length - 2) {
+                  tooltipPos = 'right-0';
+                }
+
+                return (
+                  <div key={i} className="flex flex-col items-center gap-2 group cursor-pointer flex-1 relative z-10">
+                    {/* Column Hover Background Overlay */}
+                    <div className="absolute inset-y-0 -top-2 -bottom-2 w-[90%] rounded-xl bg-white/[0.04] sm:bg-white/[0.05] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-0" />
+
+                    {/* Animated Hover Tooltip */}
+                    <div className={`absolute top-1 ${tooltipPos} bg-[#111927]/95 backdrop-blur-md text-on-surface p-3 sm:p-3.5 rounded-xl text-xs opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 scale-95 group-hover:scale-100 transition-all duration-200 ease-out whitespace-nowrap z-30 pointer-events-none flex flex-col gap-2 shadow-2xl border border-white/10 min-w-[175px]`}>
+                      <div className="font-bold text-white text-[12px] border-b border-white/10 pb-1.5 flex items-center justify-between">
+                        <span>{month} {currentYear}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4 text-[12px]">
+                        <span className="text-[#10b981] font-medium flex items-center gap-1.5">
+                          Pemasukan:
+                        </span>
+                        <span className="text-[#10b981] font-bold font-mono">{formatCurrency(inVal)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4 text-[12px]">
+                        <span className="text-[#ef4444] font-medium flex items-center gap-1.5">
+                          Pengeluaran:
+                        </span>
+                        <span className="text-[#ef4444] font-bold font-mono">{formatCurrency(outVal)}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-end gap-1 h-[170px] sm:h-[200px] w-full justify-center relative z-10">
+                      <div className="w-2 sm:w-6 bg-[#10b981] rounded-t-sm group-hover:brightness-125 group-hover:scale-y-[1.02] origin-bottom transition-all duration-200 shadow-sm" style={{ height: `${inH}%` }}></div>
+                      <div className="w-2 sm:w-6 bg-[#ef4444] rounded-t-sm group-hover:brightness-125 group-hover:scale-y-[1.02] origin-bottom transition-all duration-200 shadow-sm" style={{ height: `${outH}%` }}></div>
+                    </div>
+                    <span className="font-label-md text-[10px] sm:text-[12px] font-semibold leading-[16px] tracking-[0.05em] text-on-surface-variant opacity-95 group-hover:text-white transition-colors truncate">{month}</span>
+                  </div>
+                );
               })}
             </div>
-
-            {/* Bars */}
-            {cashflowMonths.map((month, i) => {
-              const inVal = cashflow?.income?.[i] ?? 0;
-              const outVal = cashflow?.expense?.[i] ?? 0;
-              const inH = Math.max((inVal / maxVal) * 100, 2);
-              const outH = Math.max((outVal / maxVal) * 100, 2);
-
-              return (
-                <div key={i} className="flex flex-col items-center gap-2 group cursor-pointer flex-1 relative">
-                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-3 py-2 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none flex flex-col gap-1 shadow-lg">
-                    <span className="text-secondary font-medium">Pemasukan: {formatCurrency(inVal)}</span>
-                    <span className="text-error font-medium">Pengeluaran: {formatCurrency(outVal)}</span>
-                  </div>
-                  <div className="flex items-end gap-1 h-[200px] w-full justify-center">
-                    <div className="w-2 sm:w-6 bg-secondary/80 rounded-t-sm group-hover:bg-secondary transition-colors" style={{ height: `${inH}%` }}></div>
-                    <div className="w-2 sm:w-6 bg-error/70 rounded-t-sm group-hover:bg-error transition-colors" style={{ height: `${outH}%` }}></div>
-                  </div>
-                  <span className="font-label-md text-[10px] sm:text-[12px] font-semibold leading-[16px] tracking-[0.05em] text-outline truncate">{month}</span>
-                </div>
-              );
-            })}
           </div>
           
           <div className="flex justify-center gap-6 mt-4">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-secondary"></span>
-              <span className="font-body-sm text-[14px] leading-[20px] text-on-surface-variant">Pemasukan</span>
+              <span className="font-body-sm text-[14px] leading-[20px] text-on-surface font-medium">Pemasukan</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-error/80"></span>
-              <span className="font-body-sm text-[14px] leading-[20px] text-on-surface-variant">Pengeluaran</span>
+              <span className="font-body-sm text-[14px] leading-[20px] text-on-surface font-medium">Pengeluaran</span>
             </div>
           </div>
         </div>
 
-        <div className="col-span-12 lg:col-span-4 flex flex-col gap-gutter">
-          <div className="glass-panel rounded-xl p-md flex-1 flex flex-col">
+        <div className="col-span-12 lg:col-span-4 flex flex-col gap-4 sm:gap-gutter">
+          <div className="glass-panel rounded-xl p-3 sm:p-md flex-1 flex flex-col">
             <h3 className="font-title-md text-[20px] font-semibold leading-[28px] text-on-surface mb-4">Distribusi Pengeluaran</h3>
             
             {(() => {
@@ -201,7 +261,7 @@ const LaporanPage = () => {
                   <div className="flex-1 flex items-center justify-center relative my-4">
                     <div className="w-32 h-32 rounded-full relative" style={{ background: `conic-gradient(${gradient})` }}>
                       <div className="absolute inset-2 bg-surface/90 backdrop-blur-sm rounded-full flex items-center justify-center">
-                        <span className="font-title-md text-[20px] font-semibold leading-[28px] text-on-surface font-bold">100%</span>
+                        <span className="font-title-md text-[20px] font-bold leading-[28px] text-on-surface">100%</span>
                       </div>
                     </div>
                   </div>
@@ -312,16 +372,16 @@ const LaporanPage = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="flex flex-wrap gap-4 mb-8">
-        <div className="glass-panel rounded-full px-6 py-2 flex items-center gap-3 shadow-sm border-outline/30">
+      <div className="flex flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="glass-panel rounded-full px-4 sm:px-6 py-2 flex items-center gap-2 sm:gap-3 shadow-sm border-outline/30">
           <span className="w-2 h-2 rounded-full bg-secondary"></span>
-          <span className="font-label-md text-[12px] font-semibold leading-[16px] tracking-[0.05em] text-outline">Total Saldo Terkini:</span>
-          <span className="font-title-md text-[20px] font-bold text-white">{formatCurrency(saldo)}</span>
+          <span className="font-label-md text-[11px] sm:text-[12px] font-semibold leading-[16px] tracking-[0.05em] text-outline">Saldo Terkini:</span>
+          <span className="font-title-md text-base sm:text-[20px] font-bold text-white">{formatCurrency(saldo)}</span>
         </div>
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex gap-2 mb-8 border-b border-outline-variant/30 pb-2 overflow-x-auto hide-scrollbar">
+      <div className="flex gap-2 mb-6 sm:mb-8 border-b border-outline-variant/30 pb-2 overflow-x-auto hide-scrollbar">
         <button 
           onClick={() => setActiveTab('Grafik Keuangan')}
           className={activeTab === 'Grafik Keuangan' ? activeTabClass : inactiveTabClass}

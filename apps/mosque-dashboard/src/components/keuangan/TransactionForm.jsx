@@ -22,6 +22,7 @@ const TransactionForm = ({ isOpen, onClose, onSubmit, initialData }) => {
   useEffect(() => {
     if (initialData) {
       const isCustom = !defaultCategories[initialData.type]?.includes(initialData.category) && initialData.category !== 'Program Kerja';
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Legitimate form reset on modal open
       setFormData({
         date: initialData.date,
         type: initialData.type,
@@ -44,7 +45,7 @@ const TransactionForm = ({ isOpen, onClose, onSubmit, initialData }) => {
       setIsCustomCategory(false);
       setCustomCategoryInput('');
     }
-  }, [initialData, isOpen]);
+  }, [initialData, isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleTypeChange = (newType) => {
     const defaultCat = defaultCategories[newType][0];

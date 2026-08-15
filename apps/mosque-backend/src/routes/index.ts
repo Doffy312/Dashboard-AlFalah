@@ -12,6 +12,7 @@ import qurbanRoutes from "./qurban.routes.js";
 import jadwalRoutes from "./jadwal.routes.js";
 import settingsRoutes from "./settings.routes.js";
 import articlesRoutes from "./articles.routes.js";
+import contactMessagesRoutes from "./contactMessages.routes.js";
 
 const router = Router();
 
@@ -29,6 +30,7 @@ router.use("/qurban", qurbanRoutes);
 router.use("/jadwal", jadwalRoutes);
 router.use("/settings", settingsRoutes);
 router.use("/articles", articlesRoutes);
+router.use("/contact-messages", contactMessagesRoutes);
 
 export default router;
 

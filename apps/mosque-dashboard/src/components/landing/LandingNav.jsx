@@ -46,7 +46,7 @@ const LandingNav = ({ orgName: customOrgName, logo: customLogo }) => {
               <span className="material-symbols-outlined text-[#adc6ff] text-xl">mosque</span>
             )}
           </div>
-          <span className="font-semibold tracking-tight text-[#e0e3e5] truncate max-w-[140px] sm:max-w-none">{orgName}</span>
+          <span className="font-semibold tracking-tight text-[#e0e3e5] truncate max-w-[200px] xs:max-w-[260px] sm:max-w-none">{orgName}</span>
         </div>
 
         {/* Center Links (Desktop) */}

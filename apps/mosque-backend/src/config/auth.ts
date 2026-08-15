@@ -32,5 +32,8 @@ export const auth = betterAuth({
       },
     },
   },
-  trustedOrigins: getCorsOrigins(),
+  trustedOrigins: (request) => {
+    const reqOrigin = request?.headers?.get?.("origin") || request?.headers?.get?.("referer");
+    return getCorsOrigins(reqOrigin || undefined);
+  },
 });

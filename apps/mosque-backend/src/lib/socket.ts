@@ -1,13 +1,20 @@
 import { Server as SocketIOServer } from "socket.io";
 import { Server as HttpServer } from "http";
-import { getCorsOrigins } from "../config/env.js";
+import { getCorsOrigins, isLocalNetworkOrigin, env } from "../config/env.js";
 
 let io: SocketIOServer | null = null;
 
 export function initializeSocket(httpServer: HttpServer) {
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: getCorsOrigins(),
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        const allowedOrigins = getCorsOrigins(origin);
+        if (allowedOrigins.includes(origin) || isLocalNetworkOrigin(origin) || env.NODE_ENV === "development") {
+          return callback(null, true);
+        }
+        callback(null, false);
+      },
       credentials: true,
     },
   });

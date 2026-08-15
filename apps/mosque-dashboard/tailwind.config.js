@@ -11,9 +11,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "#0b131a", // Deep dark blue background
-        surface: "#111a24", // Slightly lighter dark blue for cards
-        "surface-variant": "#1a2432", // Lighter variant for hovers/borders
+        background: "rgb(var(--color-background) / <alpha-value>)",
+        surface: "rgb(var(--color-surface) / <alpha-value>)",
+        "surface-variant": "rgb(var(--color-surface-variant) / <alpha-value>)",
         primary: "#10b981", // Emerald green
         "primary-container": "rgba(16, 185, 129, 0.1)", // Transparent emerald
         "on-primary": "#ffffff",
@@ -23,13 +23,12 @@ export default {
         "error-container": "rgba(244, 63, 94, 0.1)",
         tertiary: "#3b82f6", // Blue accent
         "tertiary-container": "rgba(59, 130, 246, 0.1)",
-        "on-surface": "#ffffff",
-        "on-surface-variant": "#9ca3af",
-        outline: "#374151",
-        "outline-variant": "rgba(255, 255, 255, 0.05)",
-        // Keep some of the old ones just in case to prevent breaking
-        "surface-dim": "#0b131a",
-        "surface-bright": "#1a2432",
+        "on-surface": "rgb(var(--color-on-surface) / <alpha-value>)",
+        "on-surface-variant": "rgb(var(--color-on-surface-variant) / <alpha-value>)",
+        outline: "rgb(var(--color-outline) / <alpha-value>)",
+        "outline-variant": "rgb(var(--color-outline-variant) / <alpha-value>)",
+        "surface-dim": "rgb(var(--color-background) / <alpha-value>)",
+        "surface-bright": "rgb(var(--color-surface-variant) / <alpha-value>)",
         "primary-fixed": "#10b981",
         "on-error": "#ffffff",
         "emerald-deep": "#047857",

@@ -94,12 +94,12 @@ const TopNavBar = () => {
 
   const recentNotifications = notifications.slice(0, 8);
 
-  // Shared notification dropdown panel
-  const NotificationPanel = ({ onClose }) => (
-    <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#0f1923] border border-outline-variant rounded-xl shadow-2xl overflow-hidden z-50">
+  // Shared notification dropdown panel helper
+  const renderNotificationPanel = (onClose) => (
+    <div className="fixed left-4 right-4 top-[56px] md:absolute md:left-auto md:right-0 md:top-full md:mt-2 w-auto md:w-96 max-w-sm sm:max-w-none bg-surface border border-outline-variant rounded-xl shadow-2xl overflow-hidden z-50">
       {/* Header */}
       <div className="px-4 py-3 border-b border-outline-variant flex justify-between items-center bg-surface-variant/20">
-        <h3 className="font-label-md text-white text-sm flex items-center gap-2">
+        <h3 className="font-label-md text-on-surface text-sm flex items-center gap-2">
           <span className="material-symbols-outlined text-primary text-[18px]">notifications</span>
           Notifikasi
           {unreadCount > 0 && (
@@ -138,7 +138,7 @@ const TopNavBar = () => {
                         <span className="w-2 h-2 rounded-full bg-primary shrink-0"></span>
                       )}
                       <span className={`text-[13px] font-label-md truncate ${
-                        !notif.isRead ? 'text-primary font-bold' : 'text-white'
+                        !notif.isRead ? 'text-primary font-bold' : 'text-on-surface'
                       }`}>
                         {notif.title}
                       </span>
@@ -177,8 +177,8 @@ const TopNavBar = () => {
     </div>
   );
 
-  // Shared Profile Dropdown Panel
-  const ProfilePanel = ({ onClose }) => {
+  // Shared Profile Dropdown Panel helper
+  const renderProfilePanel = (onClose) => {
     const user = session?.user;
     const userName = user?.name || 'Administrator';
     const userEmail = user?.email || 'admin@masjid-alfalah.or.id';
@@ -193,7 +193,7 @@ const TopNavBar = () => {
     };
 
     return (
-      <div className="absolute right-0 mt-2 w-80 sm:w-84 bg-[#0f1923] border border-outline-variant rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+      <div className="fixed left-4 right-4 top-[56px] md:absolute md:left-auto md:right-0 md:top-full md:mt-2 w-auto md:w-96 bg-surface border border-outline-variant rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
         {/* Header Avatar & Summary */}
         <div className="p-4 bg-gradient-to-b from-primary/10 via-surface-variant/30 to-transparent border-b border-outline-variant/40">
           <div className="flex items-center gap-3.5">
@@ -205,10 +205,10 @@ const TopNavBar = () => {
                   <span className="text-xl font-bold text-primary">{initial}</span>
                 )}
               </div>
-              <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-[#0f1923] rounded-full" title="Status: Aktif"></span>
+              <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-surface rounded-full" title="Status: Aktif"></span>
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="font-title-md text-white text-base font-bold truncate leading-tight">{userName}</h4>
+              <h4 className="font-title-md text-on-surface text-base font-bold truncate leading-tight">{userName}</h4>
               <p className="text-xs text-on-surface-variant/80 truncate mb-1.5">{userEmail}</p>
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-primary/15 text-primary border border-primary/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary mr-1.5"></span>
@@ -227,7 +227,7 @@ const TopNavBar = () => {
               <span className="material-symbols-outlined text-[16px] text-primary">person</span>
               <span>Nama Lengkap</span>
             </div>
-            <span className="text-xs font-semibold text-white truncate max-w-[130px]">{userName}</span>
+            <span className="text-xs font-semibold text-on-surface truncate max-w-[130px]">{userName}</span>
           </div>
 
           <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-surface-variant/30 border border-outline-variant/30">
@@ -235,7 +235,7 @@ const TopNavBar = () => {
               <span className="material-symbols-outlined text-[16px] text-primary">mail</span>
               <span>Email</span>
             </div>
-            <span className="text-xs font-semibold text-white truncate max-w-[140px]" title={userEmail}>{userEmail}</span>
+            <span className="text-xs font-semibold text-on-surface truncate max-w-[140px]" title={userEmail}>{userEmail}</span>
           </div>
 
           <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-surface-variant/30 border border-outline-variant/30">
@@ -276,7 +276,7 @@ const TopNavBar = () => {
     <>
       {/* ===== MOBILE HEADER (visible < md) ===== */}
       <header className="mobile-header md:hidden">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
           <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden shadow-lg shadow-primary/20">
             {profile.logo ? (
               <img src={profile.logo} alt="Logo" className="w-full h-full object-cover" />
@@ -284,7 +284,7 @@ const TopNavBar = () => {
               <span className="material-symbols-outlined text-primary text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>mosque</span>
             )}
           </div>
-          <span className="text-sm font-bold text-primary tracking-tight truncate max-w-[150px]">{profile.orgName || 'Al-Falah'}</span>
+          <span className="text-sm font-bold text-primary tracking-tight truncate max-w-[200px] xs:max-w-[260px]" title={profile.orgName || 'Masjid Al-Falah'}>{profile.orgName || 'Masjid Al-Falah'}</span>
         </div>
         
         <div className="flex items-center gap-1">
@@ -299,12 +299,12 @@ const TopNavBar = () => {
             >
               <span className="material-symbols-outlined text-[20px]">notifications</span>
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 min-w-[16px] h-[16px] bg-error text-white rounded-full text-[9px] font-bold flex items-center justify-center px-1 border-2 border-[#0b131a]">
+                <span className="absolute top-1 right-1 min-w-[16px] h-[16px] bg-error text-white rounded-full text-[9px] font-bold flex items-center justify-center px-1 border-2 border-background">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
             </button>
-            {showMobileNotif && <NotificationPanel onClose={() => setShowMobileNotif(false)} />}
+            {showMobileNotif && renderNotificationPanel(() => setShowMobileNotif(false))}
           </div>
 
           {/* Profile Mobile */}
@@ -327,7 +327,7 @@ const TopNavBar = () => {
                 <span className="material-symbols-outlined text-primary text-[18px]">person</span>
               )}
             </button>
-            {showMobileProfile && <ProfilePanel onClose={() => setShowMobileProfile(false)} />}
+            {showMobileProfile && renderProfilePanel(() => setShowMobileProfile(false))}
           </div>
         </div>
       </header>
@@ -372,7 +372,7 @@ const TopNavBar = () => {
               </button>
 
               {/* Dropdown Panel */}
-              {showDropdown && <NotificationPanel onClose={() => setShowDropdown(false)} />}
+              {showDropdown && renderNotificationPanel(() => setShowDropdown(false))}
             </div>
 
             <button className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant cursor-pointer transition-colors">
@@ -405,7 +405,7 @@ const TopNavBar = () => {
               </div>
             </button>
 
-            {showProfileDropdown && <ProfilePanel onClose={() => setShowProfileDropdown(false)} />}
+            {showProfileDropdown && renderProfilePanel(() => setShowProfileDropdown(false))}
           </div>
         </div>
       </header>

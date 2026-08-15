@@ -91,7 +91,7 @@ export const inventarisApi = {
 export const dashboardApi = {
   getSummary: () => request("/dashboard/summary"),
   getCashflow: (year) => request(`/dashboard/cashflow${year ? `?year=${year}` : ''}`),
-  getAllocation: () => request("/dashboard/allocation"),
+  getAllocation: (type) => request(`/dashboard/allocation${type ? `?type=${encodeURIComponent(type)}` : ''}`),
   getRecentActivity: () => request("/dashboard/recent-activity"),
   getUpcomingPrograms: () => request("/dashboard/upcoming-programs"),
   getCompletedPrograms: () => request("/dashboard/completed-programs"),
@@ -163,5 +163,13 @@ export const articleApi = {
   create: (data) => request("/articles", { method: "POST", body: JSON.stringify(data) }),
   update: (id, data) => request(`/articles/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   delete: (id) => request(`/articles/${id}`, { method: "DELETE" }),
+};
+
+export const contactMessagesApi = {
+  getAll: () => request("/contact-messages"),
+  getById: (id) => request(`/contact-messages/${id}`),
+  create: (data) => request("/contact-messages", { method: "POST", body: JSON.stringify(data) }),
+  updateStatus: (id, status) => request(`/contact-messages/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+  delete: (id) => request(`/contact-messages/${id}`, { method: "DELETE" }),
 };
 

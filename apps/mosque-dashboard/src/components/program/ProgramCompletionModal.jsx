@@ -155,7 +155,7 @@ const ProgramCompletionModal = ({ isOpen, onClose, onSubmit, program }) => {
                   {photoFiles.map((file, idx) => (
                     <div key={idx} className="relative group rounded-lg overflow-hidden border border-outline aspect-video bg-surface-variant">
                       <img src={URL.createObjectURL(file)} alt={`Preview ${idx+1}`} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="absolute inset-0 bg-black/50 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <button 
                           type="button" 
                           onClick={(e) => { e.stopPropagation(); removePhoto(idx); }} 

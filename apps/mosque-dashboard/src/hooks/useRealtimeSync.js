@@ -63,6 +63,10 @@ export function useRealtimeSync() {
         case 'articles':
           queryClient.invalidateQueries({ queryKey: ['articles'] });
           break;
+        case 'contact-messages':
+        case 'contactMessages':
+          queryClient.invalidateQueries({ queryKey: ['contact-messages'] });
+          break;
         default:
           // If entity is unknown or global update, invalidate everything
           queryClient.invalidateQueries();
@@ -73,6 +77,7 @@ export function useRealtimeSync() {
     socketRef.current.on('notificationUpdated', () => {
       console.log(`🔔 Realtime notification update received`);
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['contact-messages'] });
     });
 
     socketRef.current.on('disconnect', () => {

@@ -28,7 +28,7 @@ const JadwalSholatWidget = () => {
         } else {
           setError('Gagal mengambil jadwal sholat');
         }
-      } catch (err) {
+      } catch {
         setError('Koneksi terputus');
       } finally {
         setLoading(false);

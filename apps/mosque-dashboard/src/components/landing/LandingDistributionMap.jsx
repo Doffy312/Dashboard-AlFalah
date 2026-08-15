@@ -30,17 +30,6 @@ function seededRandom(seed) {
   return x - Math.floor(x);
 }
 
-// Calculate Haversine distance in meters between two lat/lng coordinates
-function getDistanceMeters(lat1, lon1, lat2, lon2) {
-  const R = 6371e3;
-  const p1 = lat1 * Math.PI / 180;
-  const p2 = lat2 * Math.PI / 180;
-  const dp = (lat2 - lat1) * Math.PI / 180;
-  const dl = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dp / 2) * Math.sin(dp / 2) +
-            Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
-  return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
-}
 
 const LandingDistributionMap = () => {
   const { profile } = useSettings();
@@ -130,9 +119,12 @@ const LandingDistributionMap = () => {
     if (!mapContainerRef.current) return;
     if (mapInstanceRef.current) return; // Prevent duplicate initialization
 
+    // Use slightly zoomed-out level on mobile so the full radius circle is visible
+    const initialZoom = window.innerWidth < 640 ? 16 : 17;
+
     const map = L.map(mapContainerRef.current, {
       center: [mosqueLat, mosqueLng],
-      zoom: 17,
+      zoom: initialZoom,
       zoomControl: false,
       attributionControl: false
     });
@@ -143,8 +135,8 @@ const LandingDistributionMap = () => {
       subdomains: 'abcd',
     }).addTo(map);
 
-    // Zoom Control
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    // Zoom Control — bottom-right on desktop, top-right on mobile to avoid thumb overlap
+    L.control.zoom({ position: window.innerWidth < 640 ? 'topright' : 'bottomright' }).addTo(map);
 
     // Layer Group for markers
     const layerGroup = L.layerGroup().addTo(map);
@@ -193,13 +185,26 @@ const LandingDistributionMap = () => {
 
     mapInstanceRef.current = map;
 
+    // Leaflet requires invalidateSize when its container dimensions change
+    const handleResize = () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    };
+    window.addEventListener('resize', handleResize);
+
+    // Trigger initial invalidateSize after a short delay to ensure DOM is fully rendered
+    const resizeTimer = setTimeout(handleResize, 300);
+
     return () => {
+      clearTimeout(resizeTimer);
+      window.removeEventListener('resize', handleResize);
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
       }
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Update Map Center & Mosque Marker Popup when mosque coordinates or profile change
   useEffect(() => {
@@ -299,34 +304,34 @@ const LandingDistributionMap = () => {
   }, [filteredPoints, displayMode]);
 
   return (
-    <section id="sebaran-jemaah" className="scroll-mt-24 py-16 px-6 lg:px-12 max-w-7xl mx-auto text-white relative overflow-hidden">
+    <section id="sebaran-jemaah" className="scroll-mt-24 py-8 sm:py-16 px-3 sm:px-6 lg:px-12 max-w-7xl mx-auto text-white relative overflow-hidden w-full">
       {/* Background Decorative Glow */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-0 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-0 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="relative z-10">
+      <div className="relative z-10 w-full max-w-full min-w-0">
         
         {/* Header Section */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold tracking-wide uppercase mb-4">
-            <Compass className="w-4 h-4 text-emerald-400" />
-            <span>Peta Interaktif Sebaran Jemaah</span>
+        <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-12 w-full px-2 min-w-0">
+          <div className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] sm:text-xs font-semibold tracking-wide uppercase mb-3 sm:mb-4 max-w-full text-center leading-tight">
+            <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 shrink-0" />
+            <span className="truncate">Peta Interaktif Sebaran Jemaah</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-4">
-            Jangkauan Pelayanan & Komunitas Masjid
+          <h2 className="text-xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2 sm:mb-4 break-words leading-tight px-1">
+            Jangkauan Pelayanan &amp; Komunitas Masjid
           </h2>
-          <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
+          <p className="text-slate-400 text-xs sm:text-base md:text-lg leading-relaxed px-1 sm:px-0 break-words">
             Visualisasi pemetaan titik lokasi tempat tinggal jemaah terdaftar di lingkungan {mosqueName} untuk optimalisasi dakwah, silaturahmi, dan penyaluran ZISWAF.
           </p>
         </div>
 
         {/* Action Controls & Filters Bar */}
-        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 mb-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="bg-[#0d1820]/90 border border-white/10 rounded-2xl p-3 sm:p-4 mb-4 sm:mb-6 shadow-xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 w-full max-w-full min-w-0 overflow-hidden">
           
-          {/* Category Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
-            <span className="text-xs text-slate-400 font-medium flex items-center gap-1.5 pr-2 border-r border-white/10">
-              <Filter className="w-3.5 h-3.5 text-slate-400" /> Filter:
+          {/* Category Filter Pills — horizontally scrollable on mobile with min-w-0 to prevent flexbox overflow */}
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto w-full min-w-0 max-w-full pb-1 sm:pb-0 hide-scrollbar shrink">
+            <span className="text-[11px] sm:text-xs text-slate-400 font-medium flex items-center gap-1 sm:gap-1.5 pr-2 border-r border-white/10 shrink-0 whitespace-nowrap">
+              <Filter className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400" /> Filter:
             </span>
             {['Semua', 'Jamaah Rutin', 'Muzakki', 'Mustahik', 'Lansia'].map((cat) => {
               const active = activeCategory === cat;
@@ -334,7 +339,7 @@ const LandingDistributionMap = () => {
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 whitespace-nowrap flex items-center gap-2 ${
+                  className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition-all duration-200 whitespace-nowrap flex items-center gap-1.5 sm:gap-2 shrink-0 ${
                     active
                       ? 'bg-emerald-500 text-slate-950 font-bold shadow-lg shadow-emerald-500/20'
                       : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white border border-white/10'
@@ -342,7 +347,7 @@ const LandingDistributionMap = () => {
                 >
                   {cat !== 'Semua' && (
                     <span 
-                      className="w-2 h-2 rounded-full" 
+                      className="w-2 h-2 rounded-full shrink-0" 
                       style={{ backgroundColor: CATEGORY_COLORS[cat] }}
                     />
                   )}
@@ -352,123 +357,131 @@ const LandingDistributionMap = () => {
             })}
           </div>
 
-          {/* Mode Switcher (Pins vs Density) */}
-          <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-            <div className="bg-black/30 p-1 rounded-xl border border-white/10 flex items-center">
+          {/* Mode Switcher (Pins vs Density) — 2 column grid on mobile */}
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0 min-w-0">
+            <div className="bg-black/30 p-1 rounded-xl border border-white/10 grid grid-cols-2 gap-1 w-full sm:w-auto min-w-0">
               <button
                 onClick={() => setDisplayMode('pins')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap ${
                   displayMode === 'pins'
                     ? 'bg-white/10 text-emerald-400 shadow-sm font-semibold'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                <MapPin className="w-3.5 h-3.5" /> Pin Marker
+                <MapPin className="w-3.5 h-3.5 shrink-0" /> Pin Marker
               </button>
               <button
                 onClick={() => setDisplayMode('density')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap ${
                   displayMode === 'density'
                     ? 'bg-white/10 text-emerald-400 shadow-sm font-semibold'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                <Layers className="w-3.5 h-3.5" /> Heatmap Radius
+                <Layers className="w-3.5 h-3.5 shrink-0" /> Heatmap
               </button>
             </div>
           </div>
         </div>
 
         {/* Main Grid: Stats Sidebar + Map Container */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* On mobile: Map first (order-1), Stats second (order-2) */}
+        {/* On lg desktop: Stats left (order-none), Map right (order-none) */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 w-full max-w-full min-w-0">
           
-          {/* Left Stats Grid Cards */}
-          <div className="lg:col-span-1 space-y-4">
-            
-            {/* Stat Card 1 */}
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 shadow-lg">
-              <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
-                <span>Total Jemaah Terdata</span>
-                <Users className="w-4 h-4 text-emerald-400" />
+          {/* Stats Cards — Below map on mobile, Left sidebar on desktop */}
+          <div className="lg:col-span-1 order-2 lg:order-1 min-w-0 max-w-full">
+
+            {/* Mobile: Horizontal scroll strip for stat cards */}
+            {/* Desktop: Vertical stacked cards */}
+            <div className="flex lg:flex-col gap-3 sm:gap-4 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 hide-scrollbar w-full min-w-0 max-w-full">
+              
+              {/* Stat Card 1: Total Jemaah */}
+              <div className="bg-[#0d1820]/90 border border-white/10 rounded-2xl p-3.5 sm:p-5 shadow-lg min-w-[180px] sm:min-w-[220px] lg:min-w-0 shrink-0 lg:shrink">
+                <div className="flex items-center justify-between text-slate-400 text-[11px] sm:text-xs mb-1.5 sm:mb-2">
+                  <span>Total Jemaah Terdata</span>
+                  <Users className="w-4 h-4 text-emerald-400 shrink-0" />
+                </div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-white mb-1">{totalTerdata} <span className="text-[10px] sm:text-xs font-normal text-emerald-400">Jiwa</span></div>
+                <div className="text-[10px] sm:text-xs text-slate-400 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                  <span>Terhubung ke Database</span>
+                </div>
               </div>
-              <div className="text-3xl font-extrabold text-white mb-1">{totalTerdata} <span className="text-xs font-normal text-emerald-400">Jiwa</span></div>
-              <div className="text-xs text-slate-400 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Terhubung ke Sistem Database</span>
+
+              {/* Stat Card 2: Cakupan Wilayah */}
+              <div className="bg-[#0d1820]/90 border border-white/10 rounded-2xl p-3.5 sm:p-5 shadow-lg min-w-[180px] sm:min-w-[220px] lg:min-w-0 shrink-0 lg:shrink">
+                <div className="flex items-center justify-between text-slate-400 text-[11px] sm:text-xs mb-1.5 sm:mb-2">
+                  <span>Cakupan Wilayah</span>
+                  <Building2 className="w-4 h-4 text-blue-400 shrink-0" />
+                </div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-white mb-1">{totalRt} <span className="text-[10px] sm:text-xs font-normal text-blue-400">RT / 4 RW</span></div>
+                <p className="text-[10px] sm:text-xs text-slate-400 hidden sm:block">Tersebar di seluruh RW Kelurahan sekitar masjid.</p>
+              </div>
+
+              {/* Stat Card 3: Radius */}
+              <div className="bg-[#0d1820]/90 border border-white/10 rounded-2xl p-3.5 sm:p-5 shadow-lg min-w-[180px] sm:min-w-[220px] lg:min-w-0 shrink-0 lg:shrink">
+                <div className="flex items-center justify-between text-slate-400 text-[11px] sm:text-xs mb-1.5 sm:mb-2">
+                  <span>Radius Sebaran</span>
+                  <Navigation className="w-4 h-4 text-amber-400 shrink-0" />
+                </div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-white mb-1">~{radiusText} <span className="text-[10px] sm:text-xs font-normal text-amber-400">meter</span></div>
+                <p className="text-[10px] sm:text-xs text-slate-400 hidden sm:block">Radius sebaran titik jemaah dari lokasi masjid.</p>
               </div>
             </div>
 
-            {/* Stat Card 2 */}
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 shadow-lg">
-              <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
-                <span>Cakupan Wilayah</span>
-                <Building2 className="w-4 h-4 text-blue-400" />
-              </div>
-              <div className="text-3xl font-extrabold text-white mb-1">{totalRt} <span className="text-xs font-normal text-blue-400">RT / 4 RW</span></div>
-              <p className="text-xs text-slate-400">Tersebar di seluruh RW Kelurahan sekitar masjid.</p>
-            </div>
-
-            {/* Stat Card 3 */}
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 shadow-lg">
-              <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
-                <span>Radius Sebaran</span>
-                <Navigation className="w-4 h-4 text-amber-400" />
-              </div>
-              <div className="text-3xl font-extrabold text-white mb-1">~{radiusText} <span className="text-xs font-normal text-amber-400">meter</span></div>
-              <p className="text-xs text-slate-400">Radius sebaran titik jemaah dari lokasi masjid.</p>
-            </div>
-
-            {/* Legend & Privacy Card */}
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 space-y-3">
-              <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                <Info className="w-3.5 h-3.5 text-emerald-400" /> Legenda & Data Real DB
+            {/* Legend & Privacy Card — visible on all screens, but more compact on mobile */}
+            <div className="bg-[#0d1820]/90 border border-white/10 rounded-2xl p-3 sm:p-4 mt-3 sm:mt-4 shadow-lg min-w-0 max-w-full">
+              <h4 className="text-[11px] sm:text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 mb-2 sm:mb-3">
+                <Info className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Legenda &amp; Data Real DB
               </h4>
-              <div className="space-y-2 text-xs text-slate-300">
+              {/* Mobile: 2-column compact grid | Desktop: stacked list */}
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-x-4 gap-y-1.5 sm:gap-y-2 text-[11px] sm:text-xs text-slate-300 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Jamaah Rutin
+                  <span className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-500 shrink-0"></span> Jamaah Rutin
                   </span>
-                  <span className="text-slate-400 text-[11px] font-semibold">{countRutin} jiwa</span>
+                  <span className="text-slate-400 text-[10px] sm:text-[11px] font-semibold">{countRutin}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Muzakki ZISWAF
+                  <span className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-blue-500 shrink-0"></span> Muzakki
                   </span>
-                  <span className="text-slate-400 text-[11px] font-semibold">{countMuzakki} jiwa</span>
+                  <span className="text-slate-400 text-[10px] sm:text-[11px] font-semibold">{countMuzakki}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Mustahik
+                  <span className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-amber-500 shrink-0"></span> Mustahik
                   </span>
-                  <span className="text-slate-400 text-[11px] font-semibold">{countMustahik} jiwa</span>
+                  <span className="text-slate-400 text-[10px] sm:text-[11px] font-semibold">{countMustahik}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Lansia / Sepuh
+                  <span className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-purple-500 shrink-0"></span> Lansia
                   </span>
-                  <span className="text-slate-400 text-[11px] font-semibold">{countLansia} jiwa</span>
+                  <span className="text-slate-400 text-[10px] sm:text-[11px] font-semibold">{countLansia}</span>
                 </div>
               </div>
             </div>
 
           </div>
 
-          {/* Right Map Canvas Container */}
-          <div className="lg:col-span-3 relative bg-[#060b10] rounded-3xl border border-white/10 overflow-hidden shadow-2xl min-h-[480px] lg:min-h-[540px] flex flex-col">
+          {/* Map Canvas Container — Shows FIRST on mobile (order-1), right side on desktop */}
+          <div className="lg:col-span-3 order-1 lg:order-2 relative bg-[#060b10] rounded-2xl sm:rounded-3xl border border-white/10 overflow-hidden shadow-2xl w-full max-w-full min-w-0">
             
-            {/* Map Canvas */}
-            <div ref={mapContainerRef} className="w-full flex-1 min-h-[400px] z-10"></div>
+            {/* Map Canvas — explicit height for Leaflet to render correctly */}
+            <div ref={mapContainerRef} className="w-full max-w-full h-[40vh] min-h-[260px] max-h-[440px] sm:h-[55vh] lg:h-[540px] lg:max-h-none z-10"></div>
 
             {/* Privacy Protection Overlay Badge at Bottom */}
-            <div className="bg-[#060b10]/90 backdrop-blur-md border-t border-white/10 p-3 px-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-300 z-20">
-              <div className="flex items-center gap-2 text-emerald-400 font-medium">
-                <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
-                <span>Privasi Terjaga: Koordinat disajikan secara anonim berdasarkan statistik database.</span>
+            <div className="bg-[#060b10]/90 border-t border-white/10 p-2.5 sm:p-3 px-3 sm:px-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 text-[10px] sm:text-xs text-slate-300 z-20 w-full max-w-full min-w-0 overflow-hidden">
+              <div className="flex items-start sm:items-center gap-1.5 sm:gap-2 text-emerald-400 font-medium min-w-0">
+                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-emerald-400 mt-0.5 sm:mt-0" />
+                <span className="break-words">Privasi Terjaga: Koordinat anonim berdasarkan statistik database.</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-400">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-slate-400 flex-wrap shrink-0">
                 <span>Pusat: <strong className="text-white">{mosqueName}</strong></span>
-                <span>•</span>
-                <span>Total Menampilkan: <strong className="text-emerald-400">{filteredPoints.length}</strong> titik</span>
+                <span className="hidden sm:inline">•</span>
+                <span>Menampilkan: <strong className="text-emerald-400">{filteredPoints.length}</strong> titik</span>
               </div>
             </div>
 

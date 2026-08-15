@@ -17,33 +17,66 @@ const Dashboard = () => {
   const pengeluaran = summary?.finance?.totalPengeluaran ?? 0;
   const totalJemaah = summary?.jemaah?.total ?? 0;
 
-  let maxVal = 50000000;
+  // Calculate dynamic step scale for Arus Kas Total chart (Base 10 Juta, doubles to 20 Juta, 40 Juta... if peak exceeds box height)
+  const BASE_STEP = 10000000; // 10 Juta base step
+  const MAX_INTERVALS = 5; // Max 5 ticks per box
+
+  let peak = 0;
   if (cashflow) {
     const maxIn = Math.max(...(cashflow.income ?? [0]));
     const maxOut = Math.max(...(cashflow.expense ?? [0]));
-    if (Math.max(maxIn, maxOut) > 0) {
-      maxVal = Math.max(maxIn, maxOut) * 1.2;
+    peak = Math.max(maxIn, maxOut);
+  }
+
+  let step = BASE_STEP;
+  if (peak > 0) {
+    while (Math.ceil(peak / step) > MAX_INTERVALS) {
+      step *= 2;
     }
   }
+
+  const maxVal = Math.max(step, Math.ceil(peak / step) * step);
+
+  const ticks = [];
+  for (let val = maxVal; val >= 0; val -= step) {
+    ticks.push(val);
+  }
+
+  const formatYLabel = (val) => {
+    if (val === 0) return '0';
+    if (val >= 1000000000) {
+      const miliar = val / 1000000000;
+      return `${Number.isInteger(miliar) ? miliar : miliar.toFixed(1)} Miliar`;
+    }
+    if (val >= 1000000) {
+      const juta = val / 1000000;
+      return `${Number.isInteger(juta) ? juta : juta.toFixed(1)} Juta`;
+    }
+    if (val >= 1000) {
+      const ribu = val / 1000;
+      return `${Number.isInteger(ribu) ? ribu : ribu.toFixed(0)} Ribu`;
+    }
+    return `${val}`;
+  };
 
   return (
     <div className="flex flex-col gap-6 text-on-surface">
       {/* KPI Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* KPI 1: Saldo */}
-        <div className="bg-[#111a24] rounded-2xl p-5 border border-[#1a2432] relative overflow-hidden flex flex-col justify-between h-[160px]">
-          <div className="flex justify-between items-start z-10">
-            <div>
-              <p className="text-[11px] text-on-surface-variant font-bold tracking-wider uppercase mb-1">Saldo Total</p>
-              <h3 className="text-2xl font-bold text-white">{formatCurrency(saldo)}</h3>
+        <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-outline-variant relative overflow-hidden flex flex-col justify-between min-h-[140px] sm:h-[160px]">
+          <div className="flex justify-between items-start z-10 gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] text-on-surface-variant font-bold tracking-wider uppercase mb-1 truncate">Saldo Total</p>
+              <h3 className="text-xl sm:text-2xl font-bold text-on-surface truncate">{formatCurrency(saldo)}</h3>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[18px]">account_balance_wallet</span>
             </div>
           </div>
           <div className="flex-1 flex flex-col justify-end z-10 mt-2">
             {/* Mini Bar Chart */}
-            <div className="h-10 flex items-end justify-between gap-1 opacity-80 mb-2">
+            <div className="h-8 sm:h-10 flex items-end justify-between gap-1 opacity-80 mb-2">
               {[40, 50, 45, 60, 55, 70, 85].map((h, i) => (
                 <div key={i} className="flex-1 bg-primary/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
               ))}
@@ -56,19 +89,19 @@ const Dashboard = () => {
         </div>
 
         {/* KPI 2: Pemasukan */}
-        <div className="bg-[#111a24] rounded-2xl p-5 border border-[#1a2432] relative overflow-hidden flex flex-col justify-between h-[160px]">
-          <div className="flex justify-between items-start z-10">
-            <div>
-              <p className="text-[11px] text-on-surface-variant font-bold tracking-wider uppercase mb-1">Pemasukan</p>
-              <h3 className="text-2xl font-bold text-white">{formatCurrency(pemasukan)}</h3>
+        <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-outline-variant relative overflow-hidden flex flex-col justify-between min-h-[140px] sm:h-[160px]">
+          <div className="flex justify-between items-start z-10 gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] text-on-surface-variant font-bold tracking-wider uppercase mb-1 truncate">Pemasukan</p>
+              <h3 className="text-xl sm:text-2xl font-bold text-on-surface truncate">{formatCurrency(pemasukan)}</h3>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[18px]">arrow_downward</span>
             </div>
           </div>
           <div className="flex-1 flex flex-col justify-end z-10 mt-2">
             {/* Mini Bar Chart */}
-            <div className="h-10 flex items-end justify-between gap-1 opacity-80 mb-2">
+            <div className="h-8 sm:h-10 flex items-end justify-between gap-1 opacity-80 mb-2">
               {[30, 45, 40, 55, 60, 75, 80].map((h, i) => (
                 <div key={i} className="flex-1 bg-primary/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
               ))}
@@ -81,19 +114,19 @@ const Dashboard = () => {
         </div>
 
         {/* KPI 3: Pengeluaran */}
-        <div className="bg-[#111a24] rounded-2xl p-5 border border-[#1a2432] relative overflow-hidden flex flex-col justify-between h-[160px]">
-          <div className="flex justify-between items-start z-10">
-            <div>
-              <p className="text-[11px] text-on-surface-variant font-bold tracking-wider uppercase mb-1">Pengeluaran</p>
-              <h3 className="text-2xl font-bold text-white">{formatCurrency(pengeluaran)}</h3>
+        <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-outline-variant relative overflow-hidden flex flex-col justify-between min-h-[140px] sm:h-[160px]">
+          <div className="flex justify-between items-start z-10 gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] text-on-surface-variant font-bold tracking-wider uppercase mb-1 truncate">Pengeluaran</p>
+              <h3 className="text-xl sm:text-2xl font-bold text-on-surface truncate">{formatCurrency(pengeluaran)}</h3>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-[#d97706]/20 text-[#d97706] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[#d97706]/20 text-[#d97706] flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[18px]">arrow_upward</span>
             </div>
           </div>
           <div className="flex-1 flex flex-col justify-end z-10 mt-2">
             {/* Mini Bar Chart */}
-            <div className="h-10 flex items-end justify-between gap-1 opacity-80 mb-2">
+            <div className="h-8 sm:h-10 flex items-end justify-between gap-1 opacity-80 mb-2">
               {[60, 50, 65, 45, 55, 40, 30].map((h, i) => (
                 <div key={i} className="flex-1 bg-[#d97706]/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
               ))}
@@ -106,19 +139,19 @@ const Dashboard = () => {
         </div>
 
         {/* KPI 4: Jemaah */}
-        <div className="bg-[#111a24] rounded-2xl p-5 border border-[#1a2432] relative overflow-hidden flex flex-col justify-between h-[160px]">
-          <div className="flex justify-between items-start z-10">
-            <div>
-              <p className="text-[11px] text-on-surface-variant font-bold tracking-wider uppercase mb-1">Jemaah Terdaftar</p>
-              <h3 className="text-2xl font-bold text-white">{totalJemaah}</h3>
+        <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-outline-variant relative overflow-hidden flex flex-col justify-between min-h-[140px] sm:h-[160px]">
+          <div className="flex justify-between items-start z-10 gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] text-on-surface-variant font-bold tracking-wider uppercase mb-1 truncate">Jemaah Terdaftar</p>
+              <h3 className="text-xl sm:text-2xl font-bold text-on-surface truncate">{totalJemaah}</h3>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-[#d97706]/20 text-[#d97706] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[#d97706]/20 text-[#d97706] flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[18px]">group</span>
             </div>
           </div>
           <div className="flex-1 flex flex-col justify-end z-10 mt-2">
             {/* Mini Bar Chart */}
-            <div className="h-10 flex items-end justify-between gap-1 opacity-80 mb-2">
+            <div className="h-8 sm:h-10 flex items-end justify-between gap-1 opacity-80 mb-2">
               {[20, 20, 30, 30, 40, 40, 55].map((h, i) => (
                 <div key={i} className="flex-1 bg-[#d97706]/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
               ))}
@@ -137,69 +170,101 @@ const Dashboard = () => {
       {/* Middle Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Arus Kas Total Chart */}
-        <div className="lg:col-span-2 bg-[#111a24] rounded-2xl p-6 border border-[#1a2432] flex flex-col">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold text-white">Arus Kas Total</h3>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-primary"></div>
-                <span className="text-[12px] text-on-surface-variant">Pemasukan</span>
+        <div className="lg:col-span-2 bg-surface rounded-2xl p-4 sm:p-6 border border-outline-variant flex flex-col">
+          <div className="flex justify-between items-center mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-semibold text-on-surface">Arus Kas Total</h3>
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#10b981]"></div>
+                <span className="text-[11px] sm:text-[12px] text-on-surface-variant font-medium">Pemasukan</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#f59e0b]"></div>
-                <span className="text-[12px] text-on-surface-variant">Pengeluaran</span>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#ef4444]"></div>
+                <span className="text-[11px] sm:text-[12px] text-on-surface-variant font-medium">Pengeluaran</span>
               </div>
             </div>
           </div>
 
-          <div className="flex-1 relative mt-4 flex flex-col justify-end pb-6">
-            {/* Horizontal Grid Lines */}
-            <div className="absolute inset-0 flex flex-col justify-between pb-6">
-              {[1, 0.8, 0.6, 0.4, 0.2, 0].map((ratio, i) => {
-                const val = maxVal * ratio;
-                let label = "0";
-                if (val >= 1000000) label = `${(val / 1000000).toFixed(1).replace('.0', '')}M`;
-                else if (val >= 1000) label = `${(val / 1000).toFixed(1).replace('.0', '')}K`;
-                else if (val > 0) label = Math.round(val).toString();
-                
-                return (
+          <div className="overflow-x-auto hide-scrollbar pb-2">
+            <div className="min-w-[500px] sm:min-w-0 flex-1 relative mt-4 flex flex-col justify-end pb-6">
+              {/* Horizontal Grid Lines */}
+              <div className="absolute inset-0 flex flex-col justify-between pb-6">
+                {ticks.map((val, i) => (
                   <div key={i} className="flex items-center w-full">
-                    <span className="w-8 text-right text-[10px] text-on-surface-variant font-mono">{label}</span>
+                    <span className="w-14 text-right text-[10px] text-on-surface-variant font-semibold font-mono opacity-90">{formatYLabel(val)}</span>
                     <div className="ml-3 flex-1 border-t border-white/5 border-dashed"></div>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
 
-            {/* Bars - use cashflow data if available */}
-            <div className="relative z-10 flex justify-between items-end h-[200px] pl-11 pr-2">
-              {(cashflow?.months ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des']).map((month, i) => {
-                const inVal = cashflow?.income?.[i] ?? 0;
-                const outVal = cashflow?.expense?.[i] ?? 0;
-                const incomeH = Math.max((inVal / maxVal) * 100, 2);
-                const expenseH = Math.max((outVal / maxVal) * 100, 2);
-                return (
-                  <div key={i} className="flex gap-1.5 items-end h-full group">
-                    <div className="w-4 sm:w-6 bg-primary rounded-t-sm group-hover:brightness-125 transition-all" style={{ height: `${incomeH}%` }}></div>
-                    <div className="w-4 sm:w-6 bg-[#f59e0b] rounded-t-sm group-hover:brightness-125 transition-all" style={{ height: `${expenseH}%` }}></div>
-                  </div>
-                );
-              })}
-            </div>
+              {/* Bars with animated hover tooltip & column backdrop highlight */}
+              <div className="relative z-10 flex justify-between items-end h-[180px] sm:h-[200px] pl-16 pr-2">
+                {(cashflow?.months ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des']).map((month, i, arr) => {
+                  const inVal = cashflow?.income?.[i] ?? 0;
+                  const outVal = cashflow?.expense?.[i] ?? 0;
+                  const incomeH = Math.max((inVal / maxVal) * 100, 2);
+                  const expenseH = Math.max((outVal / maxVal) * 100, 2);
+                  const currentYear = new Date().getFullYear();
 
-            {/* X-Axis Labels */}
-            <div className="absolute bottom-0 left-0 right-0 flex justify-between pl-11 pr-2">
-              {(cashflow?.months ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des']).map((month, i, arr) => (
-                <span key={i} className={`text-[11px] ${i === arr.length - 1 ? 'text-primary font-bold' : 'text-on-surface-variant'} truncate max-w-[20px] sm:max-w-none text-center`}>{month}</span>
-              ))}
+                  let tooltipPos = 'left-1/2 -translate-x-1/2';
+                  if (i <= 1) {
+                    tooltipPos = 'left-0';
+                  } else if (i >= arr.length - 2) {
+                    tooltipPos = 'right-0';
+                  }
+
+                  return (
+                    <div key={i} className="flex-1 flex justify-center items-end h-full relative group cursor-pointer">
+                      {/* Column Hover Background Overlay (shaded dark rectangle behind bars) */}
+                      <div className="absolute inset-y-0 -top-2 -bottom-2 w-[90%] rounded-xl bg-white/[0.04] sm:bg-white/[0.05] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-0" />
+
+                      {/* Floating Animated Tooltip Card */}
+                      <div className={`absolute top-1 ${tooltipPos} bg-[#111927]/95 backdrop-blur-md text-on-surface p-3 sm:p-3.5 rounded-xl text-xs opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 scale-95 group-hover:scale-100 transition-all duration-200 ease-out whitespace-nowrap z-30 pointer-events-none flex flex-col gap-2 shadow-2xl border border-white/10 min-w-[175px]`}>
+                        <div className="font-bold text-white text-[12px] border-b border-white/10 pb-1.5 flex items-center justify-between">
+                          <span>{month} {currentYear}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-4 text-[12px]">
+                          <span className="text-[#10b981] font-medium flex items-center gap-1.5">
+                            Pemasukan:
+                          </span>
+                          <span className="text-[#10b981] font-bold font-mono">
+                            {formatCurrency(inVal)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between gap-4 text-[12px]">
+                          <span className="text-[#ef4444] font-medium flex items-center gap-1.5">
+                            Pengeluaran:
+                          </span>
+                          <span className="text-[#ef4444] font-bold font-mono">
+                            {formatCurrency(outVal)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Chart Bars */}
+                      <div className="flex gap-1 sm:gap-1.5 items-end h-full relative z-10">
+                        <div className="w-3 sm:w-6 bg-[#10b981] rounded-t-sm group-hover:brightness-125 group-hover:scale-y-[1.02] origin-bottom transition-all duration-200 shadow-sm" style={{ height: `${incomeH}%` }}></div>
+                        <div className="w-3 sm:w-6 bg-[#ef4444] rounded-t-sm group-hover:brightness-125 group-hover:scale-y-[1.02] origin-bottom transition-all duration-200 shadow-sm" style={{ height: `${expenseH}%` }}></div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* X-Axis Labels */}
+              <div className="absolute bottom-0 left-0 right-0 flex justify-between pl-16 pr-2 pointer-events-none">
+                {(cashflow?.months ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des']).map((month, i, arr) => (
+                  <span key={i} className={`flex-1 text-[10px] sm:text-[11px] font-semibold ${i === arr.length - 1 ? 'text-primary font-bold' : 'text-on-surface-variant opacity-95'} text-center`}>{month}</span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Program Mendatang */}
-        <div className="bg-[#111a24] rounded-2xl p-6 border border-[#1a2432] flex flex-col">
+        <div className="bg-surface rounded-2xl p-6 border border-outline-variant flex flex-col">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold text-white">Program Mendatang</h3>
+            <h3 className="text-lg font-semibold text-on-surface">Program Mendatang</h3>
             <button className="text-on-surface-variant hover:text-white">
               <span className="material-symbols-outlined">more_horiz</span>
             </button>
@@ -211,13 +276,13 @@ const Dashboard = () => {
                 const d = new Date(prog.date);
                 const colors = ['text-primary', 'text-[#f59e0b]', 'text-tertiary'];
                 return (
-                  <div key={prog.id ?? i} onClick={() => navigate('/dashboard/program-kerja')} className="flex items-center gap-4 bg-[#1a2432]/50 p-3 rounded-xl border border-white/5 hover:bg-[#1a2432] transition-colors cursor-pointer">
-                    <div className="w-12 h-12 rounded-lg bg-[#1a2432] border border-white/10 flex flex-col items-center justify-center shrink-0">
+                  <div key={prog.id ?? i} onClick={() => navigate('/dashboard/program-kerja')} className="flex items-center gap-4 bg-surface-variant/50 p-3 rounded-xl border border-outline-variant/30 hover:bg-surface-variant transition-colors cursor-pointer">
+                    <div className="w-12 h-12 rounded-lg bg-surface-variant border border-outline-variant/50 flex flex-col items-center justify-center shrink-0">
                       <span className={`text-[14px] font-bold ${colors[i % 3]} leading-tight`}>{d.getDate()}</span>
                       <span className="text-[10px] text-on-surface-variant uppercase">{d.toLocaleDateString('id-ID', { month: 'short' })}</span>
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-[14px] font-semibold text-white mb-1">{prog.name}</h4>
+                      <h4 className="text-[14px] font-semibold text-on-surface mb-1">{prog.name}</h4>
                       <div className="flex items-center gap-1 text-[11px] text-on-surface-variant">
                         <span className="material-symbols-outlined text-[14px]">person</span> {prog.pic}
                       </div>
@@ -239,7 +304,7 @@ const Dashboard = () => {
             )}
           </div>
 
-          <button onClick={() => navigate('/dashboard/program-kerja')} className="w-full mt-4 py-2.5 rounded-xl border border-[#1a2432] text-[13px] font-medium text-white hover:bg-[#1a2432] transition-colors">
+          <button onClick={() => navigate('/dashboard/program-kerja')} className="w-full mt-4 py-2.5 rounded-xl border border-outline-variant text-[13px] font-medium text-on-surface hover:bg-surface-variant transition-colors">
             Lihat Semua Jadwal
           </button>
         </div>
@@ -248,9 +313,9 @@ const Dashboard = () => {
       {/* Bottom Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Alokasi Dana (Donut Chart) */}
-        <div className="bg-[#111a24] rounded-2xl p-6 border border-[#1a2432] flex flex-col items-center">
+        <div className="bg-surface rounded-2xl p-6 border border-outline-variant flex flex-col items-center">
           <div className="w-full flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold text-white">Alokasi Dana</h3>
+            <h3 className="text-lg font-semibold text-on-surface">Alokasi Dana</h3>
           </div>
           
           {/* Simulated Donut Chart using CSS */}
@@ -274,8 +339,8 @@ const Dashboard = () => {
                 <div className="relative w-40 h-40 rounded-full flex items-center justify-center my-4" style={{
                   background: `conic-gradient(${gradient})`
                 }}>
-                  <div className="absolute inset-2 rounded-full bg-[#111a24] flex flex-col items-center justify-center">
-                    <span className="text-3xl font-bold text-white">100%</span>
+                  <div className="absolute inset-2 rounded-full bg-surface flex flex-col items-center justify-center">
+                    <span className="text-3xl font-bold text-on-surface">100%</span>
                     <span className="text-[11px] text-on-surface-variant">Teralokasi</span>
                   </div>
                 </div>
@@ -287,7 +352,7 @@ const Dashboard = () => {
                         <span className="w-2.5 h-2.5 rounded-full" style={{ background: colors[i % colors.length] }}></span>
                         <span className="text-on-surface-variant">{item.label}</span>
                       </div>
-                      <span className="font-bold text-white">{item.percentage}%</span>
+                      <span className="font-bold text-on-surface">{item.percentage}%</span>
                     </div>
                   ))}
                 </div>
@@ -297,15 +362,15 @@ const Dashboard = () => {
         </div>
 
         {/* Aktivitas Terakhir */}
-        <div className="lg:col-span-2 bg-[#111a24] rounded-2xl p-6 border border-[#1a2432] flex flex-col">
+        <div className="lg:col-span-2 bg-surface rounded-2xl p-6 border border-outline-variant flex flex-col">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold text-white">Aktivitas Terakhir</h3>
+            <h3 className="text-lg font-semibold text-on-surface">Aktivitas Terakhir</h3>
             <span className="text-[11px] font-medium px-2 py-1 bg-primary/10 text-primary rounded-md">Terbaru</span>
           </div>
 
           <div className="flex flex-col flex-1 relative ml-2">
             {/* Timeline line */}
-            <div className="absolute left-[9px] top-4 bottom-4 w-px bg-white/10"></div>
+            <div className="absolute left-[9px] top-4 bottom-4 w-px bg-outline-variant"></div>
 
             {(() => {
               const activityList = Array.isArray(recentActivity)
@@ -317,9 +382,9 @@ const Dashboard = () => {
                 const dotColor = i % 2 === 0 ? 'border-primary' : 'border-[#f59e0b]';
                 return (
                   <div key={item.id ?? i} className={`relative pl-8 ${!isLast ? 'pb-8' : ''}`}>
-                    <div className={`absolute left-0 top-1 w-5 h-5 rounded-full bg-[#111a24] border-[4px] ${dotColor} flex items-center justify-center z-10`}></div>
+                    <div className={`absolute left-0 top-1 w-5 h-5 rounded-full bg-surface border-[4px] ${dotColor} flex items-center justify-center z-10`}></div>
                     <div className="flex justify-between items-start mb-1">
-                      <h4 className="text-[14px] font-semibold text-white">{item.title ?? item.description}</h4>
+                      <h4 className="text-[14px] font-semibold text-on-surface">{item.title ?? item.description}</h4>
                       <span className="text-[11px] text-on-surface-variant font-mono">{item.time || item.date || ''}</span>
                     </div>
                     <p className="text-[13px] text-on-surface-variant mb-3">{item.detail ?? item.description}</p>

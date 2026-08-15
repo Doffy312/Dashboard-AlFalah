@@ -16,7 +16,7 @@ const KanbanCard = ({ program, onEdit, onDelete, onStatusChange, onViewDetail, c
         <h4 className="font-title-md text-title-md text-on-surface dark:text-white leading-tight m-0">{program.name}</h4>
         
         {canEdit && (
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
             {program.status === 'Selesai' && onViewDetail && (
               <button onClick={() => onViewDetail(program)} className="p-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 transition-colors" title="Lihat Detail">
                 <Eye size={14} />
@@ -77,7 +77,7 @@ const KanbanBoard = ({ programs, onEdit, onDelete, onStatusChange, onViewDetail,
       {columns.map(col => {
         const colPrograms = programs.filter(p => p.status === col.status);
         return (
-          <div key={col.status} className={`flex-1 w-full min-h-[500px] rounded-2xl border ${col.colorClass} p-sm flex flex-col gap-sm`}>
+          <div key={col.status} className={`flex-1 w-full min-h-[200px] lg:min-h-[500px] rounded-2xl border ${col.colorClass} p-sm flex flex-col gap-sm`}>
             <div className="px-sm py-xs flex justify-between items-center border-b border-inherit mb-xs">
               <h3 className={`font-label-lg font-bold m-0 ${col.textClass}`}>{col.title}</h3>
               <span className={`px-2 py-0.5 rounded-full text-[12px] font-bold bg-surface border border-outline ${col.textClass}`}>

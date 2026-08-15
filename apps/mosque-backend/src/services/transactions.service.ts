@@ -195,14 +195,14 @@ export class TransactionService {
   /**
    * Category distribution for the donut chart.
    */
-  async getCategoryDistribution() {
+  async getCategoryDistribution(type: string = "Pengeluaran") {
     const result = await db
       .select({
         category: transaction.category,
         total: sql<string>`sum(${transaction.amount})`,
       })
       .from(transaction)
-      .where(eq(transaction.type, "Pengeluaran"))
+      .where(eq(transaction.type, type))
       .groupBy(transaction.category)
       .orderBy(sql`sum(${transaction.amount}) desc`);
 

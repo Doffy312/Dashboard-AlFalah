@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authClient } from '../lib/auth-client';
 import { useSettings } from '../contexts/SettingsContext';
+
+const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '2.0.4';
 
 const LoginPage = () => {
   const { profile } = useSettings();
@@ -13,6 +15,15 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const { data: session, isPending: isSessionPending } = authClient.useSession();
+
+  // Automatically redirect if already authenticated or session turns valid
+  useEffect(() => {
+    if (!isSessionPending && session?.user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [session, isSessionPending, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -31,7 +42,7 @@ const LoginPage = () => {
         setError(loginError.message || 'Gagal masuk. Periksa kembali email dan kata sandi Anda.');
         setIsLoading(false);
       } else {
-        // Ensure session cache is updated before redirecting to prevent ProtectedRoute from bouncing back to /login
+        // Fetch session to populate authClient store, then navigate
         await authClient.getSession();
         navigate('/dashboard', { replace: true });
       }
@@ -46,7 +57,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="text-on-surface min-h-screen relative overflow-hidden flex items-center justify-center p-md">
+    <div className="bg-background text-on-surface min-h-screen relative overflow-hidden flex items-center justify-center p-md">
       {/* Atmospheric Background (Light mode adaptation of spiritual teal) */}
       <div className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] rounded-full bg-primary/10 blur-[100px] pointer-events-none -z-10"></div>
       <div className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-secondary/10 blur-[100px] pointer-events-none -z-10"></div>
@@ -120,6 +131,7 @@ const LoginPage = () => {
                   type="button"
                   onClick={togglePassword}
                   disabled={isLoading}
+                  aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                   className="absolute right-sm text-outline-variant hover:text-primary transition-colors flex items-center justify-center p-xs disabled:opacity-50"
                 >
                   <span className="material-symbols-outlined" id="eye-icon">
@@ -153,7 +165,7 @@ const LoginPage = () => {
         </div>
 
         <p className="text-center font-body-sm text-body-sm text-on-surface-variant/70 mt-lg">
-          Sistem Manajemen Informasi Masjid Terpadu<br />Versi 2.0.4
+          Sistem Manajemen Informasi Masjid Terpadu<br />v{APP_VERSION}
         </p>
       </main>
     </div>

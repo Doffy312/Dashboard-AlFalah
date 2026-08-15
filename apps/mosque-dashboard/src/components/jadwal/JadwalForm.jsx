@@ -21,7 +21,7 @@ const JadwalForm = ({ isOpen, onClose, onSubmit, initialData }) => {
         topic: initialData.topic || ''
       });
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setFormData({
         date: new Date().toISOString().split('T')[0],
         role: 'Khotib Jumat',
@@ -51,7 +51,7 @@ const JadwalForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               type="date" required
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               value={formData.date}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, date: e.target.value})}
             />
           </div>
@@ -60,7 +60,7 @@ const JadwalForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             <select 
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none cursor-pointer"
               value={formData.role}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, role: e.target.value})}
             >
               {roles.map(r => <option key={r} value={r} className="bg-surface">{r}</option>)}
@@ -75,7 +75,7 @@ const JadwalForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
             placeholder="Ust. Fulan..."
             value={formData.personName}
-            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+            onChange={(e) =>  
     setFormData({...formData, personName: e.target.value})}
           />
         </div>
@@ -87,7 +87,7 @@ const JadwalForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
             placeholder="0812..."
             value={formData.contact}
-            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+            onChange={(e) =>  
     setFormData({...formData, contact: e.target.value})}
           />
         </div>
@@ -99,7 +99,7 @@ const JadwalForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md resize-none"
             placeholder="Tema kajian/khutbah..."
             value={formData.topic}
-            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+            onChange={(e) =>  
     setFormData({...formData, topic: e.target.value})}
           ></textarea>
         </div>

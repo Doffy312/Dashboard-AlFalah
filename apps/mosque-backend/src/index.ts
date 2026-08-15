@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { env, getCorsOrigins } from "./config/env.js";
+import { env, getCorsOrigins, isLocalNetworkOrigin } from "./config/env.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import apiRoutes from "./routes/index.js";
 import { createServer } from "http";
@@ -19,7 +19,14 @@ initializeSocket(httpServer);
 // ─── Global Middleware ───────────────────────────────────────────────
 app.use(
   cors({
-    origin: getCorsOrigins(),
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const allowedOrigins = getCorsOrigins(origin);
+      if (allowedOrigins.includes(origin) || isLocalNetworkOrigin(origin) || env.NODE_ENV === "development") {
+        return callback(null, true);
+      }
+      callback(null, false);
+    },
     credentials: true, // Required for Better Auth cookies
   })
 );

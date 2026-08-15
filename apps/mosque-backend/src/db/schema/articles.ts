@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, text, timestamp } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, longtext, timestamp } from "drizzle-orm/mysql-core";
 
 export const article = mysqlTable("articles", {
   id: varchar("id", { length: 36 }).primaryKey(),
@@ -8,9 +8,10 @@ export const article = mysqlTable("articles", {
   date: varchar("date", { length: 20 }).notNull(),
   author: varchar("author", { length: 150 }).notNull(),
   readTime: varchar("read_time", { length: 50 }).notNull().default("3 min baca"),
-  image: text("image").notNull(),
-  summary: text("summary").notNull(),
-  content: text("content").notNull(),
+  image: longtext("image").notNull(),
+  summary: longtext("summary").notNull(),
+  content: longtext("content").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });
+

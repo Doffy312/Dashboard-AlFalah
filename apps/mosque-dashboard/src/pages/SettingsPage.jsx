@@ -116,8 +116,8 @@ const SettingsPage = () => {
       {/* Standard Header Section matching other dashboard pages */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-display-sm font-display-sm text-on-surface dark:text-white m-0">Pengaturan</h1>
-          <p className="font-body-md text-on-surface-variant dark:text-white/70 m-0 mt-xs">Kelola konfigurasi sistem dan preferensi organisasi.</p>
+          <h1 className="text-display-sm font-display-sm text-on-surface m-0">Pengaturan</h1>
+          <p className="font-body-md text-on-surface-variant m-0 mt-xs">Kelola konfigurasi sistem dan preferensi organisasi.</p>
         </div>
         <div className="flex w-full sm:w-auto gap-3">
           <button 
@@ -125,7 +125,7 @@ const SettingsPage = () => {
             disabled={!hasUnsavedChanges}
             className={`flex-1 sm:flex-none px-4 py-2 rounded-lg font-label-md transition-colors ${
               hasUnsavedChanges 
-                ? 'bg-surface-variant text-white hover:bg-surface-variant/80 cursor-pointer' 
+                ? 'bg-surface-variant text-on-surface hover:bg-surface-variant/80 cursor-pointer' 
                 : 'bg-surface-variant/50 text-on-surface-variant cursor-not-allowed opacity-60'
             }`}
           >
@@ -149,15 +149,15 @@ const SettingsPage = () => {
       {/* Responsive Glass Layout without scroll traps */}
       <div className="flex flex-col md:flex-row gap-6">
         {/* Navigation Tabs */}
-        <div className="w-full md:w-72 shrink-0 glass-panel p-2 flex md:flex-col gap-1.5 overflow-x-auto md:sticky md:top-[100px] h-fit hide-scrollbar">
+        <div className="w-full md:w-72 shrink-0 glass-panel p-1.5 sm:p-2 flex md:flex-col gap-1.5 overflow-x-auto md:sticky md:top-[100px] h-fit hide-scrollbar">
           {TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className={`flex items-center gap-3 px-3.5 py-3 rounded-lg text-left transition-all duration-200 whitespace-nowrap shrink-0 min-w-0 ${
+              className={`flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:py-3 rounded-lg text-left transition-all duration-200 whitespace-nowrap shrink-0 min-w-0 ${
                 activeTab === tab.id 
                   ? 'bg-primary/20 text-primary font-bold shadow-[0_3px_0_0_rgba(16,185,129,1)] md:shadow-[inset_3px_0_0_0_rgba(16,185,129,1)]' 
-                  : 'text-on-surface-variant hover:text-white hover:bg-surface-variant/50'
+                  : 'text-on-surface-variant hover:text-primary hover:bg-surface-variant/50'
               }`}
             >
               <span className="material-symbols-outlined text-[20px] shrink-0" style={activeTab === tab.id ? { fontVariationSettings: "'FILL' 1" } : {}}>
@@ -169,7 +169,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Active Tab Content Area */}
-        <div className="flex-1 glass-panel p-6">
+        <div className="flex-1 glass-panel p-4 sm:p-6">
           {renderActiveTab()}
         </div>
       </div>

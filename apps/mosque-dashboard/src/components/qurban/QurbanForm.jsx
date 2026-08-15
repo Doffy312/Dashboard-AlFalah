@@ -8,33 +8,14 @@ const QurbanForm = ({ isOpen, onClose, onSubmit, initialData, defaultGroup }) =>
   const { data: jemaahList = [] } = useJemaahList({});
   const { data: qurbanYears = [] } = useQurbanYears();
 
-  const [searchJemaah, setSearchJemaah] = useState('');
-  const [isNewGroup, setIsNewGroup] = useState(false);
+  // Derive the default year once data is available
+  const defaultYear = useMemo(() => {
+    return qurbanYears.find((y) => y.statusAktif) || qurbanYears[0];
+  }, [qurbanYears]);
 
-  const [formData, setFormData] = useState({
-    jemaahId: '',
-    qurbanTahunId: '',
-    jenisHewan: 'Sapi',
-    qurbanKelompokId: '',
-    namaKelompokBaru: '',
-    status: 'Proses',
-    catatan: '',
-  });
-
-  // Active or selected year fallback
-  useEffect(() => {
-    if (qurbanYears.length > 0 && !formData.qurbanTahunId && !initialData) {
-      const active = qurbanYears.find((y) => y.statusAktif) || qurbanYears[0];
-      setFormData((prev) => ({ ...prev, qurbanTahunId: active.id }));
-    }
-  }, [qurbanYears, initialData]);
-
-  // Load groups for the selected year
-  const { data: groupList = [] } = useQurbanGroups(formData.qurbanTahunId);
-
-  useEffect(() => {
+  const buildInitialFormData = () => {
     if (initialData) {
-      setFormData({
+      return {
         jemaahId: initialData.jemaahId || '',
         qurbanTahunId: initialData.qurbanTahunId || '',
         jenisHewan: initialData.jenisHewan || 'Sapi',
@@ -42,24 +23,36 @@ const QurbanForm = ({ isOpen, onClose, onSubmit, initialData, defaultGroup }) =>
         namaKelompokBaru: '',
         status: initialData.status || 'Proses',
         catatan: initialData.catatan || '',
-      });
-      setIsNewGroup(false);
-      setSearchJemaah('');
-    } else {
-      const activeYear = qurbanYears.find((y) => y.statusAktif) || qurbanYears[0];
-      setFormData({
-        jemaahId: '',
-        qurbanTahunId: activeYear?.id || '',
-        jenisHewan: defaultGroup?.jenisHewan || 'Sapi',
-        qurbanKelompokId: defaultGroup?.id || '',
-        namaKelompokBaru: '',
-        status: 'Proses',
-        catatan: '',
-      });
+      };
+    }
+    return {
+      jemaahId: '',
+      qurbanTahunId: defaultYear?.id || '',
+      jenisHewan: defaultGroup?.jenisHewan || 'Sapi',
+      qurbanKelompokId: defaultGroup?.id || '',
+      namaKelompokBaru: '',
+      status: 'Proses',
+      catatan: '',
+    };
+  };
+
+  const [formData, setFormData] = useState(buildInitialFormData);
+
+  const [searchJemaah, setSearchJemaah] = useState('');
+  const [isNewGroup, setIsNewGroup] = useState(false);
+
+  // Load groups for the selected year
+  const { data: groupList = [] } = useQurbanGroups(formData.qurbanTahunId);
+
+  // Reset form when modal opens/closes or initialData changes
+  useEffect(() => {
+    if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Legitimate form reset on modal open
+      setFormData(buildInitialFormData());
       setIsNewGroup(false);
       setSearchJemaah('');
     }
-  }, [initialData, defaultGroup, isOpen]);
+  }, [initialData, defaultGroup, isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Selected Jemaah object lookup
   const selectedJemaah = useMemo(() => {

@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import pkg from './package.json'
 
 // ── Custom Plugin: Strip modulepreload for lazy-loaded chunks ──────────
 // Vite auto-injects <link rel="modulepreload"> for ALL vendor chunks,
-// including ones only used by lazy routes (e.g. vendor-charts ~400KB).
+// including ones only used by lazy routes (e.g. vendor-charts ~400KB, vendor-map ~140KB).
 // This plugin removes those hints so the browser only fetches them
 // when React.lazy actually triggers the dynamic import().
 function stripLazyModulePreload() {
@@ -13,7 +14,7 @@ function stripLazyModulePreload() {
     enforce: 'post',
     transformIndexHtml(html) {
       return html.replace(
-        /\s*<link\s+rel="modulepreload"[^>]*href="[^"]*(?:vendor-charts|vendor-socketio|vendor-datefns|vendor-icons)[^"]*"[^>]*>\s*/g,
+        /\s*<link\s+rel="modulepreload"[^>]*href="[^"]*(?:vendor-charts|vendor-socketio|vendor-datefns|vendor-icons|vendor-map)[^"]*"[^>]*>\s*/g,
         '\n'
       );
     },
@@ -22,6 +23,9 @@ function stripLazyModulePreload() {
 
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   plugins: [
     react(),
     stripLazyModulePreload(),
@@ -77,19 +81,23 @@ export default defineConfig({
             if (id.includes('recharts') || id.includes('d3-') || id.includes('victory')) {
               return 'vendor-charts';
             }
-            // ── 4. Icon library ──────────────────────────────────────
+            // ── 4. Leaflet Map (~140KB) — lazy loaded for map ──────
+            if (id.includes('leaflet')) {
+              return 'vendor-map';
+            }
+            // ── 5. Icon library ──────────────────────────────────────
             if (id.includes('lucide-react')) {
               return 'vendor-icons';
             }
-            // ── 5. Auth client ───────────────────────────────────────
+            // ── 6. Auth client ───────────────────────────────────────
             if (id.includes('better-auth')) {
               return 'vendor-auth';
             }
-            // ── 6. Socket.io — only needed inside DashboardLayout ────
+            // ── 7. Socket.io — only needed inside DashboardLayout ────
             if (id.includes('socket.io') || id.includes('engine.io')) {
               return 'vendor-socketio';
             }
-            // ── 7. Date utilities ────────────────────────────────────
+            // ── 8. Date utilities ────────────────────────────────────
             if (id.includes('date-fns')) {
               return 'vendor-datefns';
             }
@@ -101,6 +109,7 @@ export default defineConfig({
 
   // ── Dev Server ───────────────────────────────────────────────────────
   server: {
+    host: true, // Enables local network IP access (for mobile testing)
     proxy: {
       '/api': {
         target: 'http://localhost:3000',

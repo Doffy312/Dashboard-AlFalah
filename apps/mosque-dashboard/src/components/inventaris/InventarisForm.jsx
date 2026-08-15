@@ -13,6 +13,7 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   useEffect(() => {
     if (initialData) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Legitimate form reset on modal open
       setFormData({
         name: initialData.name || '',
         quantity: initialData.quantity !== undefined && initialData.quantity !== null ? String(initialData.quantity) : '',
@@ -62,7 +63,7 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               placeholder="Contoh: AC Daikin 2PK"
               value={formData.name}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, name: e.target.value})}
             />
           </div>
@@ -75,7 +76,7 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               placeholder="0"
               value={formData.quantity}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, quantity: e.target.value})}
             />
           </div>
@@ -89,7 +90,7 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               required
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               value={formData.date}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, date: e.target.value})}
             />
           </div>
@@ -98,7 +99,7 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             <select 
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none cursor-pointer pr-10"
               value={formData.location}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, location: e.target.value})}
             >
               {locations.map(loc => (
@@ -118,7 +119,7 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                   name="condition" 
                   value={cond} 
                   checked={formData.condition === cond}
-                  onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+                  onChange={(e) =>  
     setFormData({...formData, condition: e.target.value})}
                   className="hidden"
                 />
@@ -135,7 +136,7 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md resize-none"
             placeholder="Merk, asal barang, rincian kerusakan..."
             value={formData.notes}
-            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+            onChange={(e) =>  
     setFormData({...formData, notes: e.target.value})}
           ></textarea>
         </div>

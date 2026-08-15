@@ -10,17 +10,13 @@ import {
   useCreateQurbanYear,
 } from '../hooks/useQurban';
 import { authClient } from '../lib/auth-client';
-import QurbanSummaryCards from '../components/qurban/QurbanSummaryCards';
 import QurbanGrowthChart from '../components/qurban/QurbanGrowthChart';
 import QurbanGroupAccordion from '../components/qurban/QurbanGroupAccordion';
 import QurbanForm from '../components/qurban/QurbanForm';
 import QurbanDetailModal from '../components/qurban/QurbanDetailModal';
 import ConfirmDialog from '../components/common/ConfirmDialog';
-import SearchFilter from '../components/common/SearchFilter';
-import { Plus, Calendar, Layers, Search, Filter, ChevronDown } from 'lucide-react';
-import toast from 'react-hot-toast';
 
-const QurbanPage = () => {
+export default function QurbanPage() {
   const { data: session } = authClient.useSession();
   const canEdit = ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'].includes(session?.user?.role);
 
@@ -164,121 +160,174 @@ const QurbanPage = () => {
     }
   };
 
+  const {
+    totalPequrban = 0,
+    totalSapi = 0,
+    totalKambing = 0,
+    totalKelompokSapi = 0,
+  } = summaryStats;
+
   return (
-    <div className="flex flex-col gap-lg pb-xl">
-      {/* ─── HEADER SECTION ───────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-display-sm font-display-sm text-on-surface dark:text-white m-0 flex items-center gap-sm">
-            <span className="material-symbols-outlined text-[32px] text-emerald-500">
-              mosque
-            </span>
+          <h1 className="text-2xl sm:text-3xl font-bold text-on-surface flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-primary text-3xl">mosque</span>
             Manajemen Qurban
           </h1>
-          <p className="font-body-md text-on-surface-variant dark:text-white/70 m-0 mt-xs">
-            Pengelolaan data peserta, kelompok Sapi & Kambing, serta grafik tren kepanitiaan Qurban.
+          <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
+            Pengelolaan data peserta, kelompok Sapi &amp; Kambing, serta grafik tren kepanitiaan Qurban.
           </p>
         </div>
+        {canEdit && (
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <button
+              onClick={handleAddYearPrompt}
+              className="px-3 py-2 rounded-xl bg-surface-variant/80 hover:bg-surface-variant text-on-surface border border-outline-variant text-xs font-semibold flex items-center gap-1.5 transition-all"
+              title="Tambah Periode Tahun Qurban Baru"
+            >
+              <span className="material-symbols-outlined text-base">calendar_add_on</span>
+              <span className="hidden sm:inline">+ Tahun Baru</span>
+            </button>
+            <button
+              onClick={() => {
+                setEditingData(null);
+                setDefaultGroupForForm(null);
+                setIsFormOpen(true);
+              }}
+              className="px-4 py-2.5 rounded-xl bg-primary text-slate-950 font-bold text-xs sm:text-sm hover:bg-primary/90 transition-all shadow-md shadow-primary/20 flex items-center gap-2"
+            >
+              <span className="material-symbols-outlined text-xl">add</span>
+              Tambah PeQurban
+            </button>
+          </div>
+        )}
+      </div>
 
-        <div className="flex items-center gap-sm w-full sm:w-auto">
-          {canEdit && (
-            <>
-              <button
-                onClick={handleAddYearPrompt}
-                className="py-2 px-4 rounded-xl border border-outline bg-surface-variant hover:bg-surface text-on-surface font-label-md transition-all flex items-center gap-2"
-                title="Tambah Periode Tahun Qurban Baru"
-              >
-                <Calendar size={16} /> + Tahun Baru
-              </button>
-              <button
-                onClick={() => {
-                  setEditingData(null);
-                  setDefaultGroupForForm(null);
-                  setIsFormOpen(true);
-                }}
-                className="flex-1 sm:flex-initial py-2.5 px-5 rounded-full bg-emerald-500 text-slate-950 font-bold font-label-md hover:bg-emerald-400 transition-all shadow-md shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-2"
-              >
-                <Plus size={18} /> Tambah PeQurban
-              </button>
-            </>
-          )}
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-surface border border-outline-variant rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between shadow-sm">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-base sm:text-2xl">groups</span>
+            </div>
+            <div className="text-xs sm:text-sm text-on-surface-variant font-medium leading-tight">
+              Total Pequrban ({currentYearNum})
+            </div>
+          </div>
+          <div>
+            <div className="text-lg sm:text-2xl font-bold text-on-surface">
+              {totalPequrban}
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-surface border border-outline-variant rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between shadow-sm">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-base sm:text-2xl">pets</span>
+            </div>
+            <div className="text-xs sm:text-sm text-on-surface-variant font-medium leading-tight">
+              Total Sapi Qurban
+            </div>
+          </div>
+          <div>
+            <div className="text-lg sm:text-2xl font-bold text-amber-400">
+              {totalSapi} Ekor
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-surface border border-outline-variant rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between shadow-sm">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-base sm:text-2xl">cruelty_free</span>
+            </div>
+            <div className="text-xs sm:text-sm text-on-surface-variant font-medium leading-tight">
+              Total Kambing / Domba
+            </div>
+          </div>
+          <div>
+            <div className="text-lg sm:text-2xl font-bold text-blue-400">
+              {totalKambing} Ekor
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-surface border border-outline-variant rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between shadow-sm">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-base sm:text-2xl">stacks</span>
+            </div>
+            <div className="text-xs sm:text-sm text-on-surface-variant font-medium leading-tight">
+              Kelompok Sapi
+            </div>
+          </div>
+          <div>
+            <div className="text-lg sm:text-2xl font-bold text-purple-400">
+              {totalKelompokSapi} Kelompok
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ─── SUMMARY CARDS ─────────────────────────────────────────────────── */}
-      <QurbanSummaryCards summary={summaryStats} />
-
-      {/* ─── CHART PERTUMBUHAN ────────────────────────────────────────────── */}
+      {/* Chart Pertumbuhan */}
       <QurbanGrowthChart data={summaryStats.yearlyTrend || []} />
 
-      {/* ─── FILTER & TOOLBAR PRESISE ─────────────────────────────────────── */}
-      <div className="p-3.5 sm:p-4 rounded-2xl bg-surface border border-outline/50 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-        
-        {/* Left Side Filters: Periode Tahun & Jenis Hewan */}
-        <div className="flex flex-wrap items-center gap-3">
-          
-          {/* Year selector */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-on-surface-variant dark:text-white/80 flex items-center gap-1.5 whitespace-nowrap">
-              <Calendar className="w-4 h-4 text-emerald-500" /> Periode Tahun:
-            </span>
-            <div className="relative flex items-center">
-              <select
-                value={selectedYearId || currentYearId}
-                onChange={(e) => setSelectedYearId(e.target.value)}
-                className="h-9 appearance-none pl-3 pr-8 rounded-xl bg-surface-variant/80 border border-outline/60 text-on-surface dark:text-white text-xs font-semibold outline-none focus:border-emerald-500 cursor-pointer shadow-sm transition-all"
-              >
-                {years.map((y) => (
-                  <option key={y.id} value={y.id} className="bg-slate-900 text-white p-2">
-                    Tahun {y.tahun} {y.statusAktif ? '(Aktif)' : ''}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-            </div>
-          </div>
-
-          {/* Animal Type Filter Pills */}
-          <div className="flex items-center p-1 rounded-xl bg-surface-variant/80 border border-outline/60 h-9">
-            {[
-              { label: 'Semua Hewan', val: '' },
-              { label: 'Sapi', val: 'Sapi' },
-              { label: 'Kambing', val: 'Kambing' },
-            ].map((opt) => {
-              const isActive = jenisHewanFilter === opt.val;
-              return (
-                <button
-                  key={opt.val}
-                  onClick={() => setJenisHewanFilter(opt.val)}
-                  className={`h-7 px-3 text-xs rounded-lg transition-all whitespace-nowrap flex items-center justify-center ${
-                    isActive
-                      ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
-                      : 'text-on-surface-variant dark:text-white/70 hover:text-white font-medium'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-
-        </div>
-
-        {/* Right Side: Search Input */}
-        <div className="relative w-full md:w-64 h-9 flex items-center">
-          <Search className="w-4 h-4 absolute left-3 text-emerald-500 pointer-events-none" />
+      {/* Filter & Search Bar */}
+      <div className="bg-surface border border-outline-variant rounded-2xl p-4 space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between gap-4">
+        {/* Search */}
+        <div className="relative flex-1">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">search</span>
           <input
             type="text"
-            placeholder="Cari nama pequrban..."
+            placeholder="Cari nama pequrban, no. HP..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-full pl-9 pr-3 rounded-xl bg-surface-variant/80 border border-outline/60 text-xs text-on-surface dark:text-white outline-none focus:border-emerald-500 placeholder:text-on-surface-variant/50 transition-all"
+            className="w-full bg-surface-variant/50 border border-outline-variant rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-on-surface placeholder:text-on-surface-variant outline-none focus:border-primary transition-all"
           />
         </div>
 
+        {/* Filter Tabs */}
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          {/* Year Selector */}
+          <select
+            value={selectedYearId || currentYearId}
+            onChange={(e) => setSelectedYearId(e.target.value)}
+            className="bg-surface-variant/50 border border-outline-variant rounded-xl px-3 py-2 text-xs font-semibold text-on-surface outline-none focus:border-primary cursor-pointer"
+          >
+            {years.map((y) => (
+              <option key={y.id} value={y.id} className="bg-surface text-on-surface">
+                Tahun {y.tahun} {y.statusAktif ? '(Aktif)' : ''}
+              </option>
+            ))}
+          </select>
+
+          {/* Animal Type Filter Pills */}
+          <div className="flex items-center gap-1.5 bg-surface-variant/40 p-1 rounded-xl border border-outline-variant/40">
+            {[
+              { label: 'Semua', val: '' },
+              { label: 'Sapi', val: 'Sapi' },
+              { label: 'Kambing', val: 'Kambing' },
+            ].map((opt) => (
+              <button
+                key={opt.val}
+                onClick={() => setJenisHewanFilter(opt.val)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  jenisHewanFilter === opt.val
+                    ? 'bg-primary text-slate-950 shadow-md font-bold'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* ─── GROUPED TABLE DISPLAY (ACCORDION) ────────────────────────────── */}
+      {/* Grouped Table Display (Accordion) */}
       <QurbanGroupAccordion
         groups={filteredGroups}
         ungroupedList={filteredUngroupedKambing}
@@ -289,7 +338,7 @@ const QurbanPage = () => {
         onAddMemberToGroup={handleAddMemberToGroup}
       />
 
-      {/* ─── MODALS ───────────────────────────────────────────────────────── */}
+      {/* Modals */}
       <QurbanForm
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
@@ -313,6 +362,4 @@ const QurbanPage = () => {
       />
     </div>
   );
-};
-
-export default QurbanPage;
+}

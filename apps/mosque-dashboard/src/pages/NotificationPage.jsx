@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Wallet, Calendar, Package, Check, CheckCheck, HeartHandshake } from 'lucide-react';
+import { Bell, Wallet, Calendar, Package, Check, CheckCheck, HeartHandshake, MailOpen } from 'lucide-react';
 
 import { formatDistanceToNow } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
@@ -14,6 +14,7 @@ const NOTIFICATION_TYPE_ROUTES = {
   'Inventaris': '/dashboard/inventaris',
   'Jemaah': '/dashboard/jemaah',
   'Donasi': '/dashboard/ziswaf',
+  'Pesan': '/dashboard/pesan',
 };
 
 const NotificationPage = () => {
@@ -24,7 +25,7 @@ const NotificationPage = () => {
   
   const [activeTab, setActiveTab] = useState('Semua');
 
-  const tabs = ['Semua', 'Keuangan', 'Kegiatan', 'Inventaris', 'Donasi'];
+  const tabs = ['Semua', 'Keuangan', 'Kegiatan', 'Inventaris', 'Donasi', 'Pesan'];
 
   const filteredNotifications = notifications.filter(n => {
     if (activeTab === 'Semua') return true;
@@ -56,18 +57,19 @@ const NotificationPage = () => {
     if (type === 'Kegiatan') return { icon: Calendar, colorClass: 'text-blue-500 bg-blue-500/10' };
     if (type === 'Inventaris') return { icon: Package, colorClass: 'text-amber-500 bg-amber-500/10' };
     if (type === 'Donasi') return { icon: HeartHandshake, colorClass: 'text-teal-500 bg-teal-500/10' };
+    if (type === 'Pesan') return { icon: MailOpen, colorClass: 'text-purple-500 bg-purple-500/10' };
     return { icon: Bell, colorClass: 'text-gray-500 bg-gray-500/10' };
   };
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   return (
-    <div className="flex flex-col gap-xl">
-      <div className="flex justify-between items-end">
-        <div className="flex-1">
+    <div className="flex flex-col gap-md sm:gap-xl">
+      <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-3">
+        <div className="flex-1 min-w-0">
           <h1 className="text-title-lg sm:text-display-sm font-title-lg sm:font-display-sm text-on-surface dark:text-white m-0 flex items-center gap-2 sm:gap-3">
-            <Bell size={28} className="text-primary sm:w-9 sm:h-9" />
-            Notifikasi
+            <Bell size={28} className="text-primary shrink-0 sm:w-9 sm:h-9" />
+            <span className="truncate">Notifikasi</span>
           </h1>
           <p className="font-body-sm sm:font-body-md text-on-surface-variant dark:text-white/70 m-0 mt-xs hidden sm:block">
             Kelola pemberitahuan dan aktivitas terbaru masjid.
@@ -76,20 +78,20 @@ const NotificationPage = () => {
         {unreadCount > 0 && (
           <button 
             onClick={markAllAsRead}
-            className="flex py-2 px-3 sm:px-4 rounded-full bg-surface-variant text-on-surface hover:bg-surface-variant/80 transition-all items-center gap-1 sm:gap-2 border border-outline/30 cursor-pointer"
+            className="flex py-1.5 px-3 sm:py-2 sm:px-4 rounded-full bg-surface-variant text-on-surface hover:bg-surface-variant/80 transition-all items-center gap-1.5 border border-outline/30 cursor-pointer shrink-0"
           >
-            <CheckCheck size={18} />
-            <span className="font-label-md text-xs sm:text-sm">Tandai Dibaca</span>
+            <CheckCheck size={18} className="shrink-0 text-primary" />
+            <span className="font-label-md text-xs sm:text-sm whitespace-nowrap">Tandai Dibaca</span>
           </button>
         )}
       </div>
 
-      <div className="flex gap-2 mb-2 border-b border-outline-variant/30 pb-2 overflow-x-auto hide-scrollbar">
+      <div className="flex gap-1.5 sm:gap-2 mb-2 border-b border-outline-variant/30 pb-2 overflow-x-auto hide-scrollbar">
         {tabs.map(tab => (
           <button 
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-6 py-2 rounded-t-lg border-b-2 font-label-md text-[14px] font-semibold leading-[20px] transition-all whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 sm:px-6 py-2 rounded-t-lg border-b-2 font-label-md text-xs sm:text-[14px] font-semibold leading-[20px] transition-all whitespace-nowrap cursor-pointer shrink-0 ${
               activeTab === tab 
                 ? 'border-primary text-primary bg-surface-variant backdrop-blur-sm' 
                 : 'border-transparent text-on-surface-variant hover:text-primary hover:bg-surface-variant'
@@ -97,7 +99,7 @@ const NotificationPage = () => {
           >
             {tab}
             {tab === 'Semua' && unreadCount > 0 && (
-              <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-error text-white text-[10px]">
+              <span className="ml-1.5 inline-flex items-center justify-center px-1.5 py-0.5 rounded-full bg-error text-white text-[10px]">
                 {unreadCount}
               </span>
             )}
@@ -105,11 +107,11 @@ const NotificationPage = () => {
         ))}
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2.5 sm:gap-3">
         {filteredNotifications.length === 0 ? (
           <div className="py-12 text-center text-on-surface-variant flex flex-col items-center gap-3">
             <Bell size={48} className="opacity-20" />
-            <p>Tidak ada notifikasi untuk kategori ini.</p>
+            <p className="text-sm">Tidak ada notifikasi untuk kategori ini.</p>
           </div>
         ) : (
           filteredNotifications.map(notification => {
@@ -119,38 +121,38 @@ const NotificationPage = () => {
               <div 
                 key={notification.id} 
                 onClick={() => handleNotificationClick(notification)}
-                className={`p-4 rounded-xl border flex gap-4 transition-all cursor-pointer hover:shadow-md ${
+                className={`p-3 sm:p-4 rounded-xl border flex gap-3 sm:gap-4 transition-all cursor-pointer hover:shadow-md ${
                   notification.isRead 
                     ? 'bg-surface-variant/40 border-outline/20 hover:bg-surface-variant/60' 
                     : 'bg-primary/5 border-primary/30 shadow-sm hover:bg-primary/10'
                 }`}
               >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${colorClass}`}>
-                  <Icon size={24} />
+                <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shrink-0 ${colorClass}`}>
+                  <Icon size={18} className="sm:w-5 sm:h-5" />
                 </div>
                 
-                <div className="flex-1 flex flex-col justify-center">
-                  <div className="flex justify-between items-start mb-1">
-                    <h3 className={`font-title-md text-[16px] m-0 ${notification.isRead ? 'text-on-surface/80' : 'text-on-surface font-bold'}`}>
+                <div className="flex-1 flex flex-col justify-center min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-1 gap-0.5 sm:gap-2">
+                    <h3 className={`font-title-md text-xs sm:text-[16px] m-0 leading-snug break-words ${notification.isRead ? 'text-on-surface/80' : 'text-on-surface font-bold'}`}>
                       {notification.title}
                     </h3>
-                    <span className="font-label-sm text-[12px] text-outline whitespace-nowrap ml-4">
+                    <span className="font-label-sm text-[10px] sm:text-[12px] text-outline whitespace-nowrap shrink-0">
                       {timeAgo}
                     </span>
                   </div>
-                  <p className={`font-body-sm text-[14px] m-0 ${notification.isRead ? 'text-on-surface-variant/70' : 'text-on-surface-variant'}`}>
+                  <p className={`font-body-sm text-xs sm:text-[14px] m-0 leading-relaxed ${notification.isRead ? 'text-on-surface-variant/70' : 'text-on-surface-variant'}`}>
                     {notification.description}
                   </p>
                 </div>
 
                 {!notification.isRead && (
-                  <div className="flex items-center">
+                  <div className="flex items-center shrink-0">
                     <button 
                       onClick={(e) => { e.stopPropagation(); markAsRead(notification.id); }}
                       title="Tandai Sudah Dibaca"
-                      className="p-2 rounded-full text-primary hover:bg-primary/10 transition-colors cursor-pointer"
+                      className="p-1.5 sm:p-2 rounded-full text-primary hover:bg-primary/10 transition-colors cursor-pointer"
                     >
-                      <Check size={20} />
+                      <Check size={18} className="sm:w-5 sm:h-5" />
                     </button>
                   </div>
                 )}

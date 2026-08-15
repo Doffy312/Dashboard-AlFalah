@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
 
 const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
-  const { security, profile, finance, customData, resetAllSettings } = useSettings();
+  const { security, profile, finance, customData } = useSettings();
 
   const [passwords, setPasswords] = useState({
     current: '',
@@ -42,14 +42,10 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
   };
 
   const handleThemeChange = (newTheme) => {
-    setTheme(newTheme);
+    if (newTheme === 'light') return;
+    setTheme('dark');
     setHasUnsavedChanges(true);
-    // Apply theme immediately for live preview
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.add('dark');
   };
 
   const handleExportData = () => {
@@ -59,7 +55,7 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
         profile,
         finance,
         customData,
-        security: { theme }
+        security: { theme: 'dark' }
       };
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
@@ -75,19 +71,11 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
     }
   };
 
-  const handleResetView = () => {
-    if (window.confirm('Yakin ingin mengembalikan seluruh pengaturan ke default?')) {
-      resetAllSettings();
-      setTheme('dark');
-      setHasUnsavedChanges(false);
-      alert("Seluruh pengaturan tampilan dan preferensi berhasil di-reset ke default.");
-    }
-  };
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-300">
       <div className="border-b border-outline-variant pb-4 mb-2">
-        <h3 className="text-title-md font-bold text-white m-0">Keamanan & Sistem</h3>
+        <h3 className="text-title-md font-bold text-on-surface m-0">Keamanan & Sistem</h3>
         <p className="text-body-sm text-on-surface-variant m-0 mt-1">
           Kelola kata sandi, preferensi tampilan, dan pemeliharaan data.
         </p>
@@ -96,43 +84,43 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Change Password */}
         <div className="flex flex-col gap-4">
-          <h4 className="font-label-lg font-bold text-white flex items-center gap-2">
+          <h4 className="font-label-lg font-bold text-on-surface flex items-center gap-2">
             <span className="material-symbols-outlined text-primary">lock</span>
             Ubah Kata Sandi
           </h4>
           <div className="bg-surface-variant/30 rounded-xl p-5 border border-outline-variant flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="font-label-md text-white">Kata Sandi Saat Ini</label>
+              <label className="font-label-md text-on-surface">Kata Sandi Saat Ini</label>
               <input 
                 type="password" 
                 name="current"
                 value={passwords.current}
                 onChange={handlePasswordChange}
-                className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md"
+                className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md"
                 placeholder="Masukkan kata sandi lama"
                 autoComplete="current-password"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="font-label-md text-white">Kata Sandi Baru</label>
+              <label className="font-label-md text-on-surface">Kata Sandi Baru</label>
               <input 
                 type="password" 
                 name="newPass"
                 value={passwords.newPass}
                 onChange={handlePasswordChange}
-                className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md"
+                className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md"
                 placeholder="Minimal 8 karakter"
                 autoComplete="new-password"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="font-label-md text-white">Konfirmasi Kata Sandi Baru</label>
+              <label className="font-label-md text-on-surface">Konfirmasi Kata Sandi Baru</label>
               <input 
                 type="password" 
                 name="confirmPass"
                 value={passwords.confirmPass}
                 onChange={handlePasswordChange}
-                className="glass-input w-full px-4 py-2.5 rounded-lg text-white font-body-md"
+                className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md"
                 placeholder="Ulangi kata sandi baru"
                 autoComplete="new-password"
               />
@@ -143,45 +131,51 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
         <div className="flex flex-col gap-8">
           {/* Theme Preference */}
           <div className="flex flex-col gap-4">
-            <h4 className="font-label-lg font-bold text-white flex items-center gap-2">
+            <h4 className="font-label-lg font-bold text-on-surface flex items-center gap-2">
               <span className="material-symbols-outlined text-primary">palette</span>
               Preferensi Tampilan
             </h4>
             <div className="bg-surface-variant/30 rounded-xl p-5 border border-outline-variant">
-              <p className="text-sm text-white mb-4">Pilih tema antarmuka dashboard</p>
+              <p className="text-sm text-on-surface mb-4">Pilih tema antarmuka dashboard</p>
               <div className="flex gap-4">
                 <button 
-                  onClick={() => handleThemeChange('light')}
-                  className={`flex-1 py-3 rounded-lg border-2 flex items-center justify-center gap-2 transition-all ${
-                    theme === 'light' ? 'border-primary bg-primary/10 text-primary' : 'border-outline-variant text-on-surface-variant hover:border-outline'
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[20px]">light_mode</span>
-                  Terang
-                </button>
-                <button 
+                  type="button"
                   onClick={() => handleThemeChange('dark')}
-                  className={`flex-1 py-3 rounded-lg border-2 flex items-center justify-center gap-2 transition-all ${
-                    theme === 'dark' ? 'border-primary bg-primary/10 text-primary' : 'border-outline-variant text-on-surface-variant hover:border-outline'
-                  }`}
+                  className="flex-1 py-3 rounded-lg border-2 border-primary bg-primary/10 text-primary flex items-center justify-center gap-2 transition-all font-medium"
                 >
                   <span className="material-symbols-outlined text-[20px]">dark_mode</span>
-                  Gelap
+                  Gelap (Utama)
+                </button>
+                <button 
+                  type="button"
+                  disabled
+                  className="flex-1 py-3 rounded-lg border border-outline-variant/60 bg-surface-variant/20 text-on-surface-variant/50 flex items-center justify-center gap-2 transition-all cursor-not-allowed opacity-60 relative"
+                  title="Fitur tema terang sementara dinonaktifkan untuk perbaikan"
+                >
+                  <span className="material-symbols-outlined text-[20px]">light_mode</span>
+                  <span>Terang</span>
+                  <span className="text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30 font-semibold uppercase tracking-wider ml-1">
+                    Perbaikan
+                  </span>
                 </button>
               </div>
+              <p className="text-xs text-on-surface-variant/70 mt-3.5 flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px] text-primary">info</span>
+                Fitur tema terang sementara dinonaktifkan untuk peningkatan kualitas & perbaikan tampilan.
+              </p>
             </div>
           </div>
 
           {/* Data Maintenance */}
           <div className="flex flex-col gap-4">
-            <h4 className="font-label-lg font-bold text-white flex items-center gap-2">
+            <h4 className="font-label-lg font-bold text-on-surface flex items-center gap-2">
               <span className="material-symbols-outlined text-primary">database</span>
               Pemeliharaan Data
             </h4>
             <div className="bg-surface-variant/30 rounded-xl p-5 border border-outline-variant flex flex-col gap-3">
               <button 
                 onClick={handleExportData}
-                className="flex items-center justify-between w-full p-3 rounded-lg bg-surface-variant/50 hover:bg-surface-variant text-white transition-colors border border-outline-variant"
+                className="flex items-center justify-between w-full p-3 rounded-lg bg-surface-variant/50 hover:bg-surface-variant text-on-surface transition-colors border border-outline-variant"
               >
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-primary">download</span>
@@ -190,15 +184,6 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">chevron_right</span>
               </button>
               
-              <button 
-                onClick={handleResetView}
-                className="flex items-center justify-between w-full p-3 rounded-lg bg-error/10 hover:bg-error/20 text-error transition-colors border border-error/20 mt-2"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="material-symbols-outlined">restart_alt</span>
-                  <span className="font-body-md text-sm font-bold">Reset Pengaturan ke Default</span>
-                </div>
-              </button>
             </div>
           </div>
         </div>

@@ -22,6 +22,7 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData, isPending = false 
 
   useEffect(() => {
     if (initialData) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Legitimate form reset on modal open
       setFormData({
         name: initialData.name || '',
         address: initialData.address || '',
@@ -65,7 +66,7 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData, isPending = false 
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
             placeholder="Contoh: Budi Santoso"
             value={formData.name}
-            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+            onChange={(e) =>  
     setFormData({...formData, name: e.target.value})}
           />
         </div>
@@ -78,7 +79,7 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData, isPending = false 
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               placeholder="Contoh: budi@email.com"
               value={formData.email}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, email: e.target.value})}
             />
           </div>
@@ -93,7 +94,7 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData, isPending = false 
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               placeholder="Contoh: 0812xxxx"
               value={formData.phone}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, phone: e.target.value})}
             />
           </div>
@@ -102,7 +103,7 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData, isPending = false 
             <select 
               className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md appearance-none cursor-pointer pr-10"
               value={formData.category}
-              onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+              onChange={(e) =>  
     setFormData({...formData, category: e.target.value})}
             >
               {categories.map(cat => (
@@ -120,7 +121,7 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData, isPending = false 
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md resize-none"
             placeholder="Alamat rumah..."
             value={formData.address}
-            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+            onChange={(e) =>  
     setFormData({...formData, address: e.target.value})}
           ></textarea>
         </div>
@@ -132,7 +133,7 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData, isPending = false 
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
             placeholder="Misal: Teknisi AC, Dokter, Pengajar"
             value={formData.skills}
-            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+            onChange={(e) =>  
     setFormData({...formData, skills: e.target.value})}
           />
         </div>
@@ -144,7 +145,7 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData, isPending = false 
             className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
             placeholder="Misal: Butuh santunan rutin"
             value={formData.notes}
-            onChange={(e) => // eslint-disable-next-line react-hooks/set-state-in-effect
+            onChange={(e) =>  
     setFormData({...formData, notes: e.target.value})}
           />
         </div>

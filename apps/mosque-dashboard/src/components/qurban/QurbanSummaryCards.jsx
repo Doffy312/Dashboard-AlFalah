@@ -49,22 +49,22 @@ const QurbanSummaryCards = ({ summary = {} }) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       {cards.map((card, idx) => (
         <div
           key={idx}
-          className="p-lg rounded-2xl bg-surface border border-outline/50 shadow-sm flex flex-col justify-between hover:shadow-md transition-all"
+          className="p-3.5 sm:p-5 rounded-2xl bg-surface border border-outline/50 shadow-sm flex flex-col justify-between hover:shadow-md transition-all"
         >
-          <div className="flex items-center justify-between mb-sm">
-            <span className="font-label-md text-on-surface-variant dark:text-white/70">
-              {card.title}
-            </span>
-            <div className={`p-2.5 rounded-xl border ${card.bg}`}>
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className={`p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl border shrink-0 ${card.bg}`}>
               {card.icon}
             </div>
+            <span className="text-xs sm:text-sm font-medium text-on-surface-variant dark:text-white/70 leading-tight">
+              {card.title}
+            </span>
           </div>
           <div>
-            <h3 className="text-display-xs font-bold text-on-surface dark:text-white m-0">
+            <h3 className="text-lg sm:text-2xl font-bold text-on-surface dark:text-white m-0">
               {card.value}
             </h3>
             <p className="text-xs text-on-surface-variant/70 dark:text-white/50 m-0 mt-1">
