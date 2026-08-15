@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { jadwalService } from "../services/jadwal.service.js";
+import { getSocketIO } from "../lib/socket.js";
 
 export const jadwalController = {
   async getAll(req: Request, res: Response) {
@@ -14,17 +15,24 @@ export const jadwalController = {
   },
 
   async create(req: Request, res: Response) {
-    await jadwalService.create(req.body);
-    res.status(201).json({ message: "Data Jadwal berhasil ditambahkan" });
+    const result = await jadwalService.create(req.body);
+    getSocketIO().emit("dataUpdate", { entity: "jadwal" });
+    res.status(201).json({ message: "Data Jadwal berhasil ditambahkan", data: result });
   },
 
   async update(req: Request, res: Response) {
-    await jadwalService.update(req.params.id as string, req.body);
-    res.json({ message: "Data Jadwal berhasil diupdate" });
+    const result = await jadwalService.update(req.params.id as string, req.body);
+    if (!result) {
+      res.status(404).json({ message: "Data Jadwal tidak ditemukan" });
+      return;
+    }
+    getSocketIO().emit("dataUpdate", { entity: "jadwal" });
+    res.json({ message: "Data Jadwal berhasil diupdate", data: result });
   },
 
   async remove(req: Request, res: Response) {
     await jadwalService.remove(req.params.id as string);
+    getSocketIO().emit("dataUpdate", { entity: "jadwal" });
     res.json({ message: "Data Jadwal berhasil dihapus" });
   }
 };

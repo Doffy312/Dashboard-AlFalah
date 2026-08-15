@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { QueryClient, QueryClientProvider, MutationCache } from '@tanstack/react-query'
-import { Toaster, toast } from 'react-hot-toast'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Toaster } from 'react-hot-toast'
 import './index.css'
 import App from './App.jsx'
 
@@ -9,17 +9,10 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: false,
+      retry: 2,
+      staleTime: 30_000, // 30 seconds — prevents excessive refetches on navigation
     },
   },
-  mutationCache: new MutationCache({
-    onSuccess: () => {
-      toast.success('Berhasil menyimpan data');
-    },
-    onError: (error) => {
-      toast.error(error.message || 'Terjadi kesalahan');
-    },
-  }),
 })
 
 createRoot(document.getElementById('root')).render(

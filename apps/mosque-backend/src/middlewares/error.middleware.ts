@@ -16,8 +16,8 @@ export function errorHandler(
 
   if (err instanceof ZodError) {
     res.status(400).json({
-      error: "Validasi data gagal",
-      details: err.errors.map(e => ({ field: e.path.join('.'), message: e.message }))
+      message: "Validasi data gagal",
+      errors: err.errors.map(e => ({ field: e.path.join('.'), message: e.message }))
     });
     return;
   }

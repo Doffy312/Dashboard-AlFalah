@@ -13,6 +13,18 @@ export interface CreateJemaahInput {
   category?: string;
   skills?: string | null;
   notes?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+}
+
+export interface PublicRegisterInput {
+  name: string;
+  address: string;
+  phone?: string | null;
+  email?: string | null;
+  category: string;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 export interface JemaahFilters {
@@ -67,12 +79,34 @@ export class JemaahService {
         id,
         name: data.name,
         address: data.address,
-        phone: data.phone,
+        phone: data.phone ?? "-",
         email: data.email ?? null,
         category: data.category ?? "Umum",
         skills: data.skills ?? null,
         notes: data.notes ?? null,
+        lat: data.lat ?? null,
+        lng: data.lng ?? null,
         createdBy: userId,
+      });
+
+    return this.findById(id);
+  }
+
+  async publicRegister(data: PublicRegisterInput) {
+    const id = crypto.randomUUID();
+    await db
+      .insert(jemaah)
+      .values({
+        id,
+        name: data.name,
+        address: data.address,
+        phone: data.phone && data.phone.trim() !== "" ? data.phone : "-",
+        email: data.email ?? null,
+        category: data.category ?? "Umum",
+        notes: "Pendaftaran Mandiri Landing Page (Scan QR)",
+        lat: data.lat ?? null,
+        lng: data.lng ?? null,
+        createdBy: null,
       });
 
     return this.findById(id);

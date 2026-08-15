@@ -28,7 +28,7 @@ const InventarisPage = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [inventarisToDelete, setInventarisToDelete] = useState(null);
 
-  const canEdit = ['Ketua', 'Sekretaris'].includes(session?.user?.role);
+  const canEdit = ['Ketua', 'Sekretaris', 'Bendahara'].includes(session?.user?.role);
 
   const filteredInventaris = useMemo(() => {
     return inventaris.filter(i => {

@@ -13,18 +13,16 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   useEffect(() => {
     if (initialData) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFormData({
-        name: initialData.name,
-        quantity: initialData.quantity,
-        date: initialData.date,
-        location: initialData.location,
-        condition: initialData.condition,
+      setFormData({
+        name: initialData.name || '',
+        quantity: initialData.quantity !== undefined && initialData.quantity !== null ? String(initialData.quantity) : '',
+        date: initialData.date ? initialData.date.split('T')[0] : new Date().toISOString().split('T')[0],
+        location: initialData.location || 'Ruang Utama',
+        condition: initialData.condition || 'Baik',
         notes: initialData.notes || ''
       });
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFormData({
+      setFormData({
         name: '',
         quantity: '',
         date: new Date().toISOString().split('T')[0],
@@ -37,7 +35,10 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({
+      ...formData,
+      quantity: Number(formData.quantity)
+    });
     onClose();
   };
 

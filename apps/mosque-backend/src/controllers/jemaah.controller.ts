@@ -28,6 +28,15 @@ export class JemaahController {
     res.status(201).json(result);
   }
 
+  async publicRegister(req: Request, res: Response) {
+    const result = await jemaahService.publicRegister(req.body);
+    getSocketIO().emit("dataUpdate", { entity: "jemaah" });
+    res.status(201).json({
+      message: "Pendaftaran jemaah berhasil",
+      data: result,
+    });
+  }
+
   async update(req: Request, res: Response) {
     const id = req.params.id as string;
     const result = await jemaahService.update(id, req.body);

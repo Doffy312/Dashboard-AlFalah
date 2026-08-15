@@ -1,8 +1,12 @@
-const LandingHero = ({ orgName, description }) => {
+import heroWebp from '../../assets/hero.webp';
+
+const LandingHero = ({ orgName = 'Masjid Al-Falah', description, heroImage }) => {
   const handleScroll = (e, target) => {
     e.preventDefault();
     document.querySelector(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
+
+  const imageSrc = heroImage || "https://lh3.googleusercontent.com/aida-public/AB6AXuBYxD30ADrE-5DUDU7lorxjn9WSLy5EsYhQzQ7BND1_fRTc1EWvPRhYg1Gd1F97qucuzxPuzqfSYucAnLlCbxBFenqk6NNuqGKZnR0S3BmUuD_XVEAKv16f3L3JJ7QqLTtXlvvIx4anHS2X_m_bXRylLhJ5d6f1ZdmvB5Ui4dQ-PGtiihjrj-UNyw-FtKVM2ktAhr58YVoHb7jGG34nwxUzsvfTvnTuWuFx-feKc4jkDicw2gyUHWxR";
 
   return (
     <section
@@ -55,7 +59,15 @@ const LandingHero = ({ orgName, description }) => {
           <img
             alt={`${orgName} Sanctuary Visual`}
             className="w-full aspect-[4/3] object-cover rounded-2xl opacity-90"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYxD30ADrE-5DUDU7lorxjn9WSLy5EsYhQzQ7BND1_fRTc1EWvPRhYg1Gd1F97qucuzxPuzqfSYucAnLlCbxBFenqk6NNuqGKZnR0S3BmUuD_XVEAKv16f3L3JJ7QqLTtXlvvIx4anHS2X_m_bXRylLhJ5d6f1ZdmvB5Ui4dQ-PGtiihjrj-UNyw-FtKVM2ktAhr58YVoHb7jGG34nwxUzsvfTvnTuWuFx-feKc4jkDicw2gyUHWxR"
+            src={imageSrc}
+            width="800"
+            height="600"
+            fetchpriority="high"
+            decoding="async"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = heroWebp;
+            }}
           />
         </div>
       </div>

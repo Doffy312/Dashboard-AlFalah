@@ -3,5 +3,5 @@ export const formatCurrency = (amount) => {
     style: 'currency',
     currency: 'IDR',
     minimumFractionDigits: 0
-  }).format(amount);
+  }).format(amount || 0);
 };

@@ -1,11 +1,11 @@
 import cron from "node-cron";
-import { exec } from "child_process";
+import { execFile } from "child_process";
 import { promisify } from "util";
 import path from "path";
 import fs from "fs";
 import { env } from "../config/env.js";
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 export const initBackupService = () => {
   // Jadwal: Setiap hari jam 02:00 pagi
@@ -36,13 +36,23 @@ export const runBackup = async () => {
     const fileName = `backup-${database}-${dateStr}.sql`;
     const filePath = path.join(backupDir, fileName);
 
-    // Command mysqldump — password passed via MYSQL_PWD env var to avoid
-    // exposure in process list and command injection risks
-    const dumpCmd = `mysqldump -h ${host} -P ${port} -u ${user} --single-transaction --routines ${database} > "${filePath}"`;
+    // Use execFile with argument array to prevent command injection.
+    // Password passed via MYSQL_PWD env var to avoid exposure in process list.
+    const args = [
+      "-h", host,
+      "-P", port,
+      "-u", user,
+      "--single-transaction",
+      "--routines",
+      database,
+    ];
 
-    await execAsync(dumpCmd, {
+    const { stdout } = await execFileAsync("mysqldump", args, {
       env: { ...process.env, MYSQL_PWD: password },
+      maxBuffer: 100 * 1024 * 1024, // 100MB buffer for large databases
     });
+
+    fs.writeFileSync(filePath, stdout, "utf-8");
     console.log(`✅ Backup berhasil disimpan: ${fileName}`);
 
     // Auto cleanup (hapus backup yang lebih tua dari 7 hari)

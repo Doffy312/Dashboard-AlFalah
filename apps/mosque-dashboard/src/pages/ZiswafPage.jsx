@@ -7,7 +7,7 @@ import StatusBadge from '../components/common/StatusBadge';
 import ZiswafForm from '../components/ziswaf/ZiswafForm';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import { formatCurrency } from '../lib/utils';
-import { Coins, Edit2, Trash2 } from 'lucide-react';
+import { Edit2, Trash2 } from 'lucide-react';
 import { useSettings } from '../contexts/SettingsContext';
 
 const ZiswafPage = () => {
@@ -28,7 +28,7 @@ const ZiswafPage = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [dataToDelete, setDataToDelete] = useState(null);
 
-  const canEdit = ['Ketua', 'Bendahara', 'Pengurus', 'Sekretaris'].includes(session?.user?.role);
+  const canEdit = ['Ketua', 'Bendahara'].includes(session?.user?.role);
 
   const filteredData = useMemo(() => {
     return ziswaf.filter(item => {
@@ -58,11 +58,15 @@ const ZiswafPage = () => {
 
   const handleSubmit = (data) => {
     if (editingData) {
-      updateMutation.mutate({ id: editingData.id, data });
+      updateMutation.mutate(
+        { id: editingData.id, data },
+        { onSuccess: () => setIsFormOpen(false) }
+      );
     } else {
-      createMutation.mutate(data);
+      createMutation.mutate(data, {
+        onSuccess: () => setIsFormOpen(false),
+      });
     }
-    setIsFormOpen(false);
   };
 
   const columns = [

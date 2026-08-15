@@ -4,15 +4,26 @@ import { requireRole } from "../middlewares/rbac.middleware.js";
 import { jemaahController } from "../controllers/jemaah.controller.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { sanitizeBody } from "../middlewares/sanitize.middleware.js";
-import { createJemaahSchema } from "../validations/jemaah.validation.js";
+import { createJemaahSchema, publicRegisterJemaahSchema } from "../validations/jemaah.validation.js";
 
 const router = Router();
 
+// Public aggregate jemaah category counts for Landing Page counter
+router.get("/summary", jemaahController.getSummary);
+
+// Public self-registration endpoint for landing page (Scan QR)
+router.post(
+  "/public-register",
+  sanitizeBody,
+  validate(publicRegisterJemaahSchema),
+  jemaahController.publicRegister
+);
+
+// Protected routes require authentication (protects personal details)
 router.use(requireAuth);
 
-// Read access: All roles
+// Read access: All authenticated roles
 router.get("/", jemaahController.findAll);
-router.get("/summary", jemaahController.getSummary);
 router.get("/:id", jemaahController.findById);
 
 // Write access: Ketua + Sekretaris only (per JemaahPage canEdit)

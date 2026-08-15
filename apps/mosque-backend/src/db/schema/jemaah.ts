@@ -4,6 +4,7 @@ import {
   text,
   varchar,
   timestamp,
+  double,
   index,
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
@@ -20,6 +21,8 @@ export const jemaah = mysqlTable("jemaah", {
   category: varchar("category", { length: 50 }).notNull().default("Umum"), // 'Muzakki' | 'Mustahik' | 'Yatim' | 'Lansia' | 'Umum'
   skills: varchar("skills", { length: 255 }),
   notes: text("notes"),
+  lat: double("lat"),
+  lng: double("lng"),
   createdBy: varchar("created_by", { length: 255 }).references(() => user.id, {
     onDelete: "set null",
   }),

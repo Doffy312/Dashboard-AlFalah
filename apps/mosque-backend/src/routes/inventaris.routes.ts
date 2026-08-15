@@ -8,31 +8,34 @@ import { createInventarisSchema } from "../validations/inventaris.validation.js"
 
 const router = Router();
 
+// Public aggregate inventaris summary for Landing Page counter
+router.get("/summary", inventarisController.getSummary);
+
+// Protected routes require authentication
 router.use(requireAuth);
 
-// Read access: All roles
+// Read access: All authenticated roles
 router.get("/", inventarisController.findAll);
-router.get("/summary", inventarisController.getSummary);
 router.get("/:id", inventarisController.findById);
 
 // Write access: Ketua, Sekretaris, Bendahara (all roles per InventarisPage canEdit)
 router.post(
   "/",
-  requireRole("Ketua", "Sekretaris"),
+  requireRole("Ketua", "Sekretaris", "Bendahara"),
   sanitizeBody,
   validate(createInventarisSchema),
   inventarisController.create
 );
 router.put(
   "/:id",
-  requireRole("Ketua", "Sekretaris"),
+  requireRole("Ketua", "Sekretaris", "Bendahara"),
   sanitizeBody,
   validate(createInventarisSchema),
   inventarisController.update
 );
 router.delete(
   "/:id",
-  requireRole("Ketua", "Sekretaris"),
+  requireRole("Ketua", "Sekretaris", "Bendahara"),
   inventarisController.delete
 );
 

@@ -54,10 +54,12 @@ export default {
       },
       fontFamily: {
         "label-md": ["Inter"],
+        "label-lg": ["Inter"],
         "body-md": ["Inter"],
         "headline-lg-mobile": ["Inter"],
         "display-lg": ["Inter"],
         "body-sm": ["Inter"],
+        "title-sm": ["Inter"],
         "title-md": ["Inter"],
         "headline-lg": ["Inter"],
         headline: ["Inter"],
@@ -68,10 +70,12 @@ export default {
       },
       fontSize: {
         "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+        "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.025em", fontWeight: "600" }],
         "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
         "headline-lg-mobile": ["24px", { lineHeight: "32px", fontWeight: "600" }],
         "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
         "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+        "title-sm": ["16px", { lineHeight: "24px", fontWeight: "600" }],
         "title-md": ["20px", { lineHeight: "28px", fontWeight: "600" }],
         "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "600" }]
       }

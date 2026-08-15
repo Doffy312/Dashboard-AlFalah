@@ -54,6 +54,15 @@ export function useRealtimeSync() {
           queryClient.invalidateQueries({ queryKey: ['programs'] });
           queryClient.invalidateQueries({ queryKey: ['programSummary'] });
           break;
+        case 'ziswaf':
+          queryClient.invalidateQueries({ queryKey: ['ziswaf'] });
+          break;
+        case 'jadwal':
+          queryClient.invalidateQueries({ queryKey: ['jadwal'] });
+          break;
+        case 'articles':
+          queryClient.invalidateQueries({ queryKey: ['articles'] });
+          break;
         default:
           // If entity is unknown or global update, invalidate everything
           queryClient.invalidateQueries();

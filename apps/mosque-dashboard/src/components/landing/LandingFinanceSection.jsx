@@ -15,6 +15,7 @@ const AnimatedCounter = ({ value, isCurrency = false }) => {
 
   useEffect(() => {
     const target = Number(value) || 0;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (target === 0) { setDisplay(0); return; }
 
     let animationFrameId = null;

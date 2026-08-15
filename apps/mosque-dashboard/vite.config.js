@@ -47,8 +47,8 @@ export default defineConfig({
 
     // Enable CSS code splitting per async chunk
     cssCodeSplit: true,
-    // Use lightningcss for faster, smaller CSS output
-    cssMinify: 'lightningcss',
+    // Use esbuild for standard fast & compact CSS minification
+    cssMinify: 'esbuild',
 
     // Warn when a chunk exceeds 200KB (helps catch regressions)
     chunkSizeWarningLimit: 200,

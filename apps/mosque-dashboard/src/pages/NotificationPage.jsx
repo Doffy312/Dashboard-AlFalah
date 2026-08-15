@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Wallet, Calendar, Package, Check, CheckCheck } from 'lucide-react';
+import { Bell, Wallet, Calendar, Package, Check, CheckCheck, HeartHandshake } from 'lucide-react';
 
 import { formatDistanceToNow } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
@@ -13,6 +13,7 @@ const NOTIFICATION_TYPE_ROUTES = {
   'Program': '/dashboard/program-kerja',
   'Inventaris': '/dashboard/inventaris',
   'Jemaah': '/dashboard/jemaah',
+  'Donasi': '/dashboard/ziswaf',
 };
 
 const NotificationPage = () => {
@@ -23,7 +24,7 @@ const NotificationPage = () => {
   
   const [activeTab, setActiveTab] = useState('Semua');
 
-  const tabs = ['Semua', 'Keuangan', 'Kegiatan', 'Inventaris'];
+  const tabs = ['Semua', 'Keuangan', 'Kegiatan', 'Inventaris', 'Donasi'];
 
   const filteredNotifications = notifications.filter(n => {
     if (activeTab === 'Semua') return true;
@@ -54,6 +55,7 @@ const NotificationPage = () => {
     if (type === 'Keuangan') return { icon: Wallet, colorClass: 'text-emerald-500 bg-emerald-500/10' };
     if (type === 'Kegiatan') return { icon: Calendar, colorClass: 'text-blue-500 bg-blue-500/10' };
     if (type === 'Inventaris') return { icon: Package, colorClass: 'text-amber-500 bg-amber-500/10' };
+    if (type === 'Donasi') return { icon: HeartHandshake, colorClass: 'text-teal-500 bg-teal-500/10' };
     return { icon: Bell, colorClass: 'text-gray-500 bg-gray-500/10' };
   };
 

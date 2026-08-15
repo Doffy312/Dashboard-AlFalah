@@ -30,9 +30,13 @@ const JemaahPage = () => {
   const canEdit = ['Ketua', 'Sekretaris'].includes(session?.user?.role);
 
   const filteredJemaah = useMemo(() => {
+    if (!Array.isArray(jemaah)) return [];
     return jemaah.filter(j => {
-      const matchSearch = j.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          j.phone.includes(searchTerm);
+      if (!j) return false;
+      const nameStr = (j.name || '').toLowerCase();
+      const phoneStr = j.phone || '';
+      const searchStr = searchTerm.toLowerCase();
+      const matchSearch = nameStr.includes(searchStr) || phoneStr.includes(searchTerm);
       const matchCategory = filterCategory === 'Semua' || j.category === filterCategory;
       return matchSearch && matchCategory;
     });

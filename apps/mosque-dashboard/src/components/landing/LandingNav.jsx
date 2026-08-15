@@ -1,17 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSettings } from '../../contexts/SettingsContext';
 
 const NAV_LINKS = [
   { label: 'Beranda', href: '#beranda' },
   { label: 'Profil', href: '#profil' },
+  { label: 'Sebaran', href: '#sebaran-jemaah' },
   { label: 'Kegiatan', href: '#kegiatan' },
   { label: 'Program', href: '#program' },
   { label: 'Kontak', href: '#kontak' },
 ];
 
-const LandingNav = ({ orgName = 'Al-Hikmah' }) => {
+const LandingNav = ({ orgName: customOrgName, logo: customLogo }) => {
   const navigate = useNavigate();
+  const { profile } = useSettings();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const orgName = customOrgName || profile?.orgName || 'Masjid Al-Falah';
+  const logo = customLogo || profile?.logo;
 
   const handleAnchorClick = (e, href) => {
     e.preventDefault();
@@ -33,8 +39,12 @@ const LandingNav = ({ orgName = 'Al-Hikmah' }) => {
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[calc(100%-48px)] max-w-[1200px] z-50 lp-glass rounded-full px-6 sm:px-8 h-16 flex items-center justify-between lp-border shadow-2xl">
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#adc6ff]/20 rounded-lg flex items-center justify-center lp-border">
-            <span className="material-symbols-outlined text-[#adc6ff] text-xl">mosque</span>
+          <div className="w-8 h-8 bg-[#adc6ff]/20 rounded-lg flex items-center justify-center lp-border overflow-hidden shrink-0">
+            {logo ? (
+              <img src={logo} alt={orgName} className="w-full h-full object-cover" />
+            ) : (
+              <span className="material-symbols-outlined text-[#adc6ff] text-xl">mosque</span>
+            )}
           </div>
           <span className="font-semibold tracking-tight text-[#e0e3e5] truncate max-w-[140px] sm:max-w-none">{orgName}</span>
         </div>

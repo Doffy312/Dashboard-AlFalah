@@ -13,6 +13,7 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
 
   // Sync from context when it changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTheme(security.theme || 'dark');
   }, [security]);
 

@@ -27,6 +27,18 @@ const SettingsPage = () => {
   // Ref to get current data from the active tab
   const tabDataRef = useRef(null);
 
+  // Prevent closing window if unsaved
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
   if (session?.user?.role !== 'Ketua') {
     return <Navigate to="/dashboard" replace />;
   }
@@ -49,16 +61,21 @@ const SettingsPage = () => {
   };
 
   // Real Save Handler — reads current data from the active tab's ref and persists it
-  const handleSave = () => {
+  const handleSave = async () => {
     if (tabDataRef.current) {
       const currentData = tabDataRef.current();
       if (currentData !== null && currentData !== undefined) {
-        saveTabSettings(activeTab, currentData);
+        try {
+          await saveTabSettings(activeTab, currentData);
+          setHasUnsavedChanges(false);
+          showToast('Pengaturan berhasil disimpan ke database!');
+        } catch (error) {
+          showToast(error.message || 'Gagal menyimpan pengaturan', 'error');
+        }
       }
     }
-    setHasUnsavedChanges(false);
-    showToast('Pengaturan berhasil diperbarui!');
   };
+
 
   const handleCancel = () => {
     if (hasUnsavedChanges) {
@@ -69,18 +86,6 @@ const SettingsPage = () => {
       }
     }
   };
-
-  // Prevent closing window if unsaved
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges]);
 
   const renderActiveTab = () => {
     const commonProps = { setHasUnsavedChanges, tabDataRef };
@@ -95,7 +100,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-120px)] text-on-surface">
+    <div className="flex flex-col gap-6 text-on-surface">
       {/* Toast Notification */}
       {toast && (
         <div className={`fixed top-24 right-8 z-50 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 ${
@@ -108,11 +113,11 @@ const SettingsPage = () => {
         </div>
       )}
 
-      {/* Sticky Top Bar */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sticky top-[56px] md:top-[88px] bg-background/80 backdrop-blur-md z-30 py-2">
+      {/* Standard Header Section matching other dashboard pages */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-title-lg font-bold text-white m-0">Pengaturan</h2>
-          <p className="text-body-sm text-on-surface-variant m-0 mt-1 hidden sm:block">Kelola konfigurasi sistem dan preferensi organisasi.</p>
+          <h1 className="text-display-sm font-display-sm text-on-surface dark:text-white m-0">Pengaturan</h1>
+          <p className="font-body-md text-on-surface-variant dark:text-white/70 m-0 mt-xs">Kelola konfigurasi sistem dan preferensi organisasi.</p>
         </div>
         <div className="flex w-full sm:w-auto gap-3">
           <button 
@@ -120,8 +125,8 @@ const SettingsPage = () => {
             disabled={!hasUnsavedChanges}
             className={`flex-1 sm:flex-none px-4 py-2 rounded-lg font-label-md transition-colors ${
               hasUnsavedChanges 
-                ? 'bg-surface-variant text-white hover:bg-surface-variant/80' 
-                : 'bg-surface-variant/50 text-on-surface-variant cursor-not-allowed'
+                ? 'bg-surface-variant text-white hover:bg-surface-variant/80 cursor-pointer' 
+                : 'bg-surface-variant/50 text-on-surface-variant cursor-not-allowed opacity-60'
             }`}
           >
             Batal
@@ -129,10 +134,10 @@ const SettingsPage = () => {
           <button 
             onClick={handleSave}
             disabled={!hasUnsavedChanges}
-            className={`flex-2 sm:flex-none px-4 py-2 rounded-lg font-label-md flex items-center justify-center gap-2 transition-colors ${
+            className={`flex-1 sm:flex-none px-4 py-2 rounded-lg font-label-md flex items-center justify-center gap-2 transition-colors ${
               hasUnsavedChanges
-                ? 'bg-primary text-white hover:bg-primary/90'
-                : 'bg-primary/50 text-white/70 cursor-not-allowed'
+                ? 'bg-primary text-white hover:bg-primary/90 cursor-pointer shadow-md shadow-primary/20'
+                : 'bg-primary/50 text-white/70 cursor-not-allowed opacity-60'
             }`}
           >
             <span className="material-symbols-outlined text-[18px]">save</span>
@@ -141,30 +146,30 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      {/* Split Screen Layout */}
-      <div className="flex flex-col md:flex-row gap-6 flex-1 min-h-0">
+      {/* Responsive Glass Layout without scroll traps */}
+      <div className="flex flex-col md:flex-row gap-6">
         {/* Navigation Tabs */}
-        <div className="w-full md:w-64 shrink-0 glass-panel p-2 flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto h-fit md:max-h-full hide-scrollbar">
+        <div className="w-full md:w-72 shrink-0 glass-panel p-2 flex md:flex-col gap-1.5 overflow-x-auto md:sticky md:top-[100px] h-fit hide-scrollbar">
           {TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className={`flex items-center gap-2 md:gap-3 px-4 py-3 rounded-lg text-left transition-all duration-200 whitespace-nowrap shrink-0 md:shrink ${
+              className={`flex items-center gap-3 px-3.5 py-3 rounded-lg text-left transition-all duration-200 whitespace-nowrap shrink-0 min-w-0 ${
                 activeTab === tab.id 
                   ? 'bg-primary/20 text-primary font-bold shadow-[0_3px_0_0_rgba(16,185,129,1)] md:shadow-[inset_3px_0_0_0_rgba(16,185,129,1)]' 
                   : 'text-on-surface-variant hover:text-white hover:bg-surface-variant/50'
               }`}
             >
-              <span className="material-symbols-outlined text-[20px]" style={activeTab === tab.id ? { fontVariationSettings: "'FILL' 1" } : {}}>
+              <span className="material-symbols-outlined text-[20px] shrink-0" style={activeTab === tab.id ? { fontVariationSettings: "'FILL' 1" } : {}}>
                 {tab.icon}
               </span>
-              <span className="font-label-md">{tab.label}</span>
+              <span className="text-sm font-semibold truncate">{tab.label}</span>
             </button>
           ))}
         </div>
 
         {/* Active Tab Content Area */}
-        <div className="flex-1 glass-panel p-6 overflow-y-auto">
+        <div className="flex-1 glass-panel p-6">
           {renderActiveTab()}
         </div>
       </div>

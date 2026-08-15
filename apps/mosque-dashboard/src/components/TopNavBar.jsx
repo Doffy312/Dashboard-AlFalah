@@ -4,6 +4,7 @@ import { useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsR
 import { formatDistanceToNow } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import { useSettings } from '../contexts/SettingsContext';
+import { authClient } from '../lib/auth-client';
 
 // Map notification type to dashboard route
 const NOTIFICATION_TYPE_ROUTES = {
@@ -12,6 +13,7 @@ const NOTIFICATION_TYPE_ROUTES = {
   'Program': '/dashboard/program-kerja',
   'Inventaris': '/dashboard/inventaris',
   'Jemaah': '/dashboard/jemaah',
+  'Donasi': '/dashboard/ziswaf',
 };
 
 const TopNavBar = () => {
@@ -20,15 +22,21 @@ const TopNavBar = () => {
   const markAllMutation = useMarkAllNotificationsAsRead();
   const navigate = useNavigate();
   const { profile } = useSettings();
+  const { data: session } = authClient.useSession();
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileNotif, setShowMobileNotif] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showMobileProfile, setShowMobileProfile] = useState(false);
+
   const dropdownRef = useRef(null);
   const mobileDropdownRef = useRef(null);
+  const profileDropdownRef = useRef(null);
+  const mobileProfileDropdownRef = useRef(null);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside or pressing Escape
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -37,9 +45,29 @@ const TopNavBar = () => {
       if (mobileDropdownRef.current && !mobileDropdownRef.current.contains(e.target)) {
         setShowMobileNotif(false);
       }
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(e.target)) {
+        setShowProfileDropdown(false);
+      }
+      if (mobileProfileDropdownRef.current && !mobileProfileDropdownRef.current.contains(e.target)) {
+        setShowMobileProfile(false);
+      }
     };
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setShowDropdown(false);
+        setShowMobileNotif(false);
+        setShowProfileDropdown(false);
+        setShowMobileProfile(false);
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const handleNotificationClick = (notif) => {
@@ -149,6 +177,101 @@ const TopNavBar = () => {
     </div>
   );
 
+  // Shared Profile Dropdown Panel
+  const ProfilePanel = ({ onClose }) => {
+    const user = session?.user;
+    const userName = user?.name || 'Administrator';
+    const userEmail = user?.email || 'admin@masjid-alfalah.or.id';
+    const userRole = user?.role || 'Ketua';
+    const userAvatar = user?.image;
+    const initial = userName.charAt(0).toUpperCase();
+
+    const handleLogout = async () => {
+      onClose?.();
+      await authClient.signOut();
+      navigate('/login');
+    };
+
+    return (
+      <div className="absolute right-0 mt-2 w-80 sm:w-84 bg-[#0f1923] border border-outline-variant rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+        {/* Header Avatar & Summary */}
+        <div className="p-4 bg-gradient-to-b from-primary/10 via-surface-variant/30 to-transparent border-b border-outline-variant/40">
+          <div className="flex items-center gap-3.5">
+            <div className="relative shrink-0">
+              <div className="w-14 h-14 rounded-full bg-surface border-2 border-primary/40 flex items-center justify-center overflow-hidden shadow-md shadow-primary/20">
+                {userAvatar ? (
+                  <img src={userAvatar} alt={userName} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-xl font-bold text-primary">{initial}</span>
+                )}
+              </div>
+              <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-[#0f1923] rounded-full" title="Status: Aktif"></span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="font-title-md text-white text-base font-bold truncate leading-tight">{userName}</h4>
+              <p className="text-xs text-on-surface-variant/80 truncate mb-1.5">{userEmail}</p>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-primary/15 text-primary border border-primary/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary mr-1.5"></span>
+                {userRole}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Detailed Account Information */}
+        <div className="p-4 space-y-2.5 bg-surface/20">
+          <p className="text-[11px] font-bold text-on-surface-variant/60 uppercase tracking-wider mb-1">Informasi Akun</p>
+          
+          <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-surface-variant/30 border border-outline-variant/30">
+            <div className="flex items-center gap-2 text-xs text-on-surface-variant">
+              <span className="material-symbols-outlined text-[16px] text-primary">person</span>
+              <span>Nama Lengkap</span>
+            </div>
+            <span className="text-xs font-semibold text-white truncate max-w-[130px]">{userName}</span>
+          </div>
+
+          <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-surface-variant/30 border border-outline-variant/30">
+            <div className="flex items-center gap-2 text-xs text-on-surface-variant">
+              <span className="material-symbols-outlined text-[16px] text-primary">mail</span>
+              <span>Email</span>
+            </div>
+            <span className="text-xs font-semibold text-white truncate max-w-[140px]" title={userEmail}>{userEmail}</span>
+          </div>
+
+          <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-surface-variant/30 border border-outline-variant/30">
+            <div className="flex items-center gap-2 text-xs text-on-surface-variant">
+              <span className="material-symbols-outlined text-[16px] text-primary">badge</span>
+              <span>Role / Peran</span>
+            </div>
+            <span className="text-xs font-bold text-primary">{userRole}</span>
+          </div>
+
+          <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-surface-variant/30 border border-outline-variant/30">
+            <div className="flex items-center gap-2 text-xs text-on-surface-variant">
+              <span className="material-symbols-outlined text-[16px] text-emerald-400">check_circle</span>
+              <span>Status Akun</span>
+            </div>
+            <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              Aktif
+            </span>
+          </div>
+        </div>
+
+        {/* Logout Action */}
+        <div className="p-2 border-t border-outline-variant/40 bg-surface-variant/10">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2.5 px-3 py-2.5 text-xs text-error hover:bg-error/15 rounded-xl transition-colors w-full text-left font-semibold cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[18px]">logout</span>
+            <span>Keluar dari Akun</span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       {/* ===== MOBILE HEADER (visible < md) ===== */}
@@ -168,7 +291,10 @@ const TopNavBar = () => {
           {/* Mobile Notification */}
           <div className="relative" ref={mobileDropdownRef}>
             <button
-              onClick={() => setShowMobileNotif(!showMobileNotif)}
+              onClick={() => {
+                setShowMobileNotif(!showMobileNotif);
+                setShowMobileProfile(false);
+              }}
               className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant cursor-pointer transition-colors relative"
             >
               <span className="material-symbols-outlined text-[20px]">notifications</span>
@@ -181,10 +307,28 @@ const TopNavBar = () => {
             {showMobileNotif && <NotificationPanel onClose={() => setShowMobileNotif(false)} />}
           </div>
 
-          {/* Profile */}
-          <button className="w-9 h-9 rounded-full bg-surface-variant overflow-hidden flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-primary text-[18px]">person</span>
-          </button>
+          {/* Profile Mobile */}
+          <div className="relative" ref={mobileProfileDropdownRef}>
+            <button
+              onClick={() => {
+                setShowMobileProfile(!showMobileProfile);
+                setShowMobileNotif(false);
+              }}
+              className={`w-9 h-9 rounded-full bg-surface-variant border border-outline-variant overflow-hidden flex items-center justify-center shrink-0 transition-all ${
+                showMobileProfile ? 'ring-2 ring-primary' : ''
+              }`}
+              title="Profil Saya"
+            >
+              {session?.user?.image ? (
+                <img src={session.user.image} alt="User Avatar" className="w-full h-full object-cover" />
+              ) : session?.user?.name ? (
+                <span className="font-bold text-primary text-xs">{session.user.name.charAt(0).toUpperCase()}</span>
+              ) : (
+                <span className="material-symbols-outlined text-primary text-[18px]">person</span>
+              )}
+            </button>
+            {showMobileProfile && <ProfilePanel onClose={() => setShowMobileProfile(false)} />}
+          </div>
         </div>
       </header>
 
@@ -213,7 +357,10 @@ const TopNavBar = () => {
             {/* Notification Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
-                onClick={() => setShowDropdown(!showDropdown)}
+                onClick={() => {
+                  setShowDropdown(!showDropdown);
+                  setShowProfileDropdown(false);
+                }}
                 className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant cursor-pointer transition-colors relative"
               >
                 <span className="material-symbols-outlined text-[20px]">notifications</span>
@@ -235,11 +382,31 @@ const TopNavBar = () => {
           
           <div className="h-8 w-px bg-outline-variant mx-1"></div>
           
-          <button className="flex items-center gap-sm cursor-pointer p-xs rounded-full hover:bg-surface-variant transition-colors">
-            <div className="w-9 h-9 rounded-full bg-surface-variant overflow-hidden flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-primary">person</span>
-            </div>
-          </button>
+          {/* Profile Dropdown Desktop */}
+          <div className="relative" ref={profileDropdownRef}>
+            <button
+              onClick={() => {
+                setShowProfileDropdown(!showProfileDropdown);
+                setShowDropdown(false);
+              }}
+              className={`flex items-center gap-2 cursor-pointer p-1 rounded-full transition-all duration-200 ${
+                showProfileDropdown ? 'ring-2 ring-primary bg-surface-variant' : 'hover:bg-surface-variant'
+              }`}
+              title="Profil Saya"
+            >
+              <div className="w-9 h-9 rounded-full bg-surface-variant border border-outline-variant overflow-hidden flex items-center justify-center shrink-0">
+                {session?.user?.image ? (
+                  <img src={session.user.image} alt="User Avatar" className="w-full h-full object-cover" />
+                ) : session?.user?.name ? (
+                  <span className="font-bold text-primary text-sm">{session.user.name.charAt(0).toUpperCase()}</span>
+                ) : (
+                  <span className="material-symbols-outlined text-primary text-[20px]">person</span>
+                )}
+              </div>
+            </button>
+
+            {showProfileDropdown && <ProfilePanel onClose={() => setShowProfileDropdown(false)} />}
+          </div>
         </div>
       </header>
     </>
@@ -247,5 +414,6 @@ const TopNavBar = () => {
 };
 
 export default TopNavBar;
+
 
 

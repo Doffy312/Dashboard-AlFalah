@@ -9,14 +9,14 @@ import { createProgramSchema } from "../validations/programs.validation.js";
 
 const router = Router();
 
-// Public Calendar Feed
+// Public Calendar Feed & Program Summary
 router.get("/feed.ics", programController.getFeed);
+router.get("/summary", programController.getSummary);
 
 router.use(requireAuth);
 
-// Read access: All roles
+// Read access: All authenticated roles
 router.get("/", programController.findAll);
-router.get("/summary", programController.getSummary);
 router.get("/:id", programController.findById);
 
 // Write access: Ketua, Sekretaris, Bendahara (all roles per ProgramKerjaPage canEdit)

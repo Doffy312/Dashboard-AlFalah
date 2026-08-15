@@ -14,6 +14,7 @@ const Sidebar = () => {
     { name: 'Dashboard', icon: 'dashboard', path: '/dashboard', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
     { name: 'Keuangan', icon: 'payments', path: '/dashboard/keuangan', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
     { name: 'Program Kerja', icon: 'view_kanban', path: '/dashboard/program-kerja', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
+    { name: 'Berita & Artikel', icon: 'newspaper', path: '/dashboard/berita', roles: ['Ketua', 'Sekretaris', 'Pengurus'] },
     { name: 'Database Jemaah', icon: 'group', path: '/dashboard/jemaah', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
     { name: 'Inventaris', icon: 'inventory_2', path: '/dashboard/inventaris', roles: ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'] },
     { name: 'ZISWAF', icon: 'volunteer_activism', path: '/dashboard/ziswaf', roles: ['Ketua', 'Bendahara', 'Pengurus'] },

@@ -24,6 +24,7 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const ZiswafPage = lazy(() => import('./pages/ZiswafPage'));
 const QurbanPage = lazy(() => import('./pages/QurbanPage'));
 const JadwalPage = lazy(() => import('./pages/JadwalPage'));
+const BeritaPage = lazy(() => import('./pages/BeritaPage'));
 
 // Lightweight loading spinner that matches the app's dark theme
 const PageLoadingFallback = () => (
@@ -125,6 +126,7 @@ function App() {
             <Route path="ziswaf" element={<Suspense fallback={<PageLoadingFallback />}><ZiswafPage /></Suspense>} />
             <Route path="qurban" element={<Suspense fallback={<PageLoadingFallback />}><QurbanPage /></Suspense>} />
             <Route path="jadwal" element={<Suspense fallback={<PageLoadingFallback />}><JadwalPage /></Suspense>} />
+            <Route path="berita" element={<Suspense fallback={<PageLoadingFallback />}><BeritaPage /></Suspense>} />
             <Route path="notifikasi" element={<Suspense fallback={<PageLoadingFallback />}><NotificationPage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageLoadingFallback />}><SettingsPage /></Suspense>} />
           </Route>

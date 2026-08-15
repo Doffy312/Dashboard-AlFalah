@@ -63,12 +63,12 @@ const TabCustomData = ({ setHasUnsavedChanges, tabDataRef }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Jemaah Status */}
         <div className="flex flex-col gap-4">
-          <h4 className="font-label-lg font-bold text-white flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">group</span>
+          <h4 className="text-title-sm font-bold text-white flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-[20px]">group</span>
             Status Jemaah
           </h4>
           <div className="bg-surface-variant/30 rounded-xl p-5 border border-outline-variant flex flex-col gap-4">
-            <p className="text-xs text-on-surface-variant">
+            <p className="text-body-sm text-on-surface-variant m-0">
               Label status ini akan muncul sebagai opsi saat menambah atau mengubah data jemaah.
             </p>
             
@@ -77,7 +77,7 @@ const TabCustomData = ({ setHasUnsavedChanges, tabDataRef }) => {
                 type="text" 
                 value={newJemaah}
                 onChange={e => setNewJemaah(e.target.value)}
-                className="glass-input flex-1 px-3 py-2 rounded-lg text-white font-body-sm"
+                className="glass-input flex-1 px-3 py-2 rounded-lg text-white text-body-sm"
                 placeholder="Misal: Simpatisan..."
               />
               <button type="submit" className="bg-surface-variant hover:bg-surface-variant/80 border border-outline-variant text-white px-3 py-2 rounded-lg transition-colors flex items-center justify-center">
@@ -87,7 +87,7 @@ const TabCustomData = ({ setHasUnsavedChanges, tabDataRef }) => {
 
             <div className="flex flex-wrap gap-2 mt-2">
               {jemaahStatus.map(status => (
-                <div key={status} className="bg-primary/20 text-primary px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 border border-primary/30 group">
+                <div key={status} className="bg-primary/20 text-primary px-3 py-1.5 rounded-full text-label-md font-semibold flex items-center gap-2 border border-primary/30 group">
                   {status}
                   <button 
                     onClick={() => handleDeleteJemaah(status)}
@@ -103,12 +103,12 @@ const TabCustomData = ({ setHasUnsavedChanges, tabDataRef }) => {
 
         {/* Proker Status */}
         <div className="flex flex-col gap-4">
-          <h4 className="font-label-lg font-bold text-white flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">view_kanban</span>
+          <h4 className="text-title-sm font-bold text-white flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-[20px]">view_kanban</span>
             Status Program Kerja
           </h4>
           <div className="bg-surface-variant/30 rounded-xl p-5 border border-outline-variant flex flex-col gap-4">
-            <p className="text-xs text-on-surface-variant">
+            <p className="text-body-sm text-on-surface-variant m-0">
               Label status ini akan muncul sebagai opsi saat melacak progres program kerja (Proker).
             </p>
             
@@ -117,7 +117,7 @@ const TabCustomData = ({ setHasUnsavedChanges, tabDataRef }) => {
                 type="text" 
                 value={newProker}
                 onChange={e => setNewProker(e.target.value)}
-                className="glass-input flex-1 px-3 py-2 rounded-lg text-white font-body-sm"
+                className="glass-input flex-1 px-3 py-2 rounded-lg text-white text-body-sm"
                 placeholder="Misal: Ditunda..."
               />
               <button type="submit" className="bg-surface-variant hover:bg-surface-variant/80 border border-outline-variant text-white px-3 py-2 rounded-lg transition-colors flex items-center justify-center">
@@ -127,7 +127,7 @@ const TabCustomData = ({ setHasUnsavedChanges, tabDataRef }) => {
 
             <div className="flex flex-wrap gap-2 mt-2">
               {prokerStatus.map(status => (
-                <div key={status} className="bg-[#d97706]/20 text-[#d97706] px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 border border-[#d97706]/30 group">
+                <div key={status} className="bg-[#d97706]/20 text-[#d97706] px-3 py-1.5 rounded-full text-label-md font-semibold flex items-center gap-2 border border-[#d97706]/30 group">
                   {status}
                   <button 
                     onClick={() => handleDeleteProker(status)}

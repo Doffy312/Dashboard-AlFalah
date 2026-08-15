@@ -3,7 +3,7 @@ import { useUsers, useCreateUser, useDeleteUser, useUpdateUserRole, useResendVer
 
 const ROLES = ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'];
 
-const TabUsers = ({ setHasUnsavedChanges, tabDataRef }) => {
+const TabUsers = ({ tabDataRef }) => {
   // Users tab doesn't persist to localStorage settings, so return null from ref
   useEffect(() => {
     if (tabDataRef) {

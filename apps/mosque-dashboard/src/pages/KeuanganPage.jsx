@@ -33,6 +33,9 @@ const KeuanganPage = () => {
 
   const canEdit = ['Ketua', 'Bendahara'].includes(session?.user?.role);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   // Compute list of categories dynamically from transactions + standard defaults
   const availableCategories = useMemo(() => {
     const defaults = ['Infaq', 'Operasional', 'Wakaf', 'Pembangunan', 'Program Kerja', 'Zakat', 'Sosial', 'Kegiatan'];
@@ -60,6 +63,21 @@ const KeuanganPage = () => {
     });
   }, [transactions, searchTerm, filterCategory, filterDate]);
 
+  // Reset to page 1 on filter changes
+  const handleSearchChange = (val) => { setSearchTerm(val); setCurrentPage(1); };
+  const handleCategoryChange = (val) => { setFilterCategory(val); setCurrentPage(1); };
+  const handleDateChange = (val) => { setFilterDate(val); setCurrentPage(1); };
+
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage) || 1;
+  const paginatedTransactions = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredTransactions.slice(start, start + itemsPerPage);
+  }, [filteredTransactions, currentPage]);
+
+  const startIndex = filteredTransactions.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
+  const endIndex = Math.min(currentPage * itemsPerPage, filteredTransactions.length);
+
   const handleEdit = (transaction) => {
     setEditingTransaction(transaction);
     setIsFormOpen(true);
@@ -85,12 +103,6 @@ const KeuanganPage = () => {
       createMutation.mutate(data);
     }
     setIsFormOpen(false);
-  };
-
-  const resetFilters = () => {
-    setSearchTerm('');
-    setFilterCategory('');
-    setFilterDate('');
   };
 
   // Helper for status colors based on category or type
@@ -187,7 +199,7 @@ const KeuanganPage = () => {
               placeholder="Cari transaksi..." 
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
             />
           </div>
 
@@ -196,7 +208,7 @@ const KeuanganPage = () => {
             className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-10 min-w-[150px]" 
             style={{ backgroundImage: `url("data:image/svg+xml;utf8,<svg fill='none' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5 7.5L10 12.5L15 7.5' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5'/></svg>")`, backgroundPosition: 'right 8px center', backgroundRepeat: 'no-repeat' }}
             value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
+            onChange={(e) => handleCategoryChange(e.target.value)}
           >
             <option value="">Semua Kategori</option>
             {availableCategories.map(cat => (
@@ -208,19 +220,26 @@ const KeuanganPage = () => {
             className="glass-input px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface appearance-none pr-10 min-w-[130px]" 
             style={{ backgroundImage: `url("data:image/svg+xml;utf8,<svg fill='none' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5 7.5L10 12.5L15 7.5' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5'/></svg>")`, backgroundPosition: 'right 8px center', backgroundRepeat: 'no-repeat' }}
             value={filterDate}
-            onChange={(e) => setFilterDate(e.target.value)}
+            onChange={(e) => handleDateChange(e.target.value)}
           >
             <option value="">Semua Waktu</option>
-            <option value="2026-07">Jul 2026</option>
-            <option value="2026-06">Jun 2026</option>
-            <option value="2026-05">Mei 2026</option>
-            <option value="2024-10">Okt 2024</option>
-            <option value="2024-09">Sep 2024</option>
+            {Array.from({ length: 12 }, (_, i) => {
+              const d = new Date();
+              d.setMonth(d.getMonth() - i);
+              const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+              const label = d.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
+              return <option key={value} value={value}>{label}</option>;
+            })}
           </select>
 
           {(searchTerm || filterCategory || filterDate) && (
             <button
-              onClick={resetFilters}
+              onClick={() => {
+                setSearchTerm('');
+                setFilterCategory('');
+                setFilterDate('');
+                setCurrentPage(1);
+              }}
               className="px-3 py-2 text-xs text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 shrink-0"
               title="Reset Filter"
             >
@@ -257,8 +276,8 @@ const KeuanganPage = () => {
               </tr>
             </thead>
             <tbody className="font-body-sm text-body-sm">
-              {filteredTransactions.length > 0 ? (
-                filteredTransactions.map(t => (
+              {paginatedTransactions.length > 0 ? (
+                paginatedTransactions.map(t => (
                   <tr key={t.id} className="border-b border-outline glass-row">
                     <td className="py-sm px-md text-on-surface">
                       {new Date(t.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -303,16 +322,24 @@ const KeuanganPage = () => {
           </table>
         </div>
         
-        {/* Pagination simple */}
+        {/* Pagination active controls */}
         <div className="px-md py-sm border-t border-outline flex items-center justify-between bg-surface-variant">
           <span className="font-body-sm text-body-sm text-on-surface-variant">
-            Menampilkan {filteredTransactions.length > 0 ? 1 : 0}-{filteredTransactions.length} dari {filteredTransactions.length} transaksi
+            Menampilkan {startIndex}-{endIndex} dari {filteredTransactions.length} transaksi (Halaman {currentPage} dari {totalPages})
           </span>
           <div className="flex gap-2">
-            <button className="p-1 rounded text-on-surface-variant hover:bg-surface-variant disabled:opacity-50" disabled>
+            <button 
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage <= 1}
+              className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-variant disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
+            >
               <span className="material-symbols-outlined text-sm">chevron_left</span>
             </button>
-            <button className="p-1 rounded text-on-surface-variant hover:bg-surface-variant disabled:opacity-50" disabled>
+            <button 
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage >= totalPages}
+              className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-variant disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
+            >
               <span className="material-symbols-outlined text-sm">chevron_right</span>
             </button>
           </div>

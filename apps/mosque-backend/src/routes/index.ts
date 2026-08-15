@@ -10,6 +10,8 @@ import usersRoutes from "./users.routes.js";
 import ziswafRoutes from "./ziswaf.routes.js";
 import qurbanRoutes from "./qurban.routes.js";
 import jadwalRoutes from "./jadwal.routes.js";
+import settingsRoutes from "./settings.routes.js";
+import articlesRoutes from "./articles.routes.js";
 
 const router = Router();
 
@@ -25,5 +27,8 @@ router.use("/users", usersRoutes);
 router.use("/ziswaf", ziswafRoutes);
 router.use("/qurban", qurbanRoutes);
 router.use("/jadwal", jadwalRoutes);
+router.use("/settings", settingsRoutes);
+router.use("/articles", articlesRoutes);
 
 export default router;
+

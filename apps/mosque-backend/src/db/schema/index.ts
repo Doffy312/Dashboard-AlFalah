@@ -37,9 +37,22 @@ export {
 } from "./ziswaf.js";
 
 export {
-  qurbanParticipant,
+  qurbanTahun,
+  qurbanKelompok,
+  pequrban,
+  qurbanTahunRelations,
+  qurbanKelompokRelations,
+  pequrbanRelations,
 } from "./qurban.js";
 
 export {
   jadwalPetugas,
 } from "./jadwal.js";
+
+export {
+  setting,
+} from "./settings.js";
+
+export {
+  article,
+} from "./articles.js";

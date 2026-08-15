@@ -10,7 +10,7 @@ const FALLBACK_CARDS = [
     category: 'Kajian & Dakwah',
     title: 'Kajian Milenial Masa Kini',
     description: 'Diskusi interaktif membahas isu kontemporer dari sudut pandang Islam yang relevan.',
-    image: 'https://lh3.googleusercontent.com/aida/AP1WRLtK4Xcw9FfrY1Ep4fUUL9JpN6b-ey1ciGfCMV4Xj2sGLb23Hmm1OJOgAoCqRh5r_IrzCLR5KiEZzve_gokZkZ6BjoD18434ArMORe4PBYA4b2-6U10uFZv5gSlvKDZu2YshF5qCh7PL2nlTYLjRm-kpDEzc-7r3DRAqBvZ68CXY4aW41_X7dKsR7l3XDFCFjOndGvNPgEnS5ZONCQLVH1v_DNvjBooUr-NKdm3FFVj3-YsnYFyQjPyhvQ',
+    image: '/images/berita_kajian_akbar.webp',
     icon: null,
   },
   {
@@ -18,7 +18,7 @@ const FALLBACK_CARDS = [
     category: 'Sosial',
     title: 'Bakti Sosial Digital 2024',
     description: 'Penyaluran bantuan secara transparan melalui sistem pintar terverifikasi.',
-    image: null,
+    image: '/images/berita_santunan_yatim.webp',
     icon: 'volunteer_activism',
   },
   {
@@ -26,7 +26,7 @@ const FALLBACK_CARDS = [
     category: 'Pendidikan',
     title: 'Tahsin Online AI Integrated',
     description: "Kelas perbaikan bacaan Al-Qur'an dengan feedback instan berbasis teknologi AI.",
-    image: null,
+    image: '/images/berita_tahfiz_quran.webp',
     icon: 'menu_book',
   },
 ];
@@ -101,6 +101,10 @@ const LandingNews = ({ programs = [] }) => {
                     alt={card.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     src={card.image}
+                    width="400"
+                    height="250"
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.style.display = 'none';

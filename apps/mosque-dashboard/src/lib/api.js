@@ -10,6 +10,7 @@ async function request(path, options = {}) {
   }
 
   const res = await fetch(`${API_BASE}${path}`, {
+    credentials: "include",
     ...options,
     headers,
   });
@@ -37,6 +38,7 @@ export const transactionApi = {
   },
   getById: (id) => request(`/transactions/${id}`),
   create: (data) => request("/transactions", { method: "POST", body: JSON.stringify(data) }),
+  publicDonate: (data) => request("/transactions/public-donate", { method: "POST", body: JSON.stringify(data) }),
   update: (id, data) => request(`/transactions/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   delete: (id) => request(`/transactions/${id}`, { method: "DELETE" }),
   getSummary: () => request("/transactions/summary"),
@@ -68,6 +70,7 @@ export const jemaahApi = {
   },
   getById: (id) => request(`/jemaah/${id}`),
   create: (data) => request("/jemaah", { method: "POST", body: JSON.stringify(data) }),
+  publicRegister: (data) => request("/jemaah/public-register", { method: "POST", body: JSON.stringify(data) }),
   update: (id, data) => request(`/jemaah/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   delete: (id) => request(`/jemaah/${id}`, { method: "DELETE" }),
   getSummary: () => request("/jemaah/summary"),
@@ -115,14 +118,20 @@ export const ziswafApi = {
 };
 
 export const qurbanApi = {
+  getSummary: (year) => request(`/qurban/summary${year ? `?year=${year}` : ''}`),
+  getYears: () => request('/qurban/tahun'),
+  createYear: (data) => request('/qurban/tahun', { method: 'POST', body: JSON.stringify(data) }),
+  getGroups: (qurbanTahunId) => request(`/qurban/kelompok${qurbanTahunId ? `?qurbanTahunId=${qurbanTahunId}` : ''}`),
+  createGroup: (data) => request('/qurban/kelompok', { method: 'POST', body: JSON.stringify(data) }),
+  deleteGroup: (id) => request(`/qurban/kelompok/${id}`, { method: 'DELETE' }),
   getAll: (filters = {}) => {
     const params = new URLSearchParams(filters);
     return request(`/qurban?${params.toString()}`);
   },
   getById: (id) => request(`/qurban/${id}`),
-  create: (data) => request("/qurban", { method: "POST", body: JSON.stringify(data) }),
-  update: (id, data) => request(`/qurban/${id}`, { method: "PUT", body: JSON.stringify(data) }),
-  delete: (id) => request(`/qurban/${id}`, { method: "DELETE" }),
+  create: (data) => request('/qurban', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => request(`/qurban/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id) => request(`/qurban/${id}`, { method: 'DELETE' }),
 };
 
 export const jadwalApi = {
@@ -141,3 +150,18 @@ export const notificationApi = {
   markAsRead: (id) => request(`/notifications/${id}/read`, { method: "PATCH" }),
   markAllAsRead: () => request("/notifications/mark-all-read", { method: "PATCH" }),
 };
+
+export const settingsApi = {
+  getAll: () => request("/settings"),
+  getByKey: (key) => request(`/settings/${key}`),
+  update: (key, data) => request(`/settings/${key}`, { method: "PUT", body: JSON.stringify(data) }),
+};
+
+export const articleApi = {
+  getAll: () => request("/articles"),
+  getById: (id) => request(`/articles/${id}`),
+  create: (data) => request("/articles", { method: "POST", body: JSON.stringify(data) }),
+  update: (id, data) => request(`/articles/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id) => request(`/articles/${id}`, { method: "DELETE" }),
+};
+

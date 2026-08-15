@@ -6,6 +6,7 @@ import apiRoutes from "./routes/index.js";
 import { createServer } from "http";
 import { initializeSocket } from "./lib/socket.js";
 import { initBackupService } from "./services/backup.service.js";
+import { programService } from "./services/programs.service.js";
 import path from "path";
 import fs from "fs";
 
@@ -22,8 +23,8 @@ app.use(
     credentials: true, // Required for Better Auth cookies
   })
 );
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // ─── Static Files ────────────────────────────────────────────────────
 const uploadsDir = path.join(process.cwd(), "uploads");
@@ -59,8 +60,6 @@ app.use("/api", apiRoutes);
 
 // ─── Global Error Handler ────────────────────────────────────────────
 app.use(errorHandler);
-
-import { programService } from "./services/programs.service.js";
 
 // ─── Start Server ────────────────────────────────────────────────────
 httpServer.listen(env.PORT, () => {

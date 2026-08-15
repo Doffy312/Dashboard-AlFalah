@@ -4,21 +4,31 @@ import { requireRole } from "../middlewares/rbac.middleware.js";
 import { transactionController } from "../controllers/transactions.controller.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { sanitizeBody } from "../middlewares/sanitize.middleware.js";
-import { createTransactionSchema } from "../validations/transactions.validation.js";
+import { createTransactionSchema, publicDonateSchema } from "../validations/transactions.validation.js";
 
 const router = Router();
 
-// All transaction routes require authentication
-router.use(requireAuth);
-
-// Read access: Ketua + Bendahara
-router.get(
-  "/",
-  transactionController.findAll
-);
+// Public financial kas summary for Landing Page transparency
 router.get(
   "/summary",
   transactionController.getSummary
+);
+
+// Public donation endpoint for Landing Page (Scan QR Donasi Infaq)
+router.post(
+  "/public-donate",
+  sanitizeBody,
+  validate(publicDonateSchema),
+  transactionController.publicDonate
+);
+
+// Protected transaction routes require authentication
+router.use(requireAuth);
+
+// Read access: Authenticated roles
+router.get(
+  "/",
+  transactionController.findAll
 );
 router.get(
   "/:id",
