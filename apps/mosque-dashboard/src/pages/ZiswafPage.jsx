@@ -24,7 +24,8 @@ export default function ZiswafPage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [dataToDelete, setDataToDelete] = useState(null);
 
-  const canEdit = ['Ketua', 'Bendahara'].includes(session?.user?.role);
+  const isKetua = session?.user?.role === 'Ketua';
+  const canAdd = ['Ketua', 'Bendahara'].includes(session?.user?.role);
 
   const filteredData = useMemo(() => {
     return ziswaf.filter(item => {
@@ -110,7 +111,7 @@ export default function ZiswafPage() {
             Pengelolaan transaksi Zakat, Infaq, Sedekah, dan Wakaf Masjid Al-Falah.
           </p>
         </div>
-        {canEdit && (
+        {canAdd && (
           <button 
             onClick={() => {
               setEditingData(null);
@@ -264,7 +265,7 @@ export default function ZiswafPage() {
                   <th className="py-3.5 px-4">Nominal</th>
                   <th className="py-3.5 px-4">Keterangan</th>
                   <th className="py-3.5 px-4">Tanggal Transaksi</th>
-                  {canEdit && <th className="py-3.5 px-4 sm:px-6 text-right">Aksi</th>}
+                  {isKetua && <th className="py-3.5 px-4 sm:px-6 text-right">Aksi</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/60 text-xs sm:text-sm">
@@ -293,7 +294,7 @@ export default function ZiswafPage() {
                     <td className="py-4 px-4 text-xs text-on-surface-variant whitespace-nowrap">
                       {formatDate(row.date)}
                     </td>
-                    {canEdit && (
+                    {isKetua && (
                       <td className="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
                           <button

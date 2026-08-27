@@ -265,9 +265,6 @@ const Dashboard = () => {
         <div className="bg-surface rounded-2xl p-6 border border-outline-variant flex flex-col">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold text-on-surface">Program Mendatang</h3>
-            <button className="text-on-surface-variant hover:text-white">
-              <span className="material-symbols-outlined">more_horiz</span>
-            </button>
           </div>
 
           <div className="flex flex-col gap-4 flex-1">

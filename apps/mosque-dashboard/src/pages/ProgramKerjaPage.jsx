@@ -34,7 +34,8 @@ export default function ProgramKerjaPage() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [programToView, setProgramToView] = useState(null);
 
-  const canEdit = ['Ketua', 'Sekretaris'].includes(session?.user?.role);
+  const isKetua = session?.user?.role === 'Ketua';
+  const canAdd = ['Ketua', 'Sekretaris'].includes(session?.user?.role);
 
   const filteredPrograms = useMemo(() => {
     return programs.filter(p => {
@@ -126,7 +127,7 @@ export default function ProgramKerjaPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2 shrink-0">
           <a
-            href="http://localhost:3000/api/programs/feed.ics"
+            href="/api/programs/feed.ics"
             target="_blank"
             rel="noopener noreferrer"
             className="px-3 py-2 rounded-xl bg-surface-variant/80 hover:bg-surface-variant text-on-surface border border-outline-variant text-xs font-semibold flex items-center gap-1.5 transition-all"
@@ -135,7 +136,7 @@ export default function ProgramKerjaPage() {
             <span className="material-symbols-outlined text-base">calendar_add_on</span>
             <span className="hidden sm:inline">Subscribe Kalender</span>
           </a>
-          {canEdit && (
+          {canAdd && (
             <button 
               onClick={() => {
                 setEditingProgram(null);
@@ -273,7 +274,8 @@ export default function ProgramKerjaPage() {
           onDelete={handleDeleteClick} 
           onStatusChange={handleStatusChange}
           onViewDetail={handleViewDetail}
-          canEdit={canEdit}
+          isKetua={isKetua}
+          canStatusChange={canAdd}
         />
       ) : (
         <div className="bg-surface border border-outline-variant rounded-2xl overflow-hidden shadow-sm">
@@ -307,7 +309,7 @@ export default function ProgramKerjaPage() {
                     <th className="py-3.5 px-4">Tanggal Target</th>
                     <th className="py-3.5 px-4">Estimasi Anggaran</th>
                     <th className="py-3.5 px-4">Status</th>
-                    {canEdit && <th className="py-3.5 px-4 sm:px-6 text-right">Aksi</th>}
+                    {(isKetua || canAdd) && <th className="py-3.5 px-4 sm:px-6 text-right">Aksi</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-outline-variant/60 text-xs sm:text-sm">
@@ -320,7 +322,17 @@ export default function ProgramKerjaPage() {
                         {row.pic || '-'}
                       </td>
                       <td className="py-4 px-4 text-xs text-on-surface-variant whitespace-nowrap">
-                        {formatDate(row.date)}
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span>{formatDate(row.date)}</span>
+                          {row.originalDate && row.originalDate.split('T')[0] !== row.date?.split('T')[0] && (
+                            <span 
+                              className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 inline-flex items-center gap-0.5"
+                              title={`Jadwal awal: ${formatDate(row.originalDate)}`}
+                            >
+                              (Diubah)
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-4 px-4 font-mono text-emerald-400 font-semibold whitespace-nowrap">
                         {formatCurrency(row.budget)}
@@ -336,7 +348,7 @@ export default function ProgramKerjaPage() {
                           {row.status}
                         </span>
                       </td>
-                      {canEdit && (
+                      {(isKetua || canAdd) && (
                         <td className="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
                           <div className="flex items-center justify-end gap-1.5">
                             {row.status === 'Selesai' && (
@@ -349,7 +361,7 @@ export default function ProgramKerjaPage() {
                                 <span>Detail</span>
                               </button>
                             )}
-                            {row.status === 'Sedang Berjalan' && (
+                            {row.status === 'Sedang Berjalan' && canAdd && (
                               <button
                                 onClick={() => handleStatusChange(row.id, 'Selesai')}
                                 className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 font-bold text-xs flex items-center gap-1 transition-all"
@@ -359,20 +371,24 @@ export default function ProgramKerjaPage() {
                                 <span>Selesai</span>
                               </button>
                             )}
-                            <button
-                              onClick={() => handleEdit(row)}
-                              className="px-3 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-bold text-xs flex items-center gap-1 transition-all"
-                              title="Edit Program"
-                            >
-                              <span className="material-symbols-outlined text-base">edit</span>
-                            </button>
-                            <button
-                              onClick={() => handleDeleteClick(row)}
-                              className="px-2.5 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 text-xs font-bold transition-all flex items-center gap-1"
-                              title="Hapus Program"
-                            >
-                              <span className="material-symbols-outlined text-base">delete</span>
-                            </button>
+                            {isKetua && (
+                              <>
+                                <button
+                                  onClick={() => handleEdit(row)}
+                                  className="px-3 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-bold text-xs flex items-center gap-1 transition-all"
+                                  title="Edit Program"
+                                >
+                                  <span className="material-symbols-outlined text-base">edit</span>
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteClick(row)}
+                                  className="px-2.5 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 text-xs font-bold transition-all flex items-center gap-1"
+                                  title="Hapus Program"
+                                >
+                                  <span className="material-symbols-outlined text-base">delete</span>
+                                </button>
+                              </>
+                            )}
                           </div>
                         </td>
                       )}

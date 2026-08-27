@@ -26,7 +26,7 @@ router.use(requireAuth);
 router.get("/", jemaahController.findAll);
 router.get("/:id", jemaahController.findById);
 
-// Write access: Ketua + Sekretaris only (per JemaahPage canEdit)
+// Write access: Create by Ketua & Sekretaris, Edit & Delete by Ketua only
 router.post(
   "/",
   requireRole("Ketua", "Sekretaris"),
@@ -36,14 +36,14 @@ router.post(
 );
 router.put(
   "/:id",
-  requireRole("Ketua", "Sekretaris"),
+  requireRole("Ketua"),
   sanitizeBody,
   validate(createJemaahSchema),
   jemaahController.update
 );
 router.delete(
   "/:id",
-  requireRole("Ketua", "Sekretaris"),
+  requireRole("Ketua"),
   jemaahController.delete
 );
 

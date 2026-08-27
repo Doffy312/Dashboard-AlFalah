@@ -7,6 +7,7 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
     pic: '',
     budget: '',
     date: new Date().toISOString().split('T')[0],
+    originalDate: null,
     status: 'Direncanakan',
     description: '',
     evaluation: ''
@@ -14,23 +15,23 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   useEffect(() => {
     if (initialData) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFormData({
+      setFormData({
         name: initialData.name,
         pic: initialData.pic,
         budget: initialData.budget,
-        date: initialData.date,
+        date: initialData.date ? initialData.date.split('T')[0] : new Date().toISOString().split('T')[0],
+        originalDate: initialData.originalDate ? initialData.originalDate.split('T')[0] : null,
         status: initialData.status,
         description: initialData.description,
         evaluation: initialData.evaluation || ''
       });
     } else {
-       
-    setFormData({
+      setFormData({
         name: '',
         pic: '',
         budget: '',
         date: new Date().toISOString().split('T')[0],
+        originalDate: null,
         status: 'Direncanakan',
         description: '',
         evaluation: ''
@@ -99,11 +100,24 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             <input 
               type="date" 
               required
-                className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
+              className="w-full px-md py-sm bg-surface-variant border border-outline rounded-xl outline-none focus:border-primary text-on-surface font-body-md"
               value={formData.date}
-              onChange={(e) =>  
-    setFormData({...formData, date: e.target.value})}
+              onChange={(e) => setFormData({...formData, date: e.target.value})}
             />
+            {initialData && (initialData.originalDate || initialData.date) && (
+              (() => {
+                const origDate = (initialData.originalDate || initialData.date).split('T')[0];
+                if (formData.date && formData.date !== origDate) {
+                  return (
+                    <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-0.5 flex items-center gap-1 font-medium">
+                      <span className="material-symbols-outlined text-[13px]">history</span>
+                      Status perencanaan: &quot;Diubah&quot; (Jadwal awal: {new Date(origDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })})
+                    </p>
+                  );
+                }
+                return null;
+              })()
+            )}
           </div>
           <div className="flex flex-col gap-xs flex-1">
             <label className="font-label-md text-on-surface-variant dark:text-white/70">Status</label>

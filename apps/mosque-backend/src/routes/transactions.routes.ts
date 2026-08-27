@@ -35,7 +35,7 @@ router.get(
   transactionController.findById
 );
 
-// Write access: Bendahara only (Ketua is read-only per PRD)
+// Write access: Create by Ketua & Bendahara, Edit & Delete by Ketua only
 router.post(
   "/",
   requireRole("Ketua", "Bendahara"),
@@ -45,14 +45,14 @@ router.post(
 );
 router.put(
   "/:id",
-  requireRole("Ketua", "Bendahara"),
+  requireRole("Ketua"),
   sanitizeBody,
   validate(createTransactionSchema),
   transactionController.update
 );
 router.delete(
   "/:id",
-  requireRole("Ketua", "Bendahara"),
+  requireRole("Ketua"),
   transactionController.delete
 );
 

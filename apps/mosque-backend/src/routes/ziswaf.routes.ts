@@ -16,9 +16,9 @@ router.use(requireAuth);
 router.get("/", asyncHandler(ziswafController.getAll));
 router.get("/:id", asyncHandler(ziswafController.getById));
 
-// Write access: Bendahara + Ketua only
+// Write access: Create by Ketua & Bendahara, Edit & Delete by Ketua only
 router.post("/", requireRole("Ketua", "Bendahara"), sanitizeBody, validate(createZiswafSchema), asyncHandler(ziswafController.create));
-router.put("/:id", requireRole("Ketua", "Bendahara"), sanitizeBody, validate(createZiswafSchema), asyncHandler(ziswafController.update));
-router.delete("/:id", requireRole("Ketua", "Bendahara"), asyncHandler(ziswafController.remove));
+router.put("/:id", requireRole("Ketua"), sanitizeBody, validate(createZiswafSchema), asyncHandler(ziswafController.update));
+router.delete("/:id", requireRole("Ketua"), asyncHandler(ziswafController.remove));
 
 export default router;

@@ -18,7 +18,7 @@ router.use(requireAuth);
 router.get("/", inventarisController.findAll);
 router.get("/:id", inventarisController.findById);
 
-// Write access: Ketua, Sekretaris, Bendahara (all roles per InventarisPage canEdit)
+// Write access: Create by Ketua, Sekretaris, Bendahara, Edit & Delete by Ketua only
 router.post(
   "/",
   requireRole("Ketua", "Sekretaris", "Bendahara"),
@@ -28,14 +28,14 @@ router.post(
 );
 router.put(
   "/:id",
-  requireRole("Ketua", "Sekretaris", "Bendahara"),
+  requireRole("Ketua"),
   sanitizeBody,
   validate(createInventarisSchema),
   inventarisController.update
 );
 router.delete(
   "/:id",
-  requireRole("Ketua", "Sekretaris", "Bendahara"),
+  requireRole("Ketua"),
   inventarisController.delete
 );
 

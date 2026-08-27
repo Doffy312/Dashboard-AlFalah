@@ -26,7 +26,8 @@ export default function JemaahPage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [jemaahToDelete, setJemaahToDelete] = useState(null);
 
-  const canEdit = ['Ketua', 'Sekretaris'].includes(session?.user?.role);
+  const isKetua = session?.user?.role === 'Ketua';
+  const canAdd = ['Ketua', 'Sekretaris'].includes(session?.user?.role);
 
   const filteredJemaah = useMemo(() => {
     if (!Array.isArray(jemaah)) return [];
@@ -88,7 +89,7 @@ export default function JemaahPage() {
             Pengelolaan profil, kategori, dan pendataan jemaah Masjid Al-Falah.
           </p>
         </div>
-        {canEdit && (
+        {canAdd && (
           <button 
             onClick={() => {
               setEditingJemaah(null);
@@ -216,7 +217,7 @@ export default function JemaahPage() {
                   <th className="py-3.5 px-4">No. HP / WhatsApp</th>
                   <th className="py-3.5 px-4">Kategori</th>
                   <th className="py-3.5 px-4">Alamat</th>
-                  {canEdit && <th className="py-3.5 px-4 sm:px-6 text-right">Aksi</th>}
+                  {isKetua && <th className="py-3.5 px-4 sm:px-6 text-right">Aksi</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/60 text-xs sm:text-sm">
@@ -244,7 +245,7 @@ export default function JemaahPage() {
                     <td className="py-4 px-4 text-xs text-on-surface-variant max-w-xs truncate">
                       {row.address || '-'}
                     </td>
-                    {canEdit && (
+                    {isKetua && (
                       <td className="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
                           <button

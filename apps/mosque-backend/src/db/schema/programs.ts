@@ -22,6 +22,7 @@ export const program = mysqlTable("programs", {
   budget: decimal("budget", { precision: 15, scale: 2 }).notNull(),
   status: varchar("status", { length: 50 }).notNull().default("Direncanakan"), // 'Direncanakan' | 'Sedang Berjalan' | 'Selesai'
   date: date("date", { mode: "string" }).notNull(),
+  originalDate: date("original_date", { mode: "string" }), // Stores initial planned date; null for legacy data
   description: text("description").notNull(),
   evaluation: text("evaluation"), // Only filled when status = 'Selesai'
   reportDocUrl: text("report_doc_url"),

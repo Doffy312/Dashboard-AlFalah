@@ -19,13 +19,13 @@ router.post("/tahun", requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"
 // Qurban Groups
 router.get("/kelompok", asyncHandler(qurbanController.getKelompok));
 router.post("/kelompok", requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"), asyncHandler(qurbanController.createKelompok));
-router.delete("/kelompok/:id", requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"), asyncHandler(qurbanController.deleteKelompok));
+router.delete("/kelompok/:id", requireRole("Ketua"), asyncHandler(qurbanController.deleteKelompok));
 
 // Pequrban Data CRUD
 router.get("/", asyncHandler(qurbanController.getAll));
 router.get("/:id", asyncHandler(qurbanController.getById));
 router.post("/", requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"), asyncHandler(qurbanController.create));
-router.put("/:id", requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"), asyncHandler(qurbanController.update));
-router.delete("/:id", requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"), asyncHandler(qurbanController.remove));
+router.put("/:id", requireRole("Ketua"), asyncHandler(qurbanController.update));
+router.delete("/:id", requireRole("Ketua"), asyncHandler(qurbanController.remove));
 
 export default router;

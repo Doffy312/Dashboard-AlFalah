@@ -41,7 +41,7 @@ router.post("/", requireAuth, requireRole("Ketua", "Sekretaris", "Pengurus"), va
   }
 });
 
-router.put("/:id", requireAuth, requireRole("Ketua", "Sekretaris", "Pengurus"), validate(updateArticleSchema), async (req, res, next) => {
+router.put("/:id", requireAuth, requireRole("Ketua"), validate(updateArticleSchema), async (req, res, next) => {
   try {
     const id = req.params.id as string;
     const updated = await articlesService.update(id, req.body);
@@ -55,7 +55,7 @@ router.put("/:id", requireAuth, requireRole("Ketua", "Sekretaris", "Pengurus"), 
   }
 });
 
-router.delete("/:id", requireAuth, requireRole("Ketua", "Sekretaris", "Pengurus"), async (req, res, next) => {
+router.delete("/:id", requireAuth, requireRole("Ketua"), async (req, res, next) => {
   try {
     const id = req.params.id as string;
     const deleted = await articlesService.delete(id);

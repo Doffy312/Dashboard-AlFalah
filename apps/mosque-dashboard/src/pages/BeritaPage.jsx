@@ -32,7 +32,8 @@ export default function BeritaPage() {
 
   const { data: session } = authClient.useSession();
   const userRole = session?.user?.role || 'Ketua';
-  const canManage = ['Ketua', 'Sekretaris', 'Pengurus'].includes(userRole);
+  const isKetua = userRole === 'Ketua';
+  const canAdd = ['Ketua', 'Sekretaris', 'Pengurus'].includes(userRole);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
@@ -127,7 +128,7 @@ export default function BeritaPage() {
             Kelola pengumuman, dokumentasi kegiatan, dan artikel edukasi yang tampil di Landing Page.
           </p>
         </div>
-        {canManage && (
+        {canAdd && (
           <button
             onClick={() => {
               setEditingArticle(null);
@@ -325,13 +326,13 @@ export default function BeritaPage() {
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => handleViewDetail(row)}
-                          className="px-3 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-bold text-xs flex items-center gap-1 transition-all"
+                          className="px-2.5 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold transition-all flex items-center gap-1"
                           title="Lihat Detail"
                         >
                           <span className="material-symbols-outlined text-base">visibility</span>
                           <span>Detail</span>
                         </button>
-                        {canManage && (
+                        {isKetua && (
                           <>
                             <button
                               onClick={() => handleEdit(row)}
@@ -424,7 +425,7 @@ export default function BeritaPage() {
                     >
                       <span className="material-symbols-outlined text-base">visibility</span>
                     </button>
-                    {canManage && (
+                    {isKetua && (
                       <>
                         <button
                           onClick={() => handleEdit(article)}

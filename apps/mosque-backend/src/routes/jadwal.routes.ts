@@ -16,9 +16,9 @@ router.get("/:id", asyncHandler(jadwalController.getById));
 // Protected write routes require authentication
 router.use(requireAuth);
 
-// Write access: Sekretaris + Ketua only
+// Write access: Create by Ketua & Sekretaris, Edit & Delete by Ketua only
 router.post("/", requireRole("Ketua", "Sekretaris"), sanitizeBody, validate(createJadwalSchema), asyncHandler(jadwalController.create));
-router.put("/:id", requireRole("Ketua", "Sekretaris"), sanitizeBody, validate(createJadwalSchema), asyncHandler(jadwalController.update));
-router.delete("/:id", requireRole("Ketua", "Sekretaris"), asyncHandler(jadwalController.remove));
+router.put("/:id", requireRole("Ketua"), sanitizeBody, validate(createJadwalSchema), asyncHandler(jadwalController.update));
+router.delete("/:id", requireRole("Ketua"), asyncHandler(jadwalController.remove));
 
 export default router;

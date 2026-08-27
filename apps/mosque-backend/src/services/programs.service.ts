@@ -14,6 +14,7 @@ export interface CreateProgramInput {
   budget: string;
   status?: string;
   date: string;
+  originalDate?: string | null;
   description: string;
   evaluation?: string | null;
 }
@@ -136,6 +137,7 @@ export class ProgramService {
         budget: data.budget,
         status: data.status ?? "Direncanakan",
         date: data.date,
+        originalDate: data.date, // Snapshot initial planned date
         description: data.description,
         evaluation: data.evaluation ?? null,
         createdBy: userId,
@@ -173,12 +175,22 @@ export class ProgramService {
     const existing = await this.findById(id);
     if (!existing) return null;
 
+    // Prevent overwriting the original date snapshot from client input
+    const { originalDate: _ignored, ...updateData } = data;
+
+    const fieldsToSet: Record<string, any> = {
+      ...updateData,
+      updatedAt: new Date(),
+    };
+
+    // If existing record was created before originalDate existed, snapshot its original date
+    if (!existing.originalDate && existing.date) {
+      fieldsToSet.originalDate = existing.date;
+    }
+
     await db
       .update(program)
-      .set({
-        ...data,
-        updatedAt: new Date(),
-      })
+      .set(fieldsToSet)
       .where(eq(program.id, id));
 
     const updated = await this.findById(id);

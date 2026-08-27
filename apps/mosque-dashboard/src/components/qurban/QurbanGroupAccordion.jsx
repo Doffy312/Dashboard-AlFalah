@@ -5,6 +5,8 @@ import { ChevronDown, ChevronUp, Edit2, Trash2, Eye, UserPlus, Users } from 'luc
 const QurbanGroupAccordion = ({
   groups = [],
   ungroupedList = [],
+  isKetua,
+  canAdd,
   canEdit = false,
   onEdit,
   onDelete,
@@ -12,6 +14,8 @@ const QurbanGroupAccordion = ({
   onAddMemberToGroup,
 }) => {
   const [openGroups, setOpenGroups] = useState({});
+  const showEditDelete = isKetua !== undefined ? isKetua : canEdit;
+  const showAddMember = canAdd !== undefined ? canAdd : canEdit;
 
   const toggleGroup = (groupId) => {
     setOpenGroups((prev) => ({
@@ -89,7 +93,7 @@ const QurbanGroupAccordion = ({
                   </div>
                 </div>
 
-                {canEdit && !isFull && (
+                {showAddMember && !isFull && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -166,7 +170,7 @@ const QurbanGroupAccordion = ({
                                 >
                                   <Eye size={16} />
                                 </button>
-                                {canEdit && (
+                                {showEditDelete && (
                                   <>
                                     <button
                                       onClick={() => onEdit(member)}
@@ -274,7 +278,7 @@ const QurbanGroupAccordion = ({
                         >
                           <Eye size={16} />
                         </button>
-                        {canEdit && (
+                        {showEditDelete && (
                           <>
                             <button
                               onClick={() => onEdit(item)}

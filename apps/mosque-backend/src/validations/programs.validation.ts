@@ -8,6 +8,7 @@ export const createProgramSchema = z.object({
     errorMap: () => ({ message: "Status program tidak valid" })
   }),
   date: z.string().trim().min(1, "Tanggal tidak boleh kosong"),
+  originalDate: z.string().trim().nullable().optional(),
   description: z.string().trim().min(1, "Deskripsi tidak boleh kosong").max(2000, "Deskripsi terlalu panjang"),
   evaluation: z.string().trim().max(2000, "Evaluasi terlalu panjang").optional(),
 });

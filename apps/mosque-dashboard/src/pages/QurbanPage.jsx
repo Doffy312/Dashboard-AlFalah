@@ -18,7 +18,8 @@ import ConfirmDialog from '../components/common/ConfirmDialog';
 
 export default function QurbanPage() {
   const { data: session } = authClient.useSession();
-  const canEdit = ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'].includes(session?.user?.role);
+  const isKetua = session?.user?.role === 'Ketua';
+  const canAdd = ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'].includes(session?.user?.role);
 
   // Years & Selected Year Filter
   const { data: years = [] } = useQurbanYears();
@@ -180,7 +181,7 @@ export default function QurbanPage() {
             Pengelolaan data peserta, kelompok Sapi &amp; Kambing, serta grafik tren kepanitiaan Qurban.
           </p>
         </div>
-        {canEdit && (
+        {canAdd && (
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             <button
               onClick={handleAddYearPrompt}
@@ -331,7 +332,8 @@ export default function QurbanPage() {
       <QurbanGroupAccordion
         groups={filteredGroups}
         ungroupedList={filteredUngroupedKambing}
-        canEdit={canEdit}
+        isKetua={isKetua}
+        canAdd={canAdd}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
         onDetail={handleDetail}

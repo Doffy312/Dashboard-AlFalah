@@ -28,7 +28,8 @@ export default function InventarisPage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [inventarisToDelete, setInventarisToDelete] = useState(null);
 
-  const canEdit = ['Ketua', 'Sekretaris', 'Bendahara'].includes(session?.user?.role);
+  const isKetua = session?.user?.role === 'Ketua';
+  const canAdd = ['Ketua', 'Sekretaris', 'Bendahara'].includes(session?.user?.role);
 
   const filteredInventaris = useMemo(() => {
     return inventaris.filter(i => {
@@ -92,7 +93,7 @@ export default function InventarisPage() {
             Pendataan, pengelolaan, dan pemantauan kondisi aset inventaris.
           </p>
         </div>
-        {canEdit && (
+        {canAdd && (
           <button 
             onClick={() => {
               setEditingInventaris(null);
@@ -235,7 +236,7 @@ export default function InventarisPage() {
                   <th className="py-3.5 px-4">Kondisi</th>
                   <th className="py-3.5 px-4">Lokasi</th>
                   <th className="py-3.5 px-4">Tanggal Input</th>
-                  {canEdit && <th className="py-3.5 px-4 sm:px-6 text-right">Aksi</th>}
+                  {isKetua && <th className="py-3.5 px-4 sm:px-6 text-right">Aksi</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/60 text-xs sm:text-sm">
@@ -264,7 +265,7 @@ export default function InventarisPage() {
                     <td className="py-4 px-4 text-xs text-on-surface-variant whitespace-nowrap">
                       {formatDate(row.date)}
                     </td>
-                    {canEdit && (
+                    {isKetua && (
                       <td className="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
                           <button

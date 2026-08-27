@@ -19,7 +19,7 @@ router.use(requireAuth);
 router.get("/", programController.findAll);
 router.get("/:id", programController.findById);
 
-// Write access: Ketua, Sekretaris, Bendahara (all roles per ProgramKerjaPage canEdit)
+// Write access: Create by Ketua & Sekretaris, Edit & Delete by Ketua only
 router.post(
   "/",
   requireRole("Ketua", "Sekretaris"),
@@ -29,13 +29,13 @@ router.post(
 );
 router.put(
   "/:id",
-  requireRole("Ketua", "Sekretaris"),
+  requireRole("Ketua"),
   sanitizeBody,
   validate(createProgramSchema),
   programController.update
 );
 
-// Status-only update (Kanban drag) — all roles
+// Status-only update (Kanban drag) — Ketua & Sekretaris
 router.patch(
   "/:id/status",
   requireRole("Ketua", "Sekretaris"),
@@ -54,7 +54,7 @@ router.patch(
 
 router.delete(
   "/:id",
-  requireRole("Ketua", "Sekretaris"),
+  requireRole("Ketua"),
   programController.delete
 );
 

@@ -22,7 +22,8 @@ export default function JadwalPage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [dataToDelete, setDataToDelete] = useState(null);
 
-  const canEdit = ['Ketua', 'Sekretaris'].includes(session?.user?.role);
+  const isKetua = session?.user?.role === 'Ketua';
+  const canAdd = ['Ketua', 'Sekretaris'].includes(session?.user?.role);
 
   const filteredData = useMemo(() => {
     return jadwal.filter(item => {
@@ -94,7 +95,7 @@ export default function JadwalPage() {
             Pengelolaan jadwal Khotib, Imam, Muadzin, dan Penceramah Kajian.
           </p>
         </div>
-        {canEdit && (
+        {canAdd && (
           <button 
             onClick={() => {
               setEditingData(null);
@@ -223,7 +224,7 @@ export default function JadwalPage() {
                   <th className="py-3.5 px-4">Tema / Topik</th>
                   <th className="py-3.5 px-4">Kontak</th>
                   <th className="py-3.5 px-4">Tanggal</th>
-                  {canEdit && <th className="py-3.5 px-4 sm:px-6 text-right">Aksi</th>}
+                  {isKetua && <th className="py-3.5 px-4 sm:px-6 text-right">Aksi</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/60 text-xs sm:text-sm">
@@ -254,7 +255,7 @@ export default function JadwalPage() {
                     <td className="py-4 px-4 text-xs text-on-surface-variant whitespace-nowrap">
                       {formatDate(row.date)}
                     </td>
-                    {canEdit && (
+                    {isKetua && (
                       <td className="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
                           <button

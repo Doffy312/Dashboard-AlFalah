@@ -1,9 +1,26 @@
 import Modal from '../common/Modal';
-import { formatCurrency } from '../../lib/utils';
+import { formatCurrency, getFileUrl } from '../../lib/utils';
 import { FileText, Download, ExternalLink } from 'lucide-react';
 
 const ProgramDetailModal = ({ isOpen, onClose, program }) => {
   if (!isOpen || !program) return null;
+
+  // Handle documentationUrls safely whether it's an Array or JSON string
+  const documentationList = (() => {
+    if (!program.documentationUrls) return [];
+    if (Array.isArray(program.documentationUrls)) return program.documentationUrls;
+    if (typeof program.documentationUrls === 'string') {
+      try {
+        const parsed = JSON.parse(program.documentationUrls);
+        return Array.isArray(parsed) ? parsed : [program.documentationUrls];
+      } catch {
+        return [program.documentationUrls];
+      }
+    }
+    return [];
+  })();
+
+  const reportUrl = program.reportDocUrl ? getFileUrl(program.reportDocUrl) : null;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Detail Program Kerja (Selesai)">
@@ -15,8 +32,16 @@ const ProgramDetailModal = ({ isOpen, onClose, program }) => {
             <div className="bg-surface-variant px-3 py-1.5 rounded-lg text-sm text-on-surface-variant font-medium">
               PIC: <span className="text-on-surface">{program.pic}</span>
             </div>
-            <div className="bg-surface-variant px-3 py-1.5 rounded-lg text-sm text-on-surface-variant font-medium">
-              Tanggal: <span className="text-on-surface">{new Date(program.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            <div className="bg-surface-variant px-3 py-1.5 rounded-lg text-sm text-on-surface-variant font-medium flex items-center gap-1.5 flex-wrap">
+              <span>Tanggal: <span className="text-on-surface">{new Date(program.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></span>
+              {program.originalDate && program.originalDate.split('T')[0] !== program.date?.split('T')[0] && (
+                <span 
+                  className="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30"
+                  title={`Jadwal awal perencanaan: ${new Date(program.originalDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+                >
+                  (Diubah)
+                </span>
+              )}
             </div>
             <div className="bg-surface-variant px-3 py-1.5 rounded-lg text-sm text-on-surface-variant font-medium">
               Anggaran: <span className="text-on-surface font-bold text-emerald-500">{formatCurrency(program.budget)}</span>
@@ -46,9 +71,9 @@ const ProgramDetailModal = ({ isOpen, onClose, program }) => {
         {/* Laporan Dokumen */}
         <div className="flex flex-col gap-sm">
           <h4 className="font-label-lg text-on-surface border-b border-outline pb-2">Dokumen Laporan</h4>
-          {program.reportDocUrl ? (
+          {reportUrl ? (
             <a 
-              href={`http://localhost:3001${program.reportDocUrl}`} 
+              href={reportUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-3 bg-surface-variant hover:bg-surface border border-outline rounded-xl p-4 transition-colors group"
@@ -74,28 +99,32 @@ const ProgramDetailModal = ({ isOpen, onClose, program }) => {
         {/* Foto Dokumentasi */}
         <div className="flex flex-col gap-sm">
           <h4 className="font-label-lg text-on-surface border-b border-outline pb-2">Foto Dokumentasi</h4>
-          {program.documentationUrls && program.documentationUrls.length > 0 ? (
+          {documentationList.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {program.documentationUrls.map((url, idx) => (
-                <a 
-                  key={idx}
-                  href={`http://localhost:3001${url}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group relative aspect-video rounded-xl overflow-hidden border border-outline block"
-                >
-                  <img 
-                    src={`http://localhost:3001${url}`} 
-                    alt={`Dokumentasi ${idx + 1}`} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                    <span className="text-white flex items-center gap-2 font-medium text-sm">
-                      <ExternalLink size={16} /> Lihat Penuh
-                    </span>
-                  </div>
-                </a>
-              ))}
+              {documentationList.map((url, idx) => {
+                const fileUrl = getFileUrl(url);
+                return (
+                  <a 
+                    key={idx}
+                    href={fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative aspect-video rounded-xl overflow-hidden border border-outline block bg-surface-variant"
+                  >
+                    <img 
+                      src={fileUrl} 
+                      alt={`Dokumentasi ${idx + 1}`} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                      <span className="text-white flex items-center gap-2 font-medium text-sm">
+                        <ExternalLink size={16} /> Lihat Penuh
+                      </span>
+                    </div>
+                  </a>
+                );
+              })}
             </div>
           ) : (
             <div className="bg-surface-variant border border-dashed border-outline rounded-xl p-6 text-center">

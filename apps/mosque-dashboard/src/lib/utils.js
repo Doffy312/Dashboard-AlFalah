@@ -5,3 +5,12 @@ export const formatCurrency = (amount) => {
     minimumFractionDigits: 0
   }).format(amount || 0);
 };
+
+export const getFileUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:') || path.startsWith('data:')) {
+    return path;
+  }
+  return path.startsWith('/') ? path : `/${path}`;
+};
+

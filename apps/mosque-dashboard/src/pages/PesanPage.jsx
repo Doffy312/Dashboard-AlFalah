@@ -4,8 +4,12 @@ import {
   useUpdateMessageStatus, 
   useDeleteMessage 
 } from '../hooks/useContactMessages';
+import { authClient } from '../lib/auth-client';
 
 export default function PesanPage() {
+  const { data: session } = authClient.useSession();
+  const isKetua = session?.user?.role === 'Ketua';
+
   const { data: messages = [], isLoading, isError } = useContactMessages();
   const updateStatusMutation = useUpdateMessageStatus();
   const deleteMessageMutation = useDeleteMessage();
@@ -305,13 +309,15 @@ export default function PesanPage() {
                             <span className="hidden sm:inline">WA</span>
                           </a>
 
-                          <button
-                            onClick={() => setDeleteTargetId(msg.id)}
-                            className="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors"
-                            title="Hapus Pesan"
-                          >
-                            <span className="material-symbols-outlined text-lg">delete</span>
-                          </button>
+                          {isKetua && (
+                            <button
+                              onClick={() => setDeleteTargetId(msg.id)}
+                              className="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors"
+                              title="Hapus Pesan"
+                            >
+                              <span className="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

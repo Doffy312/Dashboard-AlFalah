@@ -31,7 +31,8 @@ const KeuanganPage = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
 
-  const canEdit = ['Ketua', 'Bendahara'].includes(session?.user?.role);
+  const isKetua = session?.user?.role === 'Ketua';
+  const canAdd = ['Ketua', 'Bendahara'].includes(session?.user?.role);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -248,7 +249,7 @@ const KeuanganPage = () => {
           )}
         </div>
 
-        {canEdit && (
+        {canAdd && (
           <button 
             onClick={() => {
               setEditingTransaction(null);
@@ -272,7 +273,7 @@ const KeuanganPage = () => {
                 <th className="py-sm px-md font-label-md text-label-md text-on-surface-variant">Deskripsi</th>
                 <th className="py-sm px-md font-label-md text-label-md text-on-surface-variant">Kategori</th>
                 <th className="py-sm px-md font-label-md text-label-md text-on-surface-variant text-right">Nominal</th>
-                {canEdit && <th className="py-sm px-md font-label-md text-label-md text-on-surface-variant text-center">Aksi</th>}
+                {isKetua && <th className="py-sm px-md font-label-md text-label-md text-on-surface-variant text-center">Aksi</th>}
               </tr>
             </thead>
             <tbody className="font-body-sm text-body-sm">
@@ -291,7 +292,7 @@ const KeuanganPage = () => {
                     <td className={`py-sm px-md text-right font-semibold ${t.type === 'Pemasukan' ? 'text-emerald-600' : 'text-red-600'}`}>
                       {t.type === 'Pemasukan' ? '+' : '-'} {formatCurrency(t.amount)}
                     </td>
-                    {canEdit && (
+                    {isKetua && (
                       <td className="py-sm px-md text-center">
                         <div className="relative group inline-block">
                           <button className="text-on-surface-variant hover:text-primary transition-colors cursor-pointer focus:outline-none">
@@ -313,7 +314,7 @@ const KeuanganPage = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={canEdit ? 5 : 4} className="py-md text-center text-on-surface-variant">
+                  <td colSpan={isKetua ? 5 : 4} className="py-md text-center text-on-surface-variant">
                     Tidak ada transaksi yang ditemukan.
                   </td>
                 </tr>
@@ -347,7 +348,7 @@ const KeuanganPage = () => {
       </div>
 
       {/* Mobile FAB for adding transaction */}
-      {canEdit && (
+      {canAdd && (
         <button
           onClick={() => {
             setEditingTransaction(null);
