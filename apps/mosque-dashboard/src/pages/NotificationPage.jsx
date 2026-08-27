@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, Wallet, Calendar, Package, Check, CheckCheck, HeartHandshake, MailOpen } from 'lucide-react';
 
-import { formatDistanceToNow } from 'date-fns';
-import { id as localeId } from 'date-fns/locale';
+import { formatNotificationTime, formatFullDateTime } from '../lib/dateUtils';
 import { useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead } from '../hooks/useNotifications';
 
 // Map notification type to dashboard route
@@ -116,7 +115,8 @@ const NotificationPage = () => {
         ) : (
           filteredNotifications.map(notification => {
             const { icon: Icon, colorClass } = getIconAndColor(notification.type);
-            const timeAgo = formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true, locale: localeId });
+            const timeAgo = formatNotificationTime(notification.createdAt);
+            const fullTime = formatFullDateTime(notification.createdAt);
             return (
               <div 
                 key={notification.id} 
@@ -136,7 +136,10 @@ const NotificationPage = () => {
                     <h3 className={`font-title-md text-xs sm:text-[16px] m-0 leading-snug break-words ${notification.isRead ? 'text-on-surface/80' : 'text-on-surface font-bold'}`}>
                       {notification.title}
                     </h3>
-                    <span className="font-label-sm text-[10px] sm:text-[12px] text-outline whitespace-nowrap shrink-0">
+                    <span 
+                      className="font-label-sm text-[10px] sm:text-[12px] text-outline whitespace-nowrap shrink-0"
+                      title={fullTime}
+                    >
                       {timeAgo}
                     </span>
                   </div>

@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead } from '../hooks/useNotifications';
-import { formatDistanceToNow } from 'date-fns';
-import { id as localeId } from 'date-fns/locale';
+import { formatNotificationTime, formatFullDateTime } from '../lib/dateUtils';
 import { useSettings } from '../contexts/SettingsContext';
 import { authClient } from '../lib/auth-client';
 
@@ -14,6 +13,7 @@ const NOTIFICATION_TYPE_ROUTES = {
   'Inventaris': '/dashboard/inventaris',
   'Jemaah': '/dashboard/jemaah',
   'Donasi': '/dashboard/ziswaf',
+  'Pesan': '/dashboard/pesan',
 };
 
 const TopNavBar = () => {
@@ -122,7 +122,8 @@ const TopNavBar = () => {
       <div className="max-h-[400px] overflow-y-auto">
         {recentNotifications.length > 0 ? (
           recentNotifications.map(notif => {
-            const timeAgo = formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true, locale: localeId });
+            const timeAgo = formatNotificationTime(notif.createdAt);
+            const fullTime = formatFullDateTime(notif.createdAt);
             return (
               <div
                 key={notif.id}
@@ -147,7 +148,10 @@ const TopNavBar = () => {
                       {notif.description}
                     </p>
                   </div>
-                  <span className="text-[10px] text-on-surface-variant/70 whitespace-nowrap shrink-0 mt-0.5">
+                  <span 
+                    className="text-[10px] text-on-surface-variant/70 whitespace-nowrap shrink-0 mt-0.5"
+                    title={fullTime}
+                  >
                     {timeAgo}
                   </span>
                 </div>
