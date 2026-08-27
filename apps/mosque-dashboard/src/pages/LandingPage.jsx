@@ -19,6 +19,7 @@ import LandingFooter from '../components/landing/LandingFooter';
 // Lazy-load below-fold sections for faster initial render
 const LandingPrayerBar = lazy(() => import('../components/landing/LandingPrayerBar'));
 const LandingContactSection = lazy(() => import('../components/landing/LandingContactSection'));
+const LandingCommunitySection = lazy(() => import('../components/landing/LandingCommunitySection'));
 import { useSettings } from '../contexts/SettingsContext';
 import { useDashboardSummary } from '../hooks/useDashboard';
 import { useTransactionSummary } from '../hooks/useTransactions';
@@ -417,6 +418,11 @@ const LandingPage = () => {
       {/* ===== HUBUNGI PENGURUS SECTION ===== */}
       <Suspense fallback={null}>
         <LandingContactSection onShowToast={showToast} />
+      </Suspense>
+
+      {/* ===== INISIATIF TERBUKA & PENGEMBANG (COMMUNITY) ===== */}
+      <Suspense fallback={null}>
+        <LandingCommunitySection />
       </Suspense>
 
       {/* ===== FOOTER ===== */}

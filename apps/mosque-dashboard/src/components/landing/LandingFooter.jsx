@@ -8,6 +8,7 @@ const FOOTER_NAV = [
   { label: 'Transparansi Keuangan', path: '/transparansi-keuangan' },
   { label: 'Berita & Kegiatan', path: '/berita-kegiatan' },
   { label: 'Kontak', path: '/#kontak' },
+  { label: 'Tim Pengembang', path: '/#kontribusi' },
 ];
 
 const LandingFooter = ({ orgName: customOrgName, logo: customLogo }) => {
