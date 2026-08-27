@@ -1,0 +1,1762 @@
+[
+  {
+    "id": "TC001",
+    "title": "Administrator logs in and reaches the dashboard",
+    "description": "A DKM administrator can sign in through the portal and land on the dashboard overview.",
+    "category": "Admin Authentication and Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dashboard is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify summary cards are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Submit a quick donation from the landing page",
+    "description": "A public visitor can submit a donation from the landing page and receives confirmation with payment details.",
+    "category": "Public Landing Page & Quick Donation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the quick donation flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the donor name field with a valid name"
+      },
+      {
+        "type": "action",
+        "description": "Select a donation type"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the amount field with a valid donation amount"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the notes field with a short donation note"
+      },
+      {
+        "type": "action",
+        "description": "Submit the donation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a donation confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify payment instructions or payment details are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Admin logs in and reaches the dashboard",
+    "description": "An administrator can sign in through the portal and land on the protected dashboard after submitting valid credentials.",
+    "category": "DKM Administrator Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dashboard is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify access to the protected admin area is granted"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Public donation submission shows payment instructions",
+    "description": "A visitor can submit a quick donation from the landing page and see confirmation with payment details.",
+    "category": "Public Landing Page Donation Flow",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the quick donation flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the donor name field with a valid name"
+      },
+      {
+        "type": "action",
+        "description": "Select a donation type"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the donation amount field with a valid amount"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the notes field with a short note"
+      },
+      {
+        "type": "action",
+        "description": "Submit the donation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a donation confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify payment instructions are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Dashboard shows key operational overview data",
+    "description": "An authenticated administrator can view the dashboard's KPI cards, cash flow chart, upcoming programs, and recent activity.",
+    "category": "Admin Authentication and Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify financial KPI cards are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify cash flow data is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify recent activity is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Admin reviews dashboard summary and activity",
+    "description": "A logged-in administrator can view the dashboard summary cards, cash flow overview, and recent activity after signing in.",
+    "category": "Dashboard Overview & KPI Metrics",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify dashboard summary cards are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify cash flow and recent activity information are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Admin reviews financial KPI summary on the dashboard",
+    "description": "A logged-in administrator can see the key financial summary values needed to assess mosque operations at a glance.",
+    "category": "Dashboard Overview & KPI Metrics",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify financial summary cards are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify income and expense information is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "View landing page information before donating",
+    "description": "A public visitor can review the landing page information sections before starting a donation and sees the expected public content.",
+    "category": "Public Landing Page & Quick Donation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll through the landing page content"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify prayer times and mosque information are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify upcoming agenda and financial snapshot content are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Admin creates a new work program",
+    "description": "An administrator can add a work program and see it appear in the program list.",
+    "category": "Work Program Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the work program management page"
+      },
+      {
+        "type": "action",
+        "description": "Open the add program flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the program title with a valid title"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the program date with a valid date"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the budget field with a valid budget amount"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the PIC field with a valid person in charge"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the description field with a valid description"
+      },
+      {
+        "type": "action",
+        "description": "Submit the program form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new program appears in the list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Admin records a financial transaction",
+    "description": "An administrator can add a ledger transaction and see it appear in the financial records.",
+    "category": "Financial Ledger & Transaction Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the financial ledger page"
+      },
+      {
+        "type": "action",
+        "description": "Open the add transaction flow"
+      },
+      {
+        "type": "action",
+        "description": "Choose a transaction type"
+      },
+      {
+        "type": "action",
+        "description": "Select a transaction category"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the amount field with a valid amount"
+      },
+      {
+        "type": "action",
+        "description": "Select a payment method"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the description field with a valid description"
+      },
+      {
+        "type": "action",
+        "description": "Submit the transaction form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new transaction appears in the ledger"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Public visitor registers as jemaah successfully",
+    "description": "A visitor can complete the jemaah registration form from the landing page and see a success message.",
+    "category": "Congregation (Jemaah) Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the jemaah registration form"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the name field with a valid name"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the phone field with a valid phone number"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the address field with a valid address"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the occupation field with a valid occupation"
+      },
+      {
+        "type": "action",
+        "description": "Select a membership status"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a registration success message is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Admin adds a new jemaah record",
+    "description": "An administrator can create a congregation member record and see it in the database list.",
+    "category": "Congregation (Jemaah) Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the jemaah management page"
+      },
+      {
+        "type": "action",
+        "description": "Open the add jemaah flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the member name field with a valid name"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the phone field with a valid phone number"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the address field with a valid address"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the occupation field with a valid occupation"
+      },
+      {
+        "type": "action",
+        "description": "Select the membership status"
+      },
+      {
+        "type": "action",
+        "description": "Submit the jemaah form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new jemaah record appears in the list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Admin updates a work program status and completion details",
+    "description": "An administrator can change a program's status, complete it with realization details, and see the completed state reflected.",
+    "category": "Work Program Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the work program management page"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing program"
+      },
+      {
+        "type": "action",
+        "description": "Change the program status to in progress"
+      },
+      {
+        "type": "action",
+        "description": "Save the status change"
+      },
+      {
+        "type": "action",
+        "description": "Open the same program again"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the realized budget field with a valid amount"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the completion notes field with a valid note"
+      },
+      {
+        "type": "action",
+        "description": "Submit the completion form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the program is marked as completed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify completion details are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Register as a congregation member from the landing page",
+    "description": "A public visitor can complete the congregation registration form from the landing page and sees a success message.",
+    "category": "Public Congregation Registration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the registration section"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the full name field with a valid name"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the phone number field with a valid phone number"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the address field with a valid address"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the RT/RW field with a valid neighborhood code"
+      },
+      {
+        "type": "action",
+        "description": "Select a marital status"
+      },
+      {
+        "type": "action",
+        "description": "Select an occupation"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the family member count field with a valid number"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a registration success message is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "Admin edits a jemaah profile",
+    "description": "An administrator can update an existing jemaah profile and see the changes in the member detail view.",
+    "category": "Congregation (Jemaah) Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the jemaah management page"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing member profile"
+      },
+      {
+        "type": "action",
+        "description": "Edit the member profile"
+      },
+      {
+        "type": "action",
+        "description": "Fill in an updated address"
+      },
+      {
+        "type": "action",
+        "description": "Fill in an updated occupation"
+      },
+      {
+        "type": "action",
+        "description": "Save the member changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated member profile is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC016",
+    "title": "Admin opens the program management page from the dashboard",
+    "description": "A logged-in administrator can move from the dashboard to the work program management area and see program data.",
+    "category": "Dashboard Overview & KPI Metrics",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the quick action for work programs"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the work program management page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify existing program information is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC017",
+    "title": "Admin filters and searches the financial ledger",
+    "description": "An administrator can search and filter transactions to find matching ledger entries.",
+    "category": "Financial Ledger & Transaction Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the financial ledger page"
+      },
+      {
+        "type": "action",
+        "description": "Filter transactions by type"
+      },
+      {
+        "type": "action",
+        "description": "Filter transactions by category or date range"
+      },
+      {
+        "type": "action",
+        "description": "Search for a transaction by description or donor name"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the matching ledger entries are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC018",
+    "title": "Review financial transparency summaries and charts",
+    "description": "A public visitor can inspect financial summary data and switch between transparency chart views.",
+    "category": "Financial Transparency Portal",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /transparansi-keuangan"
+      },
+      {
+        "type": "action",
+        "description": "Review the financial summary area"
+      },
+      {
+        "type": "action",
+        "description": "Switch to the cash flow chart view"
+      },
+      {
+        "type": "action",
+        "description": "Switch to the fund allocation chart view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify balance, income, and expenditure summaries are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify financial charts are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC019",
+    "title": "Admin deletes a work program",
+    "description": "An administrator can remove an existing work program from the list.",
+    "category": "Work Program Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the work program management page"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing program"
+      },
+      {
+        "type": "action",
+        "description": "Delete the program"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the program is removed from the list"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Admin reviews upcoming programs from the dashboard",
+    "description": "A logged-in administrator can see upcoming programs listed on the dashboard for operational planning.",
+    "category": "Dashboard Overview & KPI Metrics",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify upcoming programs are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify program schedule information is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "Admin edits and deletes a financial transaction",
+    "description": "An administrator can update a financial record and remove it from the ledger.",
+    "category": "Financial Ledger & Transaction Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the financial ledger page"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing transaction"
+      },
+      {
+        "type": "action",
+        "description": "Edit the transaction"
+      },
+      {
+        "type": "action",
+        "description": "Save the transaction changes"
+      },
+      {
+        "type": "action",
+        "description": "Open the same transaction again"
+      },
+      {
+        "type": "action",
+        "description": "Delete the transaction"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the transaction is removed from the ledger"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC022",
+    "title": "Add a new inventory asset",
+    "description": "Verifies that an administrator can create a new asset record and see it appear in the inventory list.",
+    "category": "Inventory & Asset Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/inventaris"
+      },
+      {
+        "type": "action",
+        "description": "Open the add asset flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the asset name with a unique value"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the quantity with a valid number"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid asset condition"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the room location with a valid value"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid purchase date"
+      },
+      {
+        "type": "action",
+        "description": "Submit the asset form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new asset appears in the inventory list"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC023",
+    "title": "Browse and search mosque news",
+    "description": "A visitor can browse published mosque news and narrow the list by category or keyword, with matching articles remaining visible.",
+    "category": "Public News & Activity Articles",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /berita-kegiatan"
+      },
+      {
+        "type": "action",
+        "description": "Select a category filter"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a keyword in the search field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify matching articles are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the article list updates based on the filter or search"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC024",
+    "title": "Update an existing inventory asset",
+    "description": "Verifies that an administrator can edit an existing asset and see the revised details saved.",
+    "category": "Inventory & Asset Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/inventaris"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing asset record"
+      },
+      {
+        "type": "action",
+        "description": "Update the asset condition"
+      },
+      {
+        "type": "action",
+        "description": "Update the asset quantity"
+      },
+      {
+        "type": "action",
+        "description": "Save the changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the asset record shows the updated details"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC025",
+    "title": "Filter and search public financial records",
+    "description": "A public visitor can narrow financial records by period or category and search for specific transactions.",
+    "category": "Financial Transparency Portal",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /transparansi-keuangan"
+      },
+      {
+        "type": "action",
+        "description": "Select a transaction period filter"
+      },
+      {
+        "type": "action",
+        "description": "Select a transaction category filter"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the search field with a relevant transaction keyword"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the filtered financial records are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the search results are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC026",
+    "title": "Record a ZISWAF donation",
+    "description": "Verifies that an administrator can submit a ZISWAF donation record and see it added to the transactions list.",
+    "category": "ZISWAF Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/ziswaf"
+      },
+      {
+        "type": "action",
+        "description": "Open the donation recording flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the muzakki details with a unique value"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid zakat type"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid donation amount"
+      },
+      {
+        "type": "action",
+        "description": "Submit the donation record"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new ZISWAF transaction appears in the list"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC027",
+    "title": "Open a news article",
+    "description": "A visitor can open a published article from the news list and view its full details.",
+    "category": "Public News & Activity Articles",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /berita-kegiatan"
+      },
+      {
+        "type": "action",
+        "description": "Click a published article card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the article detail view is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected article content is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC028",
+    "title": "Search and filter inventory items",
+    "description": "Verifies that an administrator can search and filter the inventory list to find matching assets.",
+    "category": "Inventory & Asset Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/inventaris"
+      },
+      {
+        "type": "action",
+        "description": "Search for an asset by code or name"
+      },
+      {
+        "type": "action",
+        "description": "Filter the inventory by a condition"
+      },
+      {
+        "type": "action",
+        "description": "Filter the inventory by a room location"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the inventory list shows matching assets"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC029",
+    "title": "Admin searches and filters work programs",
+    "description": "An administrator can narrow the work program list using status filters and text search.",
+    "category": "Work Program Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the work program management page"
+      },
+      {
+        "type": "action",
+        "description": "Filter programs by status"
+      },
+      {
+        "type": "action",
+        "description": "Search for a program by name or category"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the list is filtered to matching programs"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC030",
+    "title": "Filter news by category",
+    "description": "A visitor can filter the public news list by category and see only articles from the selected category.",
+    "category": "Public News & Activity Articles",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /berita-kegiatan"
+      },
+      {
+        "type": "action",
+        "description": "Select a category filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify articles from the selected category are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify unrelated articles are not shown"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC031",
+    "title": "Delete an obsolete inventory asset",
+    "description": "Verifies that an administrator can remove an obsolete asset from the inventory list.",
+    "category": "Inventory & Asset Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/inventaris"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing asset record"
+      },
+      {
+        "type": "action",
+        "description": "Delete the asset"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the deletion"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the asset is removed from the inventory list"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC032",
+    "title": "Admin exports a financial report or receipt",
+    "description": "An administrator can export financial output from the ledger and see the export complete.",
+    "category": "Financial Ledger & Transaction Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the financial ledger page"
+      },
+      {
+        "type": "action",
+        "description": "Export the financial report or receipt"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the export action completes successfully"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC033",
+    "title": "Update mosque profile details",
+    "description": "Verifies that an administrator can save updated mosque profile information and see the changes reflected in settings.",
+    "category": "Mosque Settings & Profile",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/settings"
+      },
+      {
+        "type": "action",
+        "description": "Update the mosque profile details with valid values"
+      },
+      {
+        "type": "action",
+        "description": "Save the settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated organization information is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC034",
+    "title": "Admin exports the jemaah list",
+    "description": "An administrator can export the member list and receive the exported data file.",
+    "category": "Congregation (Jemaah) Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the jemaah management page"
+      },
+      {
+        "type": "action",
+        "description": "Export the jemaah data"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the export action completes successfully"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC035",
+    "title": "Calculate zakat amount",
+    "description": "Verifies that an administrator can use the zakat calculator and see the computed amount displayed.",
+    "category": "ZISWAF Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/ziswaf"
+      },
+      {
+        "type": "action",
+        "description": "Open the zakat calculator"
+      },
+      {
+        "type": "action",
+        "description": "Enter valid calculator inputs"
+      },
+      {
+        "type": "action",
+        "description": "Run the calculation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the calculated zakat amount is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC036",
+    "title": "Review ZISWAF distribution summary",
+    "description": "Verifies that an administrator can review distribution tracking by asnaf category and see collection summary metrics.",
+    "category": "ZISWAF Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/ziswaf"
+      },
+      {
+        "type": "action",
+        "description": "Review the distribution tracking section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify distribution summary metrics are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify asnaf category tracking is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC037",
+    "title": "Admin sees an error for invalid login credentials",
+    "description": "An administrator can submit invalid credentials and see a visible login error without reaching the dashboard.",
+    "category": "DKM Administrator Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with invalid@example.com"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with invalid-password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a login error is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dashboard is not displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC038",
+    "title": "Show validation when donation fields are incomplete",
+    "description": "A public visitor sees validation feedback when required donation information is missing and the donation is not submitted.",
+    "category": "Public Landing Page & Quick Donation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the quick donation flow"
+      },
+      {
+        "type": "action",
+        "description": "Submit the donation form without completing the required fields"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify donation validation errors are visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the donation confirmation is not shown"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC039",
+    "title": "Change mosque branding logo",
+    "description": "Verifies that an administrator can change the mosque branding and see the new appearance applied in settings.",
+    "category": "Mosque Settings & Profile",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/settings"
+      },
+      {
+        "type": "action",
+        "description": "Update the logo or branding settings"
+      },
+      {
+        "type": "action",
+        "description": "Save the settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated branding is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC040",
+    "title": "Admin toggles password visibility before signing in",
+    "description": "An administrator can reveal and hide the password while preparing to log in, then still sign in successfully.",
+    "category": "DKM Administrator Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Toggle password visibility"
+      },
+      {
+        "type": "action",
+        "description": "Toggle password visibility again"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dashboard is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC041",
+    "title": "Toggle system theme preference",
+    "description": "Verifies that an administrator can change a visual preference in settings and see the interface update.",
+    "category": "Mosque Settings & Profile",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/settings"
+      },
+      {
+        "type": "action",
+        "description": "Toggle a system preference"
+      },
+      {
+        "type": "action",
+        "description": "Save the settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the interface reflects the updated preference"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC042",
+    "title": "Show validation when registration details are incomplete",
+    "description": "A public visitor sees validation feedback when required registration details are missing and the registration is not submitted.",
+    "category": "Public Congregation Registration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the registration section"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form without completing the required fields"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify registration validation errors are visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the registration success message is not shown"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC043",
+    "title": "Search with no matching results",
+    "description": "A visitor can search for a keyword that has no matches and see an empty-state result instead of unrelated articles.",
+    "category": "Public News & Activity Articles",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /berita-kegiatan"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a unique keyword in the search field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty state message is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no article cards are shown"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC044",
+    "title": "Show an empty state when no public financial records match",
+    "description": "A public visitor sees an empty state when financial filters and search terms produce no matching records.",
+    "category": "Financial Transparency Portal",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /transparansi-keuangan"
+      },
+      {
+        "type": "action",
+        "description": "Select a narrow transaction period filter"
+      },
+      {
+        "type": "action",
+        "description": "Select a category filter with no matching records"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the search field with a unique unmatched keyword"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty state message is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no financial records are displayed"
+      }
+    ],
+    "priority": "Low"
+  }
+]
