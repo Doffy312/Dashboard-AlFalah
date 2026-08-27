@@ -3,6 +3,7 @@ import { useTransactions, useTransactionSummary, useCreateTransaction, useUpdate
 import { authClient } from '../lib/auth-client';
 import TransactionForm from '../components/keuangan/TransactionForm';
 import ConfirmDialog from '../components/common/ConfirmDialog';
+import AutoFitText from '../components/common/AutoFitText';
 import { formatCurrency } from '../lib/utils';
 
 // Lazy-load the charts component — recharts (~400KB) only downloads
@@ -131,7 +132,9 @@ const KeuanganPage = () => {
             <span className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Total Saldo</span>
             <span className="material-symbols-outlined text-primary bg-primary/10 p-xs rounded-full">account_balance_wallet</span>
           </div>
-          <div className="font-headline-lg text-headline-lg text-on-surface relative z-10">{formatCurrency(summaries.saldoSaatIni)}</div>
+          <AutoFitText as="div" maxFontSize={30} minFontSize={14} className="font-bold text-on-surface relative z-10">
+            {formatCurrency(summaries.saldoSaatIni)}
+          </AutoFitText>
           <div className="font-body-sm text-body-sm text-on-surface-variant mt-xs relative z-10">Per {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
         </div>
 
@@ -142,7 +145,9 @@ const KeuanganPage = () => {
             <span className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Pemasukan Bulan Ini</span>
             <span className="material-symbols-outlined text-emerald-600 bg-emerald-100 p-xs rounded-full">arrow_downward</span>
           </div>
-          <div className="font-headline-lg text-headline-lg text-on-surface relative z-10">{formatCurrency(summaries.pemasukanBulanIni)}</div>
+          <AutoFitText as="div" maxFontSize={30} minFontSize={14} className="font-bold text-on-surface relative z-10">
+            {formatCurrency(summaries.pemasukanBulanIni)}
+          </AutoFitText>
           <div className="font-body-sm text-body-sm text-emerald-600 mt-xs flex items-center gap-1 relative z-10">
             <span className="material-symbols-outlined text-[16px]">trending_up</span> Real-time ter-update
           </div>
@@ -155,7 +160,9 @@ const KeuanganPage = () => {
             <span className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Pengeluaran Bulan Ini</span>
             <span className="material-symbols-outlined text-red-600 bg-red-100 p-xs rounded-full">arrow_upward</span>
           </div>
-          <div className="font-headline-lg text-headline-lg text-on-surface relative z-10">{formatCurrency(summaries.pengeluaranBulanIni)}</div>
+          <AutoFitText as="div" maxFontSize={30} minFontSize={14} className="font-bold text-on-surface relative z-10">
+            {formatCurrency(summaries.pengeluaranBulanIni)}
+          </AutoFitText>
           <div className="font-body-sm text-body-sm text-on-surface-variant mt-xs relative z-10">Bulan {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</div>
         </div>
 
@@ -166,7 +173,9 @@ const KeuanganPage = () => {
             <span className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Total Pemasukan</span>
             <span className="material-symbols-outlined text-emerald-600 bg-emerald-100 p-xs rounded-full">arrow_downward</span>
           </div>
-          <div className="font-headline-lg text-headline-lg text-on-surface relative z-10">{formatCurrency(summaries.totalPemasukan)}</div>
+          <AutoFitText as="div" maxFontSize={30} minFontSize={14} className="font-bold text-on-surface relative z-10">
+            {formatCurrency(summaries.totalPemasukan)}
+          </AutoFitText>
           <div className="font-body-sm text-body-sm text-on-surface-variant mt-xs relative z-10">Secara Keseluruhan</div>
         </div>
 
@@ -177,7 +186,9 @@ const KeuanganPage = () => {
             <span className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Total Pengeluaran</span>
             <span className="material-symbols-outlined text-red-600 bg-red-100 p-xs rounded-full">arrow_upward</span>
           </div>
-          <div className="font-headline-lg text-headline-lg text-on-surface relative z-10">{formatCurrency(summaries.totalPengeluaran)}</div>
+          <AutoFitText as="div" maxFontSize={30} minFontSize={14} className="font-bold text-on-surface relative z-10">
+            {formatCurrency(summaries.totalPengeluaran)}
+          </AutoFitText>
           <div className="font-body-sm text-body-sm text-on-surface-variant mt-xs relative z-10">Secara Keseluruhan</div>
         </div>
       </div>

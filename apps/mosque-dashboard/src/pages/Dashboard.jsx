@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDashboardSummary, useCashflow, useAllocation, useRecentActivity, useUpcomingPrograms } from '../hooks/useDashboard';
 import { formatCurrency } from '../lib/utils';
 import JadwalSholatWidget from '../components/dashboard/JadwalSholatWidget';
+import AutoFitText from '../components/common/AutoFitText';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -65,10 +66,12 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* KPI 1: Saldo */}
         <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-outline-variant relative overflow-hidden flex flex-col justify-between min-h-[140px] sm:h-[160px]">
-          <div className="flex justify-between items-start z-10 gap-2">
+          <div className="flex justify-between items-start z-10 gap-3">
             <div className="min-w-0 flex-1">
               <p className="text-[11px] text-on-surface-variant font-bold tracking-wider uppercase mb-1 truncate">Saldo Total</p>
-              <h3 className="text-xl sm:text-2xl font-bold text-on-surface truncate">{formatCurrency(saldo)}</h3>
+              <AutoFitText as="h3" maxFontSize={24} minFontSize={13} className="font-bold text-on-surface">
+                {formatCurrency(saldo)}
+              </AutoFitText>
             </div>
             <div className="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[18px]">account_balance_wallet</span>
@@ -90,10 +93,12 @@ const Dashboard = () => {
 
         {/* KPI 2: Pemasukan */}
         <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-outline-variant relative overflow-hidden flex flex-col justify-between min-h-[140px] sm:h-[160px]">
-          <div className="flex justify-between items-start z-10 gap-2">
+          <div className="flex justify-between items-start z-10 gap-3">
             <div className="min-w-0 flex-1">
               <p className="text-[11px] text-on-surface-variant font-bold tracking-wider uppercase mb-1 truncate">Pemasukan</p>
-              <h3 className="text-xl sm:text-2xl font-bold text-on-surface truncate">{formatCurrency(pemasukan)}</h3>
+              <AutoFitText as="h3" maxFontSize={24} minFontSize={13} className="font-bold text-on-surface">
+                {formatCurrency(pemasukan)}
+              </AutoFitText>
             </div>
             <div className="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[18px]">arrow_downward</span>
@@ -115,10 +120,12 @@ const Dashboard = () => {
 
         {/* KPI 3: Pengeluaran */}
         <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-outline-variant relative overflow-hidden flex flex-col justify-between min-h-[140px] sm:h-[160px]">
-          <div className="flex justify-between items-start z-10 gap-2">
+          <div className="flex justify-between items-start z-10 gap-3">
             <div className="min-w-0 flex-1">
               <p className="text-[11px] text-on-surface-variant font-bold tracking-wider uppercase mb-1 truncate">Pengeluaran</p>
-              <h3 className="text-xl sm:text-2xl font-bold text-on-surface truncate">{formatCurrency(pengeluaran)}</h3>
+              <AutoFitText as="h3" maxFontSize={24} minFontSize={13} className="font-bold text-on-surface">
+                {formatCurrency(pengeluaran)}
+              </AutoFitText>
             </div>
             <div className="w-8 h-8 rounded-lg bg-[#d97706]/20 text-[#d97706] flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[18px]">arrow_upward</span>
@@ -140,10 +147,12 @@ const Dashboard = () => {
 
         {/* KPI 4: Jemaah */}
         <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-outline-variant relative overflow-hidden flex flex-col justify-between min-h-[140px] sm:h-[160px]">
-          <div className="flex justify-between items-start z-10 gap-2">
+          <div className="flex justify-between items-start z-10 gap-3">
             <div className="min-w-0 flex-1">
               <p className="text-[11px] text-on-surface-variant font-bold tracking-wider uppercase mb-1 truncate">Jemaah Terdaftar</p>
-              <h3 className="text-xl sm:text-2xl font-bold text-on-surface truncate">{totalJemaah}</h3>
+              <AutoFitText as="h3" maxFontSize={24} minFontSize={13} className="font-bold text-on-surface">
+                {totalJemaah}
+              </AutoFitText>
             </div>
             <div className="w-8 h-8 rounded-lg bg-[#d97706]/20 text-[#d97706] flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[18px]">group</span>
