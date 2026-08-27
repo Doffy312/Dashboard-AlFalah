@@ -66,12 +66,6 @@ const LandingNav = ({ orgName: customOrgName, logo: customLogo }) => {
         {/* Actions (Desktop & Mobile) */}
         <div className="flex items-center gap-3 sm:gap-6">
           <button
-            onClick={() => navigate('/login')}
-            className="text-[#c2c6d6] hover:text-[#adc6ff] transition-colors text-[13px] uppercase tracking-wider hidden sm:block"
-          >
-            Masuk
-          </button>
-          <button
             onClick={(e) => handleAnchorClick(e, '#donasi')}
             className="bg-[#adc6ff]/10 hover:bg-[#adc6ff]/20 text-[#adc6ff] px-4 sm:px-6 py-2 rounded-full text-xs sm:text-[13px] uppercase tracking-wider transition-all lp-border font-medium"
           >
@@ -112,15 +106,6 @@ const LandingNav = ({ orgName: customOrgName, logo: customLogo }) => {
                   {link.label}
                 </a>
               ))}
-            </div>
-
-            <div className="pt-4 border-t border-white/10 flex flex-col gap-3">
-              <button
-                onClick={() => { setMobileMenuOpen(false); navigate('/login'); }}
-                className="w-full py-3 rounded-full bg-white/5 hover:bg-white/10 text-[#e0e3e5] uppercase text-xs tracking-widest font-semibold"
-              >
-                Masuk Portal
-              </button>
             </div>
           </div>
         </div>

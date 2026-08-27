@@ -86,7 +86,7 @@ const VerifyEmailPage = () => {
             </p>
             <div className="pt-4">
               <button
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/portal-dkm')}
                 className="w-full py-3 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-label-md font-bold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
               >
                 <span className="material-symbols-outlined text-[20px]">login</span>
@@ -157,7 +157,7 @@ const VerifyEmailPage = () => {
             </button>
 
             <div className="text-center mt-4">
-              <Link to="/login" className="text-sm text-on-surface-variant hover:text-primary transition-colors">
+              <Link to="/portal-dkm" className="text-sm text-on-surface-variant hover:text-primary transition-colors">
                 Kembali ke Login
               </Link>
             </div>

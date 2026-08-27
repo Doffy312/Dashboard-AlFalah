@@ -84,7 +84,7 @@ const ProtectedRoute = ({ children }) => {
   }
   
   if (!session?.user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/portal-dkm" replace />;
   }
   
   return children;
@@ -118,11 +118,14 @@ function App() {
               <BeritaKegiatanPage />
             </Suspense>
           } />
-          <Route path="/login" element={
+          {/* Private Login Route */}
+          <Route path="/portal-dkm" element={
             <Suspense fallback={<FullPageLoadingFallback />}>
               <LoginPage />
             </Suspense>
           } />
+          {/* Obscure default /login route by redirecting to home */}
+          <Route path="/login" element={<Navigate to="/" replace />} />
           <Route path="/verify-email" element={
             <Suspense fallback={<FullPageLoadingFallback />}>
               <VerifyEmailPage />

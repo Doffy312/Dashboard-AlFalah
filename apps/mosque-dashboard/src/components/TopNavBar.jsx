@@ -189,7 +189,7 @@ const TopNavBar = () => {
     const handleLogout = async () => {
       onClose?.();
       await authClient.signOut();
-      navigate('/login');
+      navigate('/portal-dkm');
     };
 
     return (

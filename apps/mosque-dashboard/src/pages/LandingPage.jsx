@@ -170,10 +170,10 @@ const LandingPage = () => {
               <UserPlus size={18} className="sm:w-5 sm:h-5" /> Form Pendaftaran Jemaah
             </button>
             <button 
-              onClick={() => navigate(currentUser ? '/dashboard' : '/login')}
+              onClick={() => setActiveDonasiType('Infaq')}
               className="btn-primary-large bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 sm:px-8 py-3 rounded-xl text-xs sm:text-base transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 w-full xs:w-auto"
             >
-              {currentUser ? 'Ke Dashboard' : 'Login Portal'} <ArrowRight size={18} className="sm:w-5 sm:h-5" />
+              <HeartHandshake size={18} className="sm:w-5 sm:h-5" /> Donasi Infaq
             </button>
             <Link 
               to="/transparansi-keuangan" 
