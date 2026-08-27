@@ -4,3 +4,5 @@ node_modules/
 dist/
 .env
 drizzle/
+testsprite_tests/tmp/
+testsprite_tests/tmp/config.json

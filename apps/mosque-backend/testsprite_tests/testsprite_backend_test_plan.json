@@ -1,0 +1,27 @@
+[
+  {
+    "id": "TC001",
+    "title": "database_connectivity_and_schema_health",
+    "description": "Verify that backend database connection is healthy, MySQL connection pool is responsive, and GET /api/health confirms active database connectivity without timeouts."
+  },
+  {
+    "id": "TC002",
+    "title": "database_financial_transactions_persistence_and_calculations",
+    "description": "Verify database CRUD operations on financial transactions ledger: inserting donations via POST /api/transactions/public-donate, calculating cashflow aggregation via GET /api/transactions/summary, and ensuring decimal precision."
+  },
+  {
+    "id": "TC003",
+    "title": "database_relational_integrity_and_jemaah_records",
+    "description": "Verify relational integrity in the jemaah table: self-registration via POST /api/jemaah/public-register, category aggregation via GET /api/jemaah/summary, and foreign key relations with users."
+  },
+  {
+    "id": "TC004",
+    "title": "database_work_program_lifecycle_and_state_persistence",
+    "description": "Verify persistence of work programs lifecycle in the database: public summary via GET /api/programs/summary, iCal feed generation from database records via GET /api/programs/feed.ics, and status tracking."
+  },
+  {
+    "id": "TC005",
+    "title": "database_inventaris_and_settings_storage",
+    "description": "Verify database persistence for asset inventory and system configurations: GET /api/inventaris/summary and GET /api/settings returning stored configuration and counts from MySQL."
+  }
+]
