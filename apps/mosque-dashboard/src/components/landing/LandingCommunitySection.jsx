@@ -75,6 +75,13 @@ export default function LandingCommunitySection() {
                     </strong>
                     —baik Anda yang sudah berpengalaman maupun yang baru ingin mulai belajar.
                   </p>
+
+                  <p className="text-xs sm:text-sm text-emerald-200/90 italic leading-relaxed pt-1.5">
+                    &ldquo;Sebaik-baik manusia adalah yang paling bermanfaat bagi manusia (lainnya).&rdquo;{' '}
+                    <span className="text-slate-400 not-italic text-[11px] sm:text-xs block sm:inline">
+                      (HR. Ahmad, ath-Thabrani, ad-Daruqutni; dihasankan oleh Syaikh al-Albani dalam Shahihul Jami’ no. 3289)
+                    </span>
+                  </p>
                 </div>
               </div>
 

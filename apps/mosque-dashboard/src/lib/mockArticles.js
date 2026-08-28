@@ -111,5 +111,58 @@ Acara akan dilaksanakan pada Sabtu, 15 Agustus 2026. Pelatihan ini gratis dan pe
     content: `Masjid tidak hanya menjadi pusat ibadah ritual, namun juga pusat pelayanan kesehatan jemaah. Pada Minggu lalu, Sie Kesehatan bekerjasama dengan PMI Kota sukses menggelar kegiatan Bakti Kesehatan Jemaah.
 
 Sebanyak 85 kantong darah berhasil terkumpul untuk membantu sesama yang membutuhkan di rumah sakit lokal.`
+  },
+  {
+    id: 'news-09',
+    category: 'Kajian',
+    type: 'kajian',
+    title: 'Kajian Tematik Fiqih Muamalah: Panduan Transaksi Digital Sesuai Syariah',
+    date: '2026-06-15',
+    author: 'Ust. Dr. Muhammad Zaki',
+    image: 'https://images.unsplash.com/photo-1584281722573-f938d2f168cb?q=70&w=600&auto=format&fit=crop',
+    summary: 'Membahas hukum paylater, investasi emas online, dan etika jual beli digital bagi pelaku UMKM jemaah masjid.',
+    content: `Perkembangan teknologi finansial menuntut pemahaman fiqih kontemporer yang mendalam. Takmir Masjid Al-Falah menghadirkan kajian serial Fiqih Muamalah bersama pakar ekonomi syariah.
+
+Kajian ini dihadiri oleh puluhan pelaku usaha mikro dan jemaah umum yang antusias berkonsultasi mengenai akad-akad perdagangan modern.`
+  },
+  {
+    id: 'news-10',
+    category: 'Pengumuman',
+    type: 'pengumuman',
+    title: 'Pengumuman: Pembukaan Pendaftaran Beasiswa Pendidikan Anak Yatim & Prestasi',
+    date: '2026-06-05',
+    author: 'Sie Pendidikan & Beasiswa',
+    image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=70&w=600&auto=format&fit=crop',
+    summary: 'Pendaftaran program bantuan SPP dan perlengkapan sekolah bagi siswa SD, SMP, dan SMA semester ganjil telah dibuka.',
+    content: `Takmir Masjid Al-Falah membuka pendaftaran Beasiswa Generasi Rabbani untuk periode tahun ajaran baru. Program ini bersumber dari alokasi dana ZISWAF dan donasi khusus orang tua asuh.
+
+Bagi jemaah yang ingin mendaftarkan putra-putrinya atau mengajukan rekomendasi keluarga mustahik, dapat menghubungi sekretariat DKM atau melalui portal jemaah.`
+  },
+  {
+    id: 'news-11',
+    category: 'Artikel & Edukasi',
+    type: 'edukasi',
+    title: 'Adab dan Keberkahan Memakmurkan Masjid: Refleksi Ukhuwah Islamiyah',
+    date: '2026-05-20',
+    author: 'Ust. Hasan Basri',
+    image: 'https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=70&w=800&auto=format&fit=crop',
+    summary: 'Menghidupkan sunnah di dalam masjid dengan menjaga kebersihan, ketenangan shaf, dan mempererat silaturahmi.',
+    content: `Memakmurkan masjid bukan hanya tentang mendirikan bangunan fisik yang megah, namun terutama menghidupkan sholat berjamaah, halaqah ilmu, dan solidaritas sosial.
+
+Melalui artikel edukasi ini, kami mengajak seluruh jemaah untuk terus menghidupkan masjid sebagai benteng moral dan pusat peradaban umat.`
+  },
+  {
+    id: 'news-12',
+    category: 'Agenda Mendatang',
+    type: 'mendatang',
+    title: 'Peringatan Maulid Nabi Muhammad SAW & Festival Rebana Remaja Masjid',
+    date: '2026-08-22',
+    author: 'Remaja Islam Masjid (RISMA)',
+    image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=70&w=600&auto=format&fit=crop',
+    summary: 'Semarak perayaan maulid dengan lomba sholawat antar remaja se-kabupaten dan tausiyah inspiratif pemuda muslim.',
+    content: `RISMA Al-Falah siap menggelar Festival Remaja Masjid dalam rangka peringatan Maulid Nabi SAW. Berbagai lomba islami seperti adzan, tartil, dan festival banjari siap meriahkan agenda tahunan ini.
+
+Pendaftaran peserta lomba dibuka mulai awal bulan Agustus di sekretariat panitia.`
   }
 ];
+

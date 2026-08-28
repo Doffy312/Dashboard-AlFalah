@@ -1,14 +1,31 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Modal from '../common/Modal';
+import { useSettings } from '../../contexts/SettingsContext';
 
 const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
+  const { customData } = useSettings();
+
+  const statusOptions = useMemo(() => {
+    const configured = customData?.prokerStatus || [];
+    const fallback = ['Direncanakan', 'Sedang Berjalan', 'Selesai', 'Dibatalkan'];
+    // Use configured statuses as primary source; fallback only if nothing is configured
+    const list = configured.length > 0 ? [...configured] : [...fallback];
+    // Ensure the current program's status is always selectable even if not in the list
+    if (initialData?.status && !list.includes(initialData.status)) {
+      list.push(initialData.status);
+    }
+    return list;
+  }, [customData?.prokerStatus, initialData?.status]);
+
+  const defaultStatus = statusOptions[0] || 'Direncanakan';
+
   const [formData, setFormData] = useState({
     name: '',
     pic: '',
     budget: '',
     date: new Date().toISOString().split('T')[0],
     originalDate: null,
-    status: 'Direncanakan',
+    status: defaultStatus,
     description: '',
     evaluation: ''
   });
@@ -16,13 +33,13 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
   useEffect(() => {
     if (initialData) {
       setFormData({
-        name: initialData.name,
-        pic: initialData.pic,
-        budget: initialData.budget,
+        name: initialData.name || '',
+        pic: initialData.pic || '',
+        budget: initialData.budget || '',
         date: initialData.date ? initialData.date.split('T')[0] : new Date().toISOString().split('T')[0],
         originalDate: initialData.originalDate ? initialData.originalDate.split('T')[0] : null,
-        status: initialData.status,
-        description: initialData.description,
+        status: initialData.status || defaultStatus,
+        description: initialData.description || '',
         evaluation: initialData.evaluation || ''
       });
     } else {
@@ -32,12 +49,12 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
         budget: '',
         date: new Date().toISOString().split('T')[0],
         originalDate: null,
-        status: 'Direncanakan',
+        status: defaultStatus,
         description: '',
         evaluation: ''
       });
     }
-  }, [initialData, isOpen]);
+  }, [initialData, isOpen, defaultStatus]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -127,11 +144,11 @@ const ProgramForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               onChange={(e) =>  
     setFormData({...formData, status: e.target.value})}
             >
-              <option value="Direncanakan" className="bg-surface dark:bg-surface-variant">Direncanakan</option>
-              <option value="Sedang Berjalan" className="bg-surface dark:bg-surface-variant">Sedang Berjalan</option>
-              {formData.status === 'Selesai' && (
-                <option value="Selesai" className="bg-surface dark:bg-surface-variant" disabled>Selesai</option>
-              )}
+              {statusOptions.map((st) => (
+                <option key={st} value={st} className="bg-surface dark:bg-surface-variant">
+                  {st}
+                </option>
+              ))}
             </select>
           </div>
         </div>

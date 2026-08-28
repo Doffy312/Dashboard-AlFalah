@@ -57,7 +57,7 @@ const DEFAULT_FINANCE = {
 
 const DEFAULT_CUSTOM_DATA = {
   jemaahStatus: ['Tetap', 'Mustahik', 'Muzakki', 'Pindahan'],
-  prokerStatus: ['Direncanakan', 'Berjalan', 'Selesai', 'Dibatalkan'],
+  prokerStatus: ['Direncanakan', 'Sedang Berjalan', 'Selesai', 'Dibatalkan'],
 };
 
 const DEFAULT_SECURITY = {

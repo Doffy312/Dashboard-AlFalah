@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { usePrograms, useCreateProgram, useUpdateProgram, useDeleteProgram, useUpdateProgramStatus, useCompleteProgram } from '../hooks/usePrograms';
+import { useSettings } from '../contexts/SettingsContext';
 import { authClient } from '../lib/auth-client';
 import ProgramForm from '../components/program/ProgramForm';
 import KanbanBoard from '../components/program/KanbanBoard';
@@ -21,6 +22,7 @@ export default function ProgramKerjaPage() {
   const completeMutation = useCompleteProgram();
 
   const { data: session } = authClient.useSession();
+  const { customData } = useSettings();
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProgram, setEditingProgram] = useState(null);
@@ -37,6 +39,22 @@ export default function ProgramKerjaPage() {
   const isKetua = session?.user?.role === 'Ketua';
   const canAdd = ['Ketua', 'Sekretaris'].includes(session?.user?.role);
 
+  const statusFilterOptions = useMemo(() => {
+    const configured = customData?.prokerStatus || [];
+    const fallback = ['Direncanakan', 'Sedang Berjalan', 'Selesai', 'Dibatalkan'];
+    // Use configured statuses as primary source; fallback only if nothing is configured
+    const baseList = configured.length > 0 ? [...configured] : [...fallback];
+
+    // Auto-detect any program statuses not in the configured list to prevent data loss
+    const programStatuses = programs.map(p => p.status).filter(Boolean);
+    const allStatuses = Array.from(new Set([...baseList, ...programStatuses]));
+
+    return [
+      { label: 'Semua', value: 'ALL' },
+      ...allStatuses.map(s => ({ label: s, value: s }))
+    ];
+  }, [customData?.prokerStatus, programs]);
+
   const filteredPrograms = useMemo(() => {
     return programs.filter(p => {
       const matchSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -49,10 +67,20 @@ export default function ProgramKerjaPage() {
   const stats = useMemo(() => {
     const total = programs.length;
     const perencanaan = programs.filter(p => p.status === 'Direncanakan').length;
-    const berjalan = programs.filter(p => p.status === 'Sedang Berjalan').length;
+    const berjalan = programs.filter(p => p.status === 'Sedang Berjalan' || p.status === 'Berjalan').length;
     const selesai = programs.filter(p => p.status === 'Selesai').length;
     return { total, perencanaan, berjalan, selesai };
   }, [programs]);
+
+  const getStatusBadgeClass = (status = '') => {
+    const s = status.toLowerCase();
+    if (s === 'selesai') return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
+    if (s === 'sedang berjalan' || s === 'berjalan') return 'bg-blue-500/15 text-blue-400 border-blue-500/30';
+    if (s === 'dibatalkan') return 'bg-rose-500/15 text-rose-400 border-rose-500/30';
+    if (s === 'ditunda') return 'bg-orange-500/15 text-orange-400 border-orange-500/30';
+    if (s === 'direncanakan') return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+    return 'bg-purple-500/15 text-purple-400 border-purple-500/30';
+  };
 
   const handleEdit = (program) => {
     setEditingProgram(program);
@@ -218,17 +246,12 @@ export default function ProgramKerjaPage() {
 
         {/* View Switcher & Status Filter Pills */}
         <div className="flex flex-wrap items-center gap-3 shrink-0">
-          <div className="flex items-center gap-1.5 bg-surface-variant/40 p-1 rounded-xl border border-outline-variant/40">
-            {[
-              { label: 'Semua', value: 'ALL' },
-              { label: 'Perencanaan', value: 'Direncanakan' },
-              { label: 'Berjalan', value: 'Sedang Berjalan' },
-              { label: 'Selesai', value: 'Selesai' },
-            ].map((tab) => (
+          <div className="flex items-center gap-1.5 bg-surface-variant/40 p-1 rounded-xl border border-outline-variant/40 overflow-x-auto max-w-full">
+            {statusFilterOptions.map((tab) => (
               <button
                 key={tab.value}
                 onClick={() => setStatusFilter(tab.value)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                   statusFilter === tab.value
                     ? 'bg-primary text-slate-950 shadow-md font-bold'
                     : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80'
@@ -338,13 +361,7 @@ export default function ProgramKerjaPage() {
                         {formatCurrency(row.budget)}
                       </td>
                       <td className="py-4 px-4 whitespace-nowrap">
-                        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold inline-flex items-center gap-1 border ${
-                          row.status === 'Selesai' 
-                            ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-                            : row.status === 'Sedang Berjalan'
-                            ? 'bg-blue-500/15 text-blue-400 border-blue-500/30'
-                            : 'bg-amber-500/15 text-amber-400 border-amber-500/30'
-                        }`}>
+                        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold inline-flex items-center gap-1 border ${getStatusBadgeClass(row.status)}`}>
                           {row.status}
                         </span>
                       </td>

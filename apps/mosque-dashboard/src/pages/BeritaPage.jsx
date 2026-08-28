@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { 
   useArticles, 
   useCreateArticle, 
@@ -11,10 +11,13 @@ import ConfirmDialog from '../components/common/ConfirmDialog';
 import ArticleFormModal from '../components/article/ArticleFormModal';
 import ArticleDetailModal from '../components/article/ArticleDetailModal';
 
+const ITEMS_PER_PAGE = 9;
+
 export default function BeritaPage() {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: articlesFromApi, isLoading, isError } = useArticles();
   
@@ -44,6 +47,11 @@ export default function BeritaPage() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [articleToView, setArticleToView] = useState(null);
 
+  // Reset page when category or search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchTerm]);
+
   // Summary Metrics
   const stats = useMemo(() => {
     const total = articles.length;
@@ -66,6 +74,39 @@ export default function BeritaPage() {
       return matchSearch && matchCategory;
     });
   }, [articles, searchTerm, selectedCategory]);
+
+  // Pagination Computations
+  const totalPages = Math.ceil(filteredArticles.length / ITEMS_PER_PAGE) || 1;
+  const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, filteredArticles.length);
+
+  const paginatedArticles = useMemo(() => {
+    return filteredArticles.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredArticles, startIndex]);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (validCurrentPage <= 3) {
+        pages.push(1, 2, 3, 4, '...', totalPages);
+      } else if (validCurrentPage >= totalPages - 2) {
+        pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, '...', validCurrentPage - 1, validCurrentPage, validCurrentPage + 1, '...', totalPages);
+      }
+    }
+    return pages;
+  };
 
   const handleEdit = (article) => {
     setEditingArticle(article);
@@ -289,7 +330,7 @@ export default function BeritaPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/60 text-xs sm:text-sm">
-                {filteredArticles.map((row) => (
+                {paginatedArticles.map((row) => (
                   <tr key={row.id} className="hover:bg-surface-variant/40 transition-colors">
                     <td className="py-4 px-4 sm:px-6">
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-surface-variant border border-outline-variant shrink-0">
@@ -361,7 +402,7 @@ export default function BeritaPage() {
       ) : (
         /* Grid View */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          {filteredArticles.map((article) => (
+          {paginatedArticles.map((article) => (
             <div 
               key={article.id}
               className="group flex flex-col rounded-2xl bg-surface border border-outline-variant overflow-hidden hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-primary/5"
@@ -448,6 +489,70 @@ export default function BeritaPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Pagination Bar */}
+      {!isLoading && !isError && filteredArticles.length > 0 && (
+        <div className="bg-surface border border-outline-variant rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-xs text-on-surface-variant text-center sm:text-left">
+            Menampilkan <span className="font-bold text-on-surface">{startIndex + 1}</span> - <span className="font-bold text-on-surface">{endIndex}</span> dari <span className="font-bold text-on-surface">{filteredArticles.length}</span> berita &amp; artikel
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => handlePageChange(validCurrentPage - 1)}
+                disabled={validCurrentPage === 1}
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all bg-surface-variant/50 hover:bg-surface-variant text-on-surface border border-outline-variant/60 disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label="Halaman Sebelumnya"
+              >
+                <span className="material-symbols-outlined text-base">chevron_left</span>
+                <span className="hidden xs:inline">Sebelumnya</span>
+              </button>
+
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((pageNum, idx) => {
+                  if (pageNum === '...') {
+                    return (
+                      <span key={`ellipsis-${idx}`} className="px-2 py-1 text-xs text-on-surface-variant select-none">
+                        ...
+                      </span>
+                    );
+                  }
+                  const isActive = pageNum === validCurrentPage;
+                  return (
+                    <button
+                      key={pageNum}
+                      type="button"
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`w-8 h-8 rounded-xl text-xs font-bold transition-all flex items-center justify-center ${
+                        isActive
+                          ? 'bg-primary text-slate-950 shadow-md font-bold'
+                          : 'bg-surface-variant/40 hover:bg-surface-variant text-on-surface border border-outline-variant/40'
+                      }`}
+                      aria-label={`Halaman ${pageNum}`}
+                      aria-current={isActive ? 'page' : undefined}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handlePageChange(validCurrentPage + 1)}
+                disabled={validCurrentPage === totalPages}
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all bg-surface-variant/50 hover:bg-surface-variant text-on-surface border border-outline-variant/60 disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label="Halaman Selanjutnya"
+              >
+                <span className="hidden xs:inline">Selanjutnya</span>
+                <span className="material-symbols-outlined text-base">chevron_right</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 

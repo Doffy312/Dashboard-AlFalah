@@ -6,7 +6,9 @@ import {
   X, 
   Share2, 
   Check, 
-  Tag
+  Tag,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import LandingHeader from '../components/landing/LandingHeader';
 import LandingFooter from '../components/landing/LandingFooter';
@@ -17,6 +19,7 @@ import { MOCK_NEWS_ARTICLES } from '../lib/mockArticles';
 const QRInfaqModal = lazy(() => import('../components/landing/QRInfaqModal'));
 
 const LANDING_QUERY_OPTIONS = { staleTime: 60000, gcTime: 300000, refetchOnWindowFocus: false };
+const ITEMS_PER_PAGE = 9;
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '-';
@@ -39,6 +42,7 @@ export default function BeritaKegiatanPage() {
   const [selectedNews, setSelectedNews] = useState(null);
   const [activeCategory, setActiveCategory] = useState('Semua');
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
   const [activeDonasiType, setActiveDonasiType] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
 
@@ -46,6 +50,11 @@ export default function BeritaKegiatanPage() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 3500);
   };
+
+  // Reset page when category or search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory, searchQuery]);
 
   // Auto-open modal if URL contains ?id= or ?article= parameter
   useEffect(() => {
@@ -165,6 +174,45 @@ export default function BeritaKegiatanPage() {
     });
   }, [articlesList, activeCategory, searchQuery]);
 
+  // Pagination Computations
+  const totalPages = Math.ceil(filteredArticles.length / ITEMS_PER_PAGE) || 1;
+  const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, filteredArticles.length);
+
+  const paginatedArticles = useMemo(() => {
+    return filteredArticles.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredArticles, startIndex]);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      const targetElement = document.getElementById('daftar-berita');
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
+  // Helper to generate page numbers with ellipsis
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (validCurrentPage <= 3) {
+        pages.push(1, 2, 3, 4, '...', totalPages);
+      } else if (validCurrentPage >= totalPages - 2) {
+        pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, '...', validCurrentPage - 1, validCurrentPage, validCurrentPage + 1, '...', totalPages);
+      }
+    }
+    return pages;
+  };
+
   return (
     <div className="landing-container min-h-screen bg-[#0b131a] text-white selection:bg-emerald-500/30 selection:text-emerald-200">
       {/* Header */}
@@ -195,7 +243,7 @@ export default function BeritaKegiatanPage() {
       </section>
 
       {/* Filter & Search Bar */}
-      <section className="py-4 sm:py-6 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
+      <section id="daftar-berita" className="scroll-mt-24 py-4 sm:py-6 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
           {/* Category Tabs: Auto-fit Responsive Grid on Mobile for 100% Text Visibility & Zero Clipping */}
           <div className="grid grid-cols-2 xs:grid-cols-3 md:flex md:flex-wrap items-center gap-2 w-full md:w-auto">
@@ -240,7 +288,7 @@ export default function BeritaKegiatanPage() {
       </section>
 
       {/* Articles Grid */}
-      <section className="py-8 sm:py-16 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto min-h-[300px]">
+      <section className="py-6 sm:py-10 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto min-h-[300px]">
         {filteredArticles.length === 0 ? (
           <div className="p-12 rounded-2xl bg-white/5 border border-white/10 text-center text-slate-400 space-y-3">
             <Newspaper size={40} className="mx-auto text-slate-500 mb-2" />
@@ -260,62 +308,129 @@ export default function BeritaKegiatanPage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredArticles.map((article) => (
-              <div 
-                key={article.id}
-                onClick={() => setSelectedNews(article)}
-                className="group bg-white/5 border border-white/10 hover:border-amber-500/40 rounded-2xl overflow-hidden cursor-pointer transition-all hover:-translate-y-1 flex flex-col justify-between"
-              >
-                <div>
-                  <div className="h-44 overflow-hidden relative bg-slate-900">
-                    <img 
-                      src={article.image} 
-                      alt={article.title} 
-                      width="400"
-                      height="250"
-                      loading="lazy"
-                      decoding="async"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = '/images/berita_kajian_akbar.webp';
-                      }}
-                    />
-                    <span className="absolute top-3 left-3 px-2.5 py-1 bg-slate-950/80 backdrop-blur-md text-amber-300 text-[10px] font-bold rounded-md border border-amber-500/20">
-                      {article.category}
-                    </span>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {paginatedArticles.map((article) => (
+                <div 
+                  key={article.id}
+                  onClick={() => setSelectedNews(article)}
+                  className="group bg-white/5 border border-white/10 hover:border-amber-500/40 rounded-2xl overflow-hidden cursor-pointer transition-all hover:-translate-y-1 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="h-44 overflow-hidden relative bg-slate-900">
+                      <img 
+                        src={article.image} 
+                        alt={article.title} 
+                        width="400"
+                        height="250"
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/images/berita_kajian_akbar.webp';
+                        }}
+                      />
+                      <span className="absolute top-3 left-3 px-2.5 py-1 bg-slate-950/80 backdrop-blur-md text-amber-300 text-[10px] font-bold rounded-md border border-amber-500/20">
+                        {article.category}
+                      </span>
+                    </div>
+
+                    <div className="p-5">
+                      <div className="text-xs text-slate-400 mb-2">
+                        <span>{formatDate(article.date)}</span>
+                      </div>
+                      <h3 className="font-bold text-white text-sm line-clamp-2 mb-2 group-hover:text-amber-400 transition-colors">
+                        {article.title}
+                      </h3>
+                      <p className="text-slate-400 text-xs line-clamp-3 leading-relaxed">
+                        {article.summary}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="p-5">
-                    <div className="text-xs text-slate-400 mb-2">
-                      <span>{formatDate(article.date)}</span>
-                    </div>
-                    <h3 className="font-bold text-white text-sm line-clamp-2 mb-2 group-hover:text-amber-400 transition-colors">
-                      {article.title}
-                    </h3>
-                    <p className="text-slate-400 text-xs line-clamp-3 leading-relaxed">
-                      {article.summary}
-                    </p>
+                  <div className="px-5 pb-5 pt-2">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedNews(article);
+                      }}
+                      className="text-xs font-bold text-emerald-400 hover:text-emerald-300 group-hover:underline flex items-center gap-1.5 transition-colors"
+                    >
+                      <span>Baca Selengkapnya</span>
+                      <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    </button>
                   </div>
                 </div>
+              ))}
+            </div>
 
-                <div className="px-5 pb-5 pt-2">
+            {/* Pagination Controls */}
+            <div className="mt-10 sm:mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-white/10">
+              <div className="text-xs text-slate-400 text-center sm:text-left">
+                Menampilkan <span className="font-semibold text-white">{startIndex + 1}</span> - <span className="font-semibold text-white">{endIndex}</span> dari <span className="font-semibold text-white">{filteredArticles.length}</span> berita &amp; kegiatan
+              </div>
+
+              {totalPages > 1 && (
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  {/* Previous Button */}
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedNews(article);
-                    }}
-                    className="text-xs font-bold text-emerald-400 hover:text-emerald-300 group-hover:underline flex items-center gap-1.5 transition-colors"
+                    onClick={() => handlePageChange(validCurrentPage - 1)}
+                    disabled={validCurrentPage === 1}
+                    className="px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white/5"
+                    aria-label="Halaman Sebelumnya"
                   >
-                    <span>Baca Selengkapnya</span>
-                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    <ChevronLeft size={16} />
+                    <span className="hidden xs:inline">Sebelumnya</span>
+                  </button>
+
+                  {/* Page Numbers */}
+                  <div className="flex items-center gap-1">
+                    {getPageNumbers().map((pageNum, idx) => {
+                      if (pageNum === '...') {
+                        return (
+                          <span key={`ellipsis-${idx}`} className="px-2 py-1 text-xs text-slate-500 select-none">
+                            ...
+                          </span>
+                        );
+                      }
+                      const isActive = pageNum === validCurrentPage;
+                      return (
+                        <button
+                          key={pageNum}
+                          type="button"
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl text-xs font-bold transition-all flex items-center justify-center ${
+                            isActive
+                              ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 scale-105'
+                              : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5'
+                          }`}
+                          aria-label={`Halaman ${pageNum}`}
+                          aria-current={isActive ? 'page' : undefined}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Next Button */}
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(validCurrentPage + 1)}
+                    disabled={validCurrentPage === totalPages}
+                    className="px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white/5"
+                    aria-label="Halaman Selanjutnya"
+                  >
+                    <span className="hidden xs:inline">Selanjutnya</span>
+                    <ChevronRight size={16} />
                   </button>
                 </div>
-              </div>
-            ))}
-          </div>
+              )}
+            </div>
+          </>
         )}
       </section>
 

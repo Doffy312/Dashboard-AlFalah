@@ -36,7 +36,7 @@ const DEFAULT_SETTINGS: Record<string, any> = {
   },
   customData: {
     jemaahStatus: ['Tetap', 'Mustahik', 'Muzakki', 'Pindahan'],
-    prokerStatus: ['Direncanakan', 'Berjalan', 'Selesai', 'Dibatalkan'],
+    prokerStatus: ['Direncanakan', 'Sedang Berjalan', 'Selesai', 'Dibatalkan'],
   },
   security: {
     theme: 'dark',
