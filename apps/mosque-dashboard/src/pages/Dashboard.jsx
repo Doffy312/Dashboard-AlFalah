@@ -201,7 +201,7 @@ const Dashboard = () => {
                 {ticks.map((val, i) => (
                   <div key={i} className="flex items-center w-full">
                     <span className="w-14 text-right text-[10px] text-on-surface-variant font-semibold font-mono opacity-90">{formatYLabel(val)}</span>
-                    <div className="ml-3 flex-1 border-t border-white/5 border-dashed"></div>
+                    <div className="ml-3 flex-1 border-t border-outline-variant/40 border-dashed"></div>
                   </div>
                 ))}
               </div>
@@ -224,12 +224,12 @@ const Dashboard = () => {
 
                   return (
                     <div key={i} className="flex-1 flex justify-center items-end h-full relative group cursor-pointer">
-                      {/* Column Hover Background Overlay (shaded dark rectangle behind bars) */}
-                      <div className="absolute inset-y-0 -top-2 -bottom-2 w-[90%] rounded-xl bg-white/[0.04] sm:bg-white/[0.05] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-0" />
+                      {/* Column Hover Background Overlay */}
+                      <div className="absolute inset-y-0 -top-2 -bottom-2 w-[90%] rounded-xl bg-on-surface/[0.04] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-0" />
 
                       {/* Floating Animated Tooltip Card */}
-                      <div className={`absolute top-1 ${tooltipPos} bg-[#111927]/95 backdrop-blur-md text-on-surface p-3 sm:p-3.5 rounded-xl text-xs opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 scale-95 group-hover:scale-100 transition-all duration-200 ease-out whitespace-nowrap z-30 pointer-events-none flex flex-col gap-2 shadow-2xl border border-white/10 min-w-[175px]`}>
-                        <div className="font-bold text-white text-[12px] border-b border-white/10 pb-1.5 flex items-center justify-between">
+                      <div className={`absolute top-1 ${tooltipPos} bg-surface/95 backdrop-blur-md text-on-surface p-3 sm:p-3.5 rounded-xl text-xs opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 scale-95 group-hover:scale-100 transition-all duration-200 ease-out whitespace-nowrap z-30 pointer-events-none flex flex-col gap-2 shadow-2xl border border-outline-variant min-w-[175px]`}>
+                        <div className="font-bold text-on-surface text-[12px] border-b border-outline-variant/50 pb-1.5 flex items-center justify-between">
                           <span>{month} {currentYear}</span>
                         </div>
                         <div className="flex items-center justify-between gap-4 text-[12px]">
@@ -298,8 +298,8 @@ const Dashboard = () => {
               })
             ) : (
               <>
-                <div className="flex items-center gap-4 bg-[#1a2432]/50 p-3 rounded-xl border border-white/5">
-                  <div className="w-12 h-12 rounded-lg bg-[#1a2432] border border-white/10 flex flex-col items-center justify-center shrink-0">
+                <div className="flex items-center gap-4 bg-surface-variant/40 p-3 rounded-xl border border-outline-variant/30">
+                  <div className="w-12 h-12 rounded-lg bg-surface-variant border border-outline-variant/50 flex flex-col items-center justify-center shrink-0">
                     <span className="text-[14px] font-bold text-primary leading-tight">-</span>
                   </div>
                   <div className="flex-1">
@@ -407,9 +407,9 @@ const Dashboard = () => {
               <>
                 {/* Fallback static items */}
                 <div className="relative pl-8 pb-8">
-                  <div className="absolute left-0 top-1 w-5 h-5 rounded-full bg-[#111a24] border-[4px] border-primary flex items-center justify-center z-10"></div>
+                  <div className="absolute left-0 top-1 w-5 h-5 rounded-full bg-surface border-[4px] border-primary flex items-center justify-center z-10"></div>
                   <div className="flex justify-between items-start mb-1">
-                    <h4 className="text-[14px] font-semibold text-white">Menunggu data aktivitas...</h4>
+                    <h4 className="text-[14px] font-semibold text-on-surface">Menunggu data aktivitas...</h4>
                   </div>
                   <p className="text-[13px] text-on-surface-variant mb-3">Hubungkan ke backend untuk melihat aktivitas terbaru.</p>
                 </div>

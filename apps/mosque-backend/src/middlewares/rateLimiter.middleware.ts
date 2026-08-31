@@ -7,13 +7,13 @@ import { env } from "../config/env.js";
  */
 export const globalRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 menit
-  limit: env.NODE_ENV === "development" ? 1000 : 300, // 1000 req di dev, 300 di production
+  limit: env.NODE_ENV === "development" ? 3000 : 1500, // 1.500 req di production (aman untuk SPA & multiple users di 1 WiFi/NAT)
   standardHeaders: "draft-7", // `RateLimit-*` headers standar
   legacyHeaders: false,
   message: {
     status: 429,
     error: "Too Many Requests",
-    message: "Terlalu banyak permintaan dari IP ini. Silakan coba lagi setelah 15 menit.",
+    message: "Terlalu banyak permintaan dari IP ini. Silakan coba lagi setelah beberapa menit.",
   },
 });
 
@@ -23,7 +23,7 @@ export const globalRateLimiter = rateLimit({
  */
 export const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 menit
-  limit: env.NODE_ENV === "development" ? 100 : 15, // 100 percobaan di dev, 15 di production
+  limit: env.NODE_ENV === "development" ? 100 : 30, // 30 percobaan di production, 100 di dev
   standardHeaders: "draft-7",
   legacyHeaders: false,
   message: {

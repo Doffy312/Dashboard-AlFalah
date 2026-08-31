@@ -87,8 +87,15 @@ const LaporanCharts = ({ programSummary }) => {
                     ))}
                   </Pie>
                   <Tooltip 
-                    contentStyle={{backgroundColor: '#1a2432', borderRadius: '12px', border: '1px solid #2a3644', color: '#fff', fontSize: '12px'}}
-                    itemStyle={{color: '#fff'}}
+                    contentStyle={{
+                      backgroundColor: 'rgb(var(--color-surface))',
+                      borderRadius: '12px',
+                      border: '1px solid rgb(var(--color-outline-variant))',
+                      color: 'rgb(var(--color-on-surface))',
+                      fontSize: '12px',
+                      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)'
+                    }}
+                    itemStyle={{color: 'rgb(var(--color-on-surface))'}}
                   />
                   <Legend content={renderCustomLegend} />
                 </PieChart>
@@ -106,7 +113,7 @@ const LaporanCharts = ({ programSummary }) => {
         <div className="lg:col-span-7 bg-surface-variant/40 rounded-xl p-5 sm:p-6 border border-outline/20 flex flex-col justify-between gap-5">
           <div>
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-outline/15">
-              <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+              <h4 className="text-sm font-semibold text-on-surface flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary text-lg">analytics</span>
                 Rincian & Progres Status
               </h4>

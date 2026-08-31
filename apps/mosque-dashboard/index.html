@@ -11,7 +11,8 @@
     <meta name="description" content="Portal resmi Sistem Informasi, Transparansi Keuangan, Program Kerja, dan Manajemen Data Jemaah Masjid Al-Falah yang modern, akuntabel, dan terpercaya." />
     <meta name="keywords" content="Masjid Al-Falah, Takmir Masjid, Transparansi Kas Masjid, Jadwal Shalat Sigi, Infaq Online, Ziswaf, Management Masjid" />
     <meta name="author" content="Pengurus Takmir Masjid Al-Falah" />
-    <meta name="theme-color" content="#0b131a" />
+    <meta name="theme-color" content="#0b131a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F5ECD7" media="(prefers-color-scheme: light)" />
 
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website" />
@@ -45,6 +46,7 @@
     <!-- Inline Critical CSS: Instant background + loading spinner without FOUC -->
     <style>
       html, body { background-color: #0b131a; color: #f8fafc; margin: 0; }
+      html:not(.dark), html:not(.dark) body { background-color: #F5ECD7; color: #3B2F20; }
       #root:empty { display: flex; height: 100vh; align-items: center; justify-content: center; }
       #root:empty::after { content: ''; width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #10b981; border-radius: 50%; animation: _s .8s linear infinite; }
       @keyframes _s { to { transform: rotate(360deg); } }

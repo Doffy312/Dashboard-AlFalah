@@ -42,10 +42,13 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
   };
 
   const handleThemeChange = (newTheme) => {
-    if (newTheme === 'light') return;
-    setTheme('dark');
+    setTheme(newTheme);
     setHasUnsavedChanges(true);
-    document.documentElement.classList.add('dark');
+    if (newTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
   };
 
   const handleExportData = () => {
@@ -55,7 +58,7 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
         profile,
         finance,
         customData,
-        security: { theme: 'dark' }
+        security: { theme }
       };
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
@@ -141,27 +144,34 @@ const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
                 <button 
                   type="button"
                   onClick={() => handleThemeChange('dark')}
-                  className="flex-1 py-3 rounded-lg border-2 border-primary bg-primary/10 text-primary flex items-center justify-center gap-2 transition-all font-medium"
+                  className={`flex-1 py-3 rounded-lg border-2 flex items-center justify-center gap-2 transition-all font-medium ${
+                    theme === 'dark'
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-outline-variant bg-surface-variant/20 text-on-surface-variant hover:border-outline'
+                  }`}
                 >
                   <span className="material-symbols-outlined text-[20px]">dark_mode</span>
-                  Gelap (Utama)
+                  Gelap
                 </button>
                 <button 
                   type="button"
-                  disabled
-                  className="flex-1 py-3 rounded-lg border border-outline-variant/60 bg-surface-variant/20 text-on-surface-variant/50 flex items-center justify-center gap-2 transition-all cursor-not-allowed opacity-60 relative"
-                  title="Fitur tema terang sementara dinonaktifkan untuk perbaikan"
+                  onClick={() => handleThemeChange('light')}
+                  className={`flex-1 py-3 rounded-lg border-2 flex items-center justify-center gap-2 transition-all font-medium ${
+                    theme === 'light'
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-outline-variant bg-surface-variant/20 text-on-surface-variant hover:border-outline'
+                  }`}
                 >
                   <span className="material-symbols-outlined text-[20px]">light_mode</span>
                   <span>Terang</span>
-                  <span className="text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30 font-semibold uppercase tracking-wider ml-1">
-                    Perbaikan
+                  <span className="text-[10px] bg-primary/15 text-primary px-1.5 py-0.5 rounded border border-primary/30 font-semibold uppercase tracking-wider ml-1">
+                    Baru
                   </span>
                 </button>
               </div>
               <p className="text-xs text-on-surface-variant/70 mt-3.5 flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-[16px] text-primary">info</span>
-                Fitur tema terang sementara dinonaktifkan untuk peningkatan kualitas & perbaikan tampilan.
+                Tema Terang menggunakan nuansa kertas tua (parchment) dengan tekstur klasik.
               </p>
             </div>
           </div>

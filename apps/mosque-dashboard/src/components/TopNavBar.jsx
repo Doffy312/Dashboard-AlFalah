@@ -4,6 +4,7 @@ import { useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsR
 import { formatNotificationTime, formatFullDateTime } from '../lib/dateUtils';
 import { useSettings } from '../contexts/SettingsContext';
 import { authClient } from '../lib/auth-client';
+import HelpGuideModal from './common/HelpGuideModal';
 
 // Map notification type to dashboard route
 const NOTIFICATION_TYPE_ROUTES = {
@@ -28,6 +29,7 @@ const TopNavBar = () => {
   const [showMobileNotif, setShowMobileNotif] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showMobileProfile, setShowMobileProfile] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
   const dropdownRef = useRef(null);
   const mobileDropdownRef = useRef(null);
@@ -311,6 +313,15 @@ const TopNavBar = () => {
             {showMobileNotif && renderNotificationPanel(() => setShowMobileNotif(false))}
           </div>
 
+          {/* Mobile Help Button */}
+          <button
+            onClick={() => setShowHelpModal(true)}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant cursor-pointer transition-colors"
+            title="Pusat Bantuan & Panduan Fitur"
+          >
+            <span className="material-symbols-outlined text-[20px]">help</span>
+          </button>
+
           {/* Profile Mobile */}
           <div className="relative" ref={mobileProfileDropdownRef}>
             <button
@@ -379,7 +390,11 @@ const TopNavBar = () => {
               {showDropdown && renderNotificationPanel(() => setShowDropdown(false))}
             </div>
 
-            <button className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant cursor-pointer transition-colors">
+            <button 
+              onClick={() => setShowHelpModal(true)}
+              className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant cursor-pointer transition-colors"
+              title="Pusat Bantuan & Panduan Fitur"
+            >
               <span className="material-symbols-outlined text-[20px]">help</span>
             </button>
           </div>
@@ -413,6 +428,12 @@ const TopNavBar = () => {
           </div>
         </div>
       </header>
+
+      {/* Help Guide Modal */}
+      <HelpGuideModal 
+        isOpen={showHelpModal} 
+        onClose={() => setShowHelpModal(false)} 
+      />
     </>
   );
 };

@@ -32,7 +32,7 @@ export default {
         "primary-fixed": "#10b981",
         "on-error": "#ffffff",
         "emerald-deep": "#047857",
-        "light-bg": "#f8fafc",
+        "light-bg": "#F5ECD7",
       },
       borderRadius: {
         DEFAULT: "0.25rem",

@@ -66,11 +66,11 @@ const NotificationPage = () => {
     <div className="flex flex-col gap-md sm:gap-xl">
       <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-3">
         <div className="flex-1 min-w-0">
-          <h1 className="text-title-lg sm:text-display-sm font-title-lg sm:font-display-sm text-on-surface dark:text-white m-0 flex items-center gap-2 sm:gap-3">
+          <h1 className="text-title-lg sm:text-display-sm font-title-lg sm:font-display-sm text-on-surface m-0 flex items-center gap-2 sm:gap-3">
             <Bell size={28} className="text-primary shrink-0 sm:w-9 sm:h-9" />
             <span className="truncate">Notifikasi</span>
           </h1>
-          <p className="font-body-sm sm:font-body-md text-on-surface-variant dark:text-white/70 m-0 mt-xs hidden sm:block">
+          <p className="font-body-sm sm:font-body-md text-on-surface-variant m-0 mt-xs hidden sm:block">
             Kelola pemberitahuan dan aktivitas terbaru masjid.
           </p>
         </div>

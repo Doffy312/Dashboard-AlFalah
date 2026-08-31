@@ -11,11 +11,24 @@ import { initializeSocket } from "./lib/socket.js";
 import { initBackupService } from "./services/backup.service.js";
 import { programService } from "./services/programs.service.js";
 import { syncProgramTable } from "./db/sync-program-db.js";
+import { pool } from "./config/db.js";
 import path from "path";
 import fs from "fs";
 
+// ─── Process Level Crash Resilience ──────────────────────────────────
+process.on("uncaughtException", (err) => {
+  console.error("💥 Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("💥 Unhandled Rejection at:", promise, "reason:", reason);
+});
+
 const app = express();
 const httpServer = createServer(app);
+
+// ─── Reverse Proxy Support (Render, Vercel, Railway, Nginx, Cloudflare)
+app.set("trust proxy", 1);
 
 // ─── Socket.IO Setup ───────────────────────────────────────────────────
 initializeSocket(httpServer);
@@ -108,5 +121,23 @@ httpServer.listen(env.PORT, () => {
   ⚡ Socket.IO is active
   `);
 });
+
+// ─── Graceful Shutdown ───────────────────────────────────────────────
+const gracefulShutdown = (signal: string) => {
+  console.log(`🛑 Received ${signal}, starting graceful shutdown...`);
+  httpServer.close(async () => {
+    console.log("🔒 HTTP server closed.");
+    try {
+      await pool.end();
+      console.log("🗄️ Database pool closed cleanly.");
+    } catch (err) {
+      console.error("Error closing database pool:", err);
+    }
+    process.exit(0);
+  });
+};
+
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
 export default app;

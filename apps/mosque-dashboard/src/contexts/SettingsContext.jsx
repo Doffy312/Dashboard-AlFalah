@@ -90,10 +90,7 @@ export const SettingsProvider = ({ children }) => {
   const [profile, setProfile] = useState(() => loadFromStorage(STORAGE_KEYS.profile, DEFAULT_PROFILE));
   const [finance, setFinance] = useState(() => loadFromStorage(STORAGE_KEYS.finance, DEFAULT_FINANCE));
   const [customData, setCustomData] = useState(() => loadFromStorage(STORAGE_KEYS.customData, DEFAULT_CUSTOM_DATA));
-  const [security, setSecurity] = useState(() => {
-    const sec = loadFromStorage(STORAGE_KEYS.security, DEFAULT_SECURITY);
-    return { ...sec, theme: 'dark' };
-  });
+  const [security, setSecurity] = useState(() => loadFromStorage(STORAGE_KEYS.security, DEFAULT_SECURITY));
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch initial settings from MySQL backend
@@ -116,9 +113,8 @@ export const SettingsProvider = ({ children }) => {
             saveToStorage(STORAGE_KEYS.customData, res.customData);
           }
           if (res.security) {
-            const sanitizedSec = { ...res.security, theme: 'dark' };
-            setSecurity(sanitizedSec);
-            saveToStorage(STORAGE_KEYS.security, sanitizedSec);
+            setSecurity(res.security);
+            saveToStorage(STORAGE_KEYS.security, res.security);
           }
         }
       } catch (err) {
@@ -149,10 +145,9 @@ export const SettingsProvider = ({ children }) => {
       await settingsApi.update('customData', c).catch(console.error);
     }
     if (s) {
-      const sanitizedS = { ...s, theme: 'dark' };
-      setSecurity(sanitizedS);
-      saveToStorage(STORAGE_KEYS.security, sanitizedS);
-      await settingsApi.update('security', sanitizedS).catch(console.error);
+      setSecurity(s);
+      saveToStorage(STORAGE_KEYS.security, s);
+      await settingsApi.update('security', s).catch(console.error);
     }
   }, []);
 
@@ -184,10 +179,9 @@ export const SettingsProvider = ({ children }) => {
         });
         break;
       case 'security': {
-        const sanitizedData = { ...data, theme: 'dark' };
-        setSecurity(sanitizedData);
-        saveToStorage(STORAGE_KEYS.security, sanitizedData);
-        await settingsApi.update('security', sanitizedData).catch(err => {
+        setSecurity(data);
+        saveToStorage(STORAGE_KEYS.security, data);
+        await settingsApi.update('security', data).catch(err => {
           console.error('Failed to save security settings to MySQL backend:', err);
           throw err;
         });
@@ -198,9 +192,13 @@ export const SettingsProvider = ({ children }) => {
 
 
 
-  // Apply theme whenever security.theme changes (Enforce dark theme while light theme is under maintenance)
+  // Apply theme whenever security.theme changes
   useEffect(() => {
-    document.documentElement.classList.add('dark');
+    if (security.theme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
   }, [security.theme]);
 
   const value = {

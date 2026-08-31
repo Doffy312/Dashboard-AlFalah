@@ -133,8 +133,19 @@ const LaporanPage = () => {
 
     const formatYLabel = (val) => {
       if (val === 0) return '0';
-      const juta = val / 1000000;
-      return `${juta} Juta`;
+      if (val >= 1000000000) {
+        const miliar = val / 1000000000;
+        return `${Number.isInteger(miliar) ? miliar : miliar.toFixed(1)} Miliar`;
+      }
+      if (val >= 1000000) {
+        const juta = val / 1000000;
+        return `${Number.isInteger(juta) ? juta : juta.toFixed(1)} Juta`;
+      }
+      if (val >= 1000) {
+        const ribu = val / 1000;
+        return `${Number.isInteger(ribu) ? ribu : ribu.toFixed(0)} Ribu`;
+      }
+      return `${val}`;
     };
 
     return (
@@ -188,11 +199,11 @@ const LaporanPage = () => {
                 return (
                   <div key={i} className="flex flex-col items-center gap-2 group cursor-pointer flex-1 relative z-10">
                     {/* Column Hover Background Overlay */}
-                    <div className="absolute inset-y-0 -top-2 -bottom-2 w-[90%] rounded-xl bg-white/[0.04] sm:bg-white/[0.05] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-0" />
+                    <div className="absolute inset-y-0 -top-2 -bottom-2 w-[90%] rounded-xl bg-on-surface/[0.04] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-0" />
 
                     {/* Animated Hover Tooltip */}
-                    <div className={`absolute top-1 ${tooltipPos} bg-[#111927]/95 backdrop-blur-md text-on-surface p-3 sm:p-3.5 rounded-xl text-xs opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 scale-95 group-hover:scale-100 transition-all duration-200 ease-out whitespace-nowrap z-30 pointer-events-none flex flex-col gap-2 shadow-2xl border border-white/10 min-w-[175px]`}>
-                      <div className="font-bold text-white text-[12px] border-b border-white/10 pb-1.5 flex items-center justify-between">
+                    <div className={`absolute top-1 ${tooltipPos} bg-surface/95 backdrop-blur-md text-on-surface p-3 sm:p-3.5 rounded-xl text-xs opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 scale-95 group-hover:scale-100 transition-all duration-200 ease-out whitespace-nowrap z-30 pointer-events-none flex flex-col gap-2 shadow-2xl border border-outline-variant min-w-[175px]`}>
+                      <div className="font-bold text-on-surface text-[12px] border-b border-outline-variant/50 pb-1.5 flex items-center justify-between">
                         <span>{month} {currentYear}</span>
                       </div>
                       <div className="flex items-center justify-between gap-4 text-[12px]">
@@ -213,7 +224,7 @@ const LaporanPage = () => {
                       <div className="w-2 sm:w-6 bg-[#10b981] rounded-t-sm group-hover:brightness-125 group-hover:scale-y-[1.02] origin-bottom transition-all duration-200 shadow-sm" style={{ height: `${inH}%` }}></div>
                       <div className="w-2 sm:w-6 bg-[#ef4444] rounded-t-sm group-hover:brightness-125 group-hover:scale-y-[1.02] origin-bottom transition-all duration-200 shadow-sm" style={{ height: `${outH}%` }}></div>
                     </div>
-                    <span className="font-label-md text-[10px] sm:text-[12px] font-semibold leading-[16px] tracking-[0.05em] text-on-surface-variant opacity-95 group-hover:text-white transition-colors truncate">{month}</span>
+                    <span className="font-label-md text-[10px] sm:text-[12px] font-semibold leading-[16px] tracking-[0.05em] text-on-surface-variant opacity-95 group-hover:text-primary transition-colors truncate">{month}</span>
                   </div>
                 );
               })}
@@ -375,8 +386,8 @@ const LaporanPage = () => {
       <div className="flex flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-8">
         <div className="glass-panel rounded-full px-4 sm:px-6 py-2 flex items-center gap-2 sm:gap-3 shadow-sm border-outline/30">
           <span className="w-2 h-2 rounded-full bg-secondary"></span>
-          <span className="font-label-md text-[11px] sm:text-[12px] font-semibold leading-[16px] tracking-[0.05em] text-outline">Saldo Terkini:</span>
-          <span className="font-title-md text-base sm:text-[20px] font-bold text-white">{formatCurrency(saldo)}</span>
+          <span className="font-label-md text-[11px] sm:text-[12px] font-semibold leading-[16px] tracking-[0.05em] text-on-surface-variant">Saldo Terkini:</span>
+          <span className="font-title-md text-base sm:text-[20px] font-bold text-on-surface">{formatCurrency(saldo)}</span>
         </div>
       </div>
 

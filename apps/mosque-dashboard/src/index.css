@@ -1,19 +1,19 @@
 :root {
-  /* Light Theme (Default when html does not have .dark) */
-  --color-background: 248 250 252;          /* #f8fafc slate-50 */
-  --color-surface: 255 255 255;             /* #ffffff white */
-  --color-surface-variant: 241 245 249;     /* #f1f5f9 slate-100 */
-  --color-on-surface: 15 23 42;             /* #0f172a slate-900 */
-  --color-on-surface-variant: 71 85 105;     /* #475569 slate-600 */
-  --color-outline: 203 213 225;             /* #cbd5e1 slate-300 */
-  --color-outline-variant: 226 232 240;     /* #e2e8f0 slate-200 */
-  
-  --glass-panel-bg: rgba(255, 255, 255, 0.85);
-  --glass-panel-border: rgba(203, 213, 225, 0.8);
-  --glass-input-bg: #ffffff;
-  --glass-input-border: #cbd5e1;
-  --nav-bg: rgba(255, 255, 255, 0.92);
-  --mobile-sheet-bg: #ffffff;
+  /* Light Theme — Parchment / Antique Paper */
+  --color-background: 245 236 215;          /* #F5ECD7 parchment base */
+  --color-surface: 250 244 232;             /* #FAF4E8 lighter parchment */
+  --color-surface-variant: 237 228 207;     /* #EDE4CF slightly darker parchment */
+  --color-on-surface: 59 47 32;             /* #3B2F20 dark brown text */
+  --color-on-surface-variant: 122 107 86;   /* #7A6B56 medium brown text */
+  --color-outline: 196 180 153;             /* #C4B499 warm border */
+  --color-outline-variant: 217 206 188;     /* #D9CEBC subtle border */
+
+  --glass-panel-bg: rgba(250, 244, 232, 0.88);
+  --glass-panel-border: rgba(196, 180, 153, 0.6);
+  --glass-input-bg: #FAF4E8;
+  --glass-input-border: #C4B499;
+  --nav-bg: rgba(245, 236, 215, 0.94);
+  --mobile-sheet-bg: #FAF4E8;
 }
 
 html.dark {
@@ -55,6 +55,24 @@ html {
   }
 }
 
+/* ====== PAPER TEXTURE OVERLAY (Light Theme Only) ====== */
+html:not(.dark) body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* Ensure page content sits above the texture */
+html:not(.dark) body > * {
+  position: relative;
+  z-index: 1;
+}
+
 @layer components {
 
   /* Glow Spheres for Glassmorphism Background (GPU Accelerated) */
@@ -69,6 +87,12 @@ html {
     z-index: -1;
     opacity: 0.1;
     pointer-events: none;
+  }
+
+  /* Softer glow spheres on light (parchment) theme */
+  html:not(.dark) .glow-sphere {
+    opacity: 0.06;
+    filter: blur(160px);
   }
 
   .glow-sphere-1 {
@@ -147,23 +171,42 @@ html {
   }
 }
 
-/* Custom Dark Scrollbar */
-::-webkit-scrollbar {
+/* Custom Scrollbar — Dark */
+html.dark ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-::-webkit-scrollbar-track {
+html.dark ::-webkit-scrollbar-track {
   background: #0b131a;
 }
 
-::-webkit-scrollbar-thumb {
+html.dark ::-webkit-scrollbar-thumb {
   background: #1a2432;
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+html.dark ::-webkit-scrollbar-thumb:hover {
   background: #2a3644;
+}
+
+/* Custom Scrollbar — Light (Parchment) */
+html:not(.dark) ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html:not(.dark) ::-webkit-scrollbar-track {
+  background: #EDE4CF;
+}
+
+html:not(.dark) ::-webkit-scrollbar-thumb {
+  background: #C4B499;
+  border-radius: 4px;
+}
+
+html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+  background: #A89878;
 }
 
 /* ====== MOBILE RESPONSIVE STYLES ====== */
@@ -219,7 +262,7 @@ html {
 
 .mobile-nav-item .nav-icon {
   font-size: 22px;
-  color: #9ca3af;
+  color: rgb(var(--color-on-surface-variant));
   transition: color 0.2s ease, transform 0.15s ease;
 }
 
@@ -227,7 +270,7 @@ html {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: #9ca3af;
+  color: rgb(var(--color-on-surface-variant));
   transition: color 0.2s ease;
 }
 
@@ -360,12 +403,12 @@ html {
 
 .more-menu-item:hover,
 .more-menu-item:active {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgb(var(--color-surface-variant) / 0.5);
 }
 
 .more-menu-item .material-symbols-outlined {
   font-size: 22px;
-  color: #9ca3af;
+  color: rgb(var(--color-on-surface-variant));
 }
 
 .more-menu-item.active .material-symbols-outlined {
