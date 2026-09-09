@@ -1,9 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Wallet, Calendar, Package, Check, CheckCheck, HeartHandshake, MailOpen } from 'lucide-react';
+import { Bell, Wallet, Calendar, Package, Check, CheckCheck, HeartHandshake, MailOpen, Trash2 } from 'lucide-react';
 
 import { formatNotificationTime, formatFullDateTime } from '../lib/dateUtils';
-import { useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead } from '../hooks/useNotifications';
+import { 
+  useNotifications, 
+  useMarkNotificationAsRead, 
+  useMarkAllNotificationsAsRead,
+  useDeleteNotification,
+  useDeleteAllNotifications
+} from '../hooks/useNotifications';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 
 // Map notification type to dashboard route
 const NOTIFICATION_TYPE_ROUTES = {
@@ -20,9 +27,14 @@ const NotificationPage = () => {
   const { data: notifications = [] } = useNotifications();
   const markAsReadMutation = useMarkNotificationAsRead();
   const markAllAsReadMutation = useMarkAllNotificationsAsRead();
+  const deleteMutation = useDeleteNotification();
+  const deleteAllMutation = useDeleteAllNotifications();
   const navigate = useNavigate();
   
   const [activeTab, setActiveTab] = useState('Semua');
+  const [isDeleteSingleOpen, setIsDeleteSingleOpen] = useState(false);
+  const [notificationToDelete, setNotificationToDelete] = useState(null);
+  const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
 
   const tabs = ['Semua', 'Keuangan', 'Kegiatan', 'Inventaris', 'Donasi', 'Pesan'];
 
@@ -37,6 +49,29 @@ const NotificationPage = () => {
 
   const markAllAsRead = () => {
     markAllAsReadMutation.mutate();
+  };
+
+  const handleDeleteClick = (e, notification) => {
+    e.stopPropagation();
+    setNotificationToDelete(notification);
+    setIsDeleteSingleOpen(true);
+  };
+
+  const confirmDeleteSingle = () => {
+    if (notificationToDelete) {
+      deleteMutation.mutate(notificationToDelete.id);
+      setNotificationToDelete(null);
+      setIsDeleteSingleOpen(false);
+    }
+  };
+
+  const handleDeleteAllClick = () => {
+    setIsDeleteAllOpen(true);
+  };
+
+  const confirmDeleteAll = () => {
+    deleteAllMutation.mutate();
+    setIsDeleteAllOpen(false);
   };
 
   const handleNotificationClick = (notification) => {
@@ -63,26 +98,39 @@ const NotificationPage = () => {
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   return (
-    <div className="flex flex-col gap-md sm:gap-xl">
-      <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-3">
-        <div className="flex-1 min-w-0">
-          <h1 className="text-title-lg sm:text-display-sm font-title-lg sm:font-display-sm text-on-surface m-0 flex items-center gap-2 sm:gap-3">
-            <Bell size={28} className="text-primary shrink-0 sm:w-9 sm:h-9" />
-            <span className="truncate">Notifikasi</span>
+    <div className="flex flex-col gap-6 text-on-surface">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-on-surface flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-primary text-3xl">notifications</span>
+            Notifikasi
           </h1>
-          <p className="font-body-sm sm:font-body-md text-on-surface-variant m-0 mt-xs hidden sm:block">
+          <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
             Kelola pemberitahuan dan aktivitas terbaru masjid.
           </p>
         </div>
-        {unreadCount > 0 && (
-          <button 
-            onClick={markAllAsRead}
-            className="flex py-1.5 px-3 sm:py-2 sm:px-4 rounded-full bg-surface-variant text-on-surface hover:bg-surface-variant/80 transition-all items-center gap-1.5 border border-outline/30 cursor-pointer shrink-0"
-          >
-            <CheckCheck size={18} className="shrink-0 text-primary" />
-            <span className="font-label-md text-xs sm:text-sm whitespace-nowrap">Tandai Dibaca</span>
-          </button>
-        )}
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          {unreadCount > 0 && (
+            <button 
+              onClick={markAllAsRead}
+              className="flex py-1.5 px-3 sm:py-2 sm:px-4 rounded-full bg-surface-variant text-on-surface hover:bg-surface-variant/80 transition-all items-center gap-1.5 border border-outline/30 cursor-pointer shrink-0"
+            >
+              <CheckCheck size={18} className="shrink-0 text-primary" />
+              <span className="font-label-md text-xs sm:text-sm whitespace-nowrap">Tandai Dibaca</span>
+            </button>
+          )}
+          {notifications.length > 0 && (
+            <button 
+              onClick={handleDeleteAllClick}
+              className="flex py-1.5 px-3 sm:py-2 sm:px-4 rounded-full bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-all items-center gap-1.5 border border-rose-500/20 cursor-pointer shrink-0"
+              title="Hapus semua notifikasi"
+            >
+              <Trash2 size={16} className="shrink-0 text-rose-500" />
+              <span className="font-label-md text-xs sm:text-sm whitespace-nowrap">Hapus Semua</span>
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex gap-1.5 sm:gap-2 mb-2 border-b border-outline-variant/30 pb-2 overflow-x-auto hide-scrollbar">
@@ -148,8 +196,8 @@ const NotificationPage = () => {
                   </p>
                 </div>
 
-                {!notification.isRead && (
-                  <div className="flex items-center shrink-0">
+                <div className="flex items-center gap-1 shrink-0">
+                  {!notification.isRead && (
                     <button 
                       onClick={(e) => { e.stopPropagation(); markAsRead(notification.id); }}
                       title="Tandai Sudah Dibaca"
@@ -157,16 +205,49 @@ const NotificationPage = () => {
                     >
                       <Check size={18} className="sm:w-5 sm:h-5" />
                     </button>
-                  </div>
-                )}
+                  )}
+                  <button 
+                    onClick={(e) => handleDeleteClick(e, notification)}
+                    title="Hapus Notifikasi"
+                    className="p-1.5 sm:p-2 rounded-full text-rose-400 hover:text-rose-600 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                  >
+                    <Trash2 size={18} className="sm:w-5 sm:h-5" />
+                  </button>
+                </div>
               </div>
             );
           })
         )}
       </div>
+
+      {/* Modal Konfirmasi Hapus Satuan */}
+      <ConfirmDialog
+        isOpen={isDeleteSingleOpen}
+        onClose={() => {
+          setIsDeleteSingleOpen(false);
+          setNotificationToDelete(null);
+        }}
+        onConfirm={confirmDeleteSingle}
+        title="Hapus Notifikasi"
+        message={`Apakah Anda yakin ingin menghapus notifikasi "${notificationToDelete?.title}"? Tindakan ini tidak dapat dibatalkan.`}
+        confirmText="Hapus"
+        cancelText="Batal"
+        isDanger={true}
+      />
+
+      {/* Modal Konfirmasi Hapus Semua */}
+      <ConfirmDialog
+        isOpen={isDeleteAllOpen}
+        onClose={() => setIsDeleteAllOpen(false)}
+        onConfirm={confirmDeleteAll}
+        title="Hapus Semua Notifikasi"
+        message="Apakah Anda yakin ingin menghapus seluruh notifikasi? Semua riwayat pemberitahuan akan dihapus secara permanen."
+        confirmText="Hapus Semua"
+        cancelText="Batal"
+        isDanger={true}
+      />
     </div>
   );
 };
 
 export default NotificationPage;
-

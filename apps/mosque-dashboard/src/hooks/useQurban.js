@@ -55,6 +55,20 @@ export const useCreateQurbanGroup = () => {
   });
 };
 
+export const useDeleteQurbanGroup = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: qurbanApi.deleteGroup,
+    onSuccess: () => {
+      toast.success('Kelompok Qurban berhasil dihapus');
+      queryClient.invalidateQueries({ queryKey: ['qurban'] });
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Gagal menghapus kelompok Qurban');
+    },
+  });
+};
+
 export const useQurbanList = (filters, options = {}) => {
   return useQuery({
     queryKey: ['qurban', 'list', filters],

@@ -7,6 +7,7 @@ import {
   useCreateQurban,
   useUpdateQurban,
   useDeleteQurban,
+  useDeleteQurbanGroup,
   useCreateQurbanYear,
 } from '../hooks/useQurban';
 import { authClient } from '../lib/auth-client';
@@ -20,6 +21,7 @@ export default function QurbanPage() {
   const { data: session } = authClient.useSession();
   const isKetua = session?.user?.role === 'Ketua';
   const canAdd = ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'].includes(session?.user?.role);
+  const canEdit = ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'].includes(session?.user?.role);
 
   // Years & Selected Year Filter
   const { data: years = [] } = useQurbanYears();
@@ -49,6 +51,7 @@ export default function QurbanPage() {
   const createMutation = useCreateQurban();
   const updateMutation = useUpdateQurban();
   const deleteMutation = useDeleteQurban();
+  const deleteGroupMutation = useDeleteQurbanGroup();
   const createYearMutation = useCreateQurbanYear();
 
   // Modals state
@@ -61,6 +64,9 @@ export default function QurbanPage() {
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [dataToDelete, setDataToDelete] = useState(null);
+
+  const [isDeleteGroupOpen, setIsDeleteGroupOpen] = useState(false);
+  const [groupToDelete, setGroupToDelete] = useState(null);
 
   // Grouped datasets
   const ungroupedKambing = useMemo(() => {
@@ -130,6 +136,19 @@ export default function QurbanPage() {
       deleteMutation.mutate(dataToDelete.id);
       setDataToDelete(null);
       setIsDeleteOpen(false);
+    }
+  };
+
+  const handleDeleteGroupClick = (group) => {
+    setGroupToDelete(group);
+    setIsDeleteGroupOpen(true);
+  };
+
+  const confirmDeleteGroup = () => {
+    if (groupToDelete) {
+      deleteGroupMutation.mutate(groupToDelete.id);
+      setGroupToDelete(null);
+      setIsDeleteGroupOpen(false);
     }
   };
 
@@ -334,8 +353,10 @@ export default function QurbanPage() {
         ungroupedList={filteredUngroupedKambing}
         isKetua={isKetua}
         canAdd={canAdd}
+        canEdit={canEdit}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
+        onDeleteGroup={handleDeleteGroupClick}
         onDetail={handleDetail}
         onAddMemberToGroup={handleAddMemberToGroup}
       />
@@ -361,6 +382,15 @@ export default function QurbanPage() {
         onConfirm={confirmDelete}
         title="Hapus Data PeQurban"
         message={`Apakah Anda yakin ingin menghapus data PeQurban dari "${dataToDelete?.jemaahName}"?`}
+      />
+
+      <ConfirmDialog
+        isOpen={isDeleteGroupOpen}
+        onClose={() => setIsDeleteGroupOpen(false)}
+        onConfirm={confirmDeleteGroup}
+        title="Hapus Kelompok Qurban"
+        message={`Apakah Anda yakin ingin menghapus "${groupToDelete?.namaKelompok}"? Anggota di dalam kelompok ini tidak akan terhapus dari data pequrban, namun status kelompoknya akan dilepaskan.`}
+        confirmText="Hapus Kelompok"
       />
     </div>
   );

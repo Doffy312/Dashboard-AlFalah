@@ -66,6 +66,39 @@ export class NotificationService {
       .where(eq(notification.isRead, false));
     return { success: true };
   }
+
+  async delete(id: string) {
+    const existing = await this.findById(id);
+    if (!existing) {
+      return null;
+    }
+
+    await db.delete(notification).where(eq(notification.id, id));
+
+    // Emit event to connected clients to update notification state
+    try {
+      const io = getSocketIO();
+      io.emit("notificationUpdated");
+    } catch {
+      // Socket.IO might not be initialized in tests
+    }
+
+    return existing;
+  }
+
+  async deleteAll() {
+    await db.delete(notification);
+
+    // Emit event to connected clients to update notification state
+    try {
+      const io = getSocketIO();
+      io.emit("notificationUpdated");
+    } catch {
+      // Socket.IO might not be initialized in tests
+    }
+
+    return { success: true };
+  }
 }
 
 export const notificationService = new NotificationService();

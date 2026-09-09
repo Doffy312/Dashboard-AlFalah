@@ -53,6 +53,14 @@ const DEFAULT_FINANCE = {
     accountNumber: '7123456789',
     accountHolder: 'Masjid Al-Falah',
   },
+  signatures: {
+    bendaharaName: 'Ahmad Dahlan',
+    bendaharaTitle: 'Bendahara DKM',
+    bendaharaSignature: '',
+    ketuaName: 'H. Abdullah',
+    ketuaTitle: 'Ketua DKM',
+    ketuaSignature: '',
+  },
 };
 
 const DEFAULT_CUSTOM_DATA = {
@@ -63,6 +71,23 @@ const DEFAULT_CUSTOM_DATA = {
 const DEFAULT_SECURITY = {
   theme: 'dark',
 };
+
+const THEME_STORAGE_KEY = 'theme_preference';
+
+function getInitialTheme() {
+  try {
+    const saved = localStorage.getItem(THEME_STORAGE_KEY);
+    if (saved === 'light' || saved === 'dark') return saved;
+    const legacy = localStorage.getItem('settings_security');
+    if (legacy) {
+      const parsed = JSON.parse(legacy);
+      if (parsed?.theme === 'light' || parsed?.theme === 'dark') return parsed.theme;
+    }
+  } catch {
+    // fallback
+  }
+  return 'dark';
+}
 
 function loadFromStorage(key, defaultValue) {
   try {
@@ -91,7 +116,46 @@ export const SettingsProvider = ({ children }) => {
   const [finance, setFinance] = useState(() => loadFromStorage(STORAGE_KEYS.finance, DEFAULT_FINANCE));
   const [customData, setCustomData] = useState(() => loadFromStorage(STORAGE_KEYS.customData, DEFAULT_CUSTOM_DATA));
   const [security, setSecurity] = useState(() => loadFromStorage(STORAGE_KEYS.security, DEFAULT_SECURITY));
+  const [theme, setThemeState] = useState(getInitialTheme);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Set theme on local device
+  const setTheme = useCallback((newTheme) => {
+    const targetTheme = newTheme === 'light' ? 'light' : 'dark';
+    setThemeState(targetTheme);
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, targetTheme);
+    } catch (e) {
+      console.error('Failed to save theme preference:', e);
+    }
+    if (targetTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
+    }
+  }, []);
+
+  // Toggle theme between dark and light
+  const toggleTheme = useCallback(() => {
+    setThemeState((prev) => {
+      const nextTheme = prev === 'light' ? 'dark' : 'light';
+      try {
+        localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+      } catch (e) {
+        console.error('Failed to save theme preference:', e);
+      }
+      if (nextTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+      }
+      return nextTheme;
+    });
+  }, []);
 
   // Fetch initial settings from MySQL backend
   useEffect(() => {
@@ -190,22 +254,25 @@ export const SettingsProvider = ({ children }) => {
     }
   }, []);
 
-
-
-  // Apply theme whenever security.theme changes
+  // Dynamically synchronize theme with documentElement
   useEffect(() => {
-    if (security.theme === 'light') {
-      document.documentElement.classList.remove('dark');
-    } else {
+    if (theme === 'dark') {
       document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
     }
-  }, [security.theme]);
+  }, [theme]);
 
   const value = {
     profile,
     finance,
     customData,
-    security,
+    security: { ...security, theme },
+    theme,
+    setTheme,
+    toggleTheme,
     isLoading,
     saveAllSettings,
     saveTabSettings,

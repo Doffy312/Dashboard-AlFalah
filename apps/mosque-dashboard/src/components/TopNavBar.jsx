@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead } from '../hooks/useNotifications';
+import { 
+  useNotifications, 
+  useMarkNotificationAsRead, 
+  useMarkAllNotificationsAsRead,
+  useDeleteNotification 
+} from '../hooks/useNotifications';
 import { formatNotificationTime, formatFullDateTime } from '../lib/dateUtils';
 import { useSettings } from '../contexts/SettingsContext';
 import { authClient } from '../lib/auth-client';
@@ -21,8 +26,9 @@ const TopNavBar = () => {
   const { data: notifications = [] } = useNotifications();
   const markAsReadMutation = useMarkNotificationAsRead();
   const markAllMutation = useMarkAllNotificationsAsRead();
+  const deleteMutation = useDeleteNotification();
   const navigate = useNavigate();
-  const { profile } = useSettings();
+  const { profile, theme, toggleTheme } = useSettings();
   const { data: session } = authClient.useSession();
 
   const [showDropdown, setShowDropdown] = useState(false);
@@ -130,7 +136,7 @@ const TopNavBar = () => {
               <div
                 key={notif.id}
                 onClick={() => handleNotificationClick(notif)}
-                className={`px-4 py-3 border-b border-outline-variant/30 hover:bg-surface-variant/40 cursor-pointer transition-colors ${
+                className={`group px-4 py-3 border-b border-outline-variant/30 hover:bg-surface-variant/40 cursor-pointer transition-colors relative ${
                   !notif.isRead ? 'bg-primary/5' : ''
                 }`}
               >
@@ -150,12 +156,24 @@ const TopNavBar = () => {
                       {notif.description}
                     </p>
                   </div>
-                  <span 
-                    className="text-[10px] text-on-surface-variant/70 whitespace-nowrap shrink-0 mt-0.5"
-                    title={fullTime}
-                  >
-                    {timeAgo}
-                  </span>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span 
+                      className="text-[10px] text-on-surface-variant/70 whitespace-nowrap"
+                      title={fullTime}
+                    >
+                      {timeAgo}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteMutation.mutate(notif.id);
+                      }}
+                      title="Hapus notifikasi"
+                      className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-on-surface-variant/70 hover:text-rose-500 hover:bg-rose-500/10 transition-all cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-[15px]">delete</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -313,6 +331,18 @@ const TopNavBar = () => {
             {showMobileNotif && renderNotificationPanel(() => setShowMobileNotif(false))}
           </div>
 
+          {/* Mobile Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant cursor-pointer transition-colors"
+            title={theme === 'dark' ? 'Ganti ke Tema Terang' : 'Ganti ke Tema Gelap'}
+            aria-label="Toggle Theme"
+          >
+            <span className="material-symbols-outlined text-[20px] text-primary">
+              {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+            </span>
+          </button>
+
           {/* Mobile Help Button */}
           <button
             onClick={() => setShowHelpModal(true)}
@@ -356,11 +386,13 @@ const TopNavBar = () => {
             <input 
               className="w-full h-full bg-transparent border-none outline-none text-body-sm font-body-sm text-on-surface placeholder-on-surface-variant focus:ring-0 px-xs" 
               placeholder="Search..." 
-              type="text"
-              name="search"
-              id="search"
+              type="search"
+              name="topbar_global_search"
+              id="topbar_global_search"
               autoComplete="off"
               data-lpignore="true"
+              data-1p-ignore="true"
+              data-bwignore="true"
               data-form-type="other"
             />
           </div>
@@ -369,6 +401,18 @@ const TopNavBar = () => {
         {/* Actions & Profile */}
         <div className="flex items-center gap-md">
           <div className="flex items-center gap-sm">
+            {/* Quick Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant cursor-pointer transition-colors"
+              title={theme === 'dark' ? 'Ganti ke Tema Terang' : 'Ganti ke Tema Gelap'}
+              aria-label="Toggle Theme"
+            >
+              <span className="material-symbols-outlined text-[20px] text-primary">
+                {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+              </span>
+            </button>
+
             {/* Notification Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button

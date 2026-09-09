@@ -21,10 +21,6 @@ const LaporanPage = () => {
   const { data: programSummary } = useProgramSummary();
 
   const saldo = summary?.finance?.saldoSaatIni ?? 0;
-  
-  // Tab classes
-  const activeTabClass = "px-6 py-2 rounded-t-lg border-b-2 border-primary text-primary font-label-md text-[12px] font-semibold leading-[16px] tracking-[0.05em] bg-surface-variant backdrop-blur-sm transition-all";
-  const inactiveTabClass = "px-6 py-2 rounded-t-lg border-b-2 border-transparent text-on-surface-variant hover:text-primary hover:bg-surface-variant font-label-md text-[12px] font-semibold leading-[16px] tracking-[0.05em] transition-all";
 
   // CSV Generator Utility
   const generateCSV = (data, filename) => {
@@ -375,42 +371,49 @@ const LaporanPage = () => {
   };
 
   return (
-    <div className="flex flex-col">
-      {/* Page Header */}
-      <div className="mb-8 flex flex-col gap-2">
-        <h2 className="font-headline-lg text-[32px] font-semibold leading-[40px] tracking-[-0.01em] text-on-surface">Analisis & Laporan</h2>
-        <p className="font-body-md text-[16px] leading-[24px] text-on-surface-variant">Tinjauan komprehensif keuangan dan aktivitas jemaah.</p>
-      </div>
+    <div className="flex flex-col gap-6 text-on-surface">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-on-surface flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-primary text-3xl">analytics</span>
+            Laporan &amp; Analisis
+          </h1>
+          <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
+            Tinjauan komprehensif keuangan, aktivitas program kerja, dan statistik jemaah.
+          </p>
+        </div>
 
-      {/* Quick Stats */}
-      <div className="flex flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <div className="glass-panel rounded-full px-4 sm:px-6 py-2 flex items-center gap-2 sm:gap-3 shadow-sm border-outline/30">
-          <span className="w-2 h-2 rounded-full bg-secondary"></span>
-          <span className="font-label-md text-[11px] sm:text-[12px] font-semibold leading-[16px] tracking-[0.05em] text-on-surface-variant">Saldo Terkini:</span>
-          <span className="font-title-md text-base sm:text-[20px] font-bold text-on-surface">{formatCurrency(saldo)}</span>
+        {/* Quick Summary Pill */}
+        <div className="flex items-center gap-3 shrink-0 self-start sm:self-auto">
+          <div className="bg-surface border border-outline-variant rounded-2xl px-4 py-2.5 flex items-center gap-2.5 shadow-sm">
+            <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shrink-0"></div>
+            <span className="text-xs sm:text-sm text-on-surface-variant font-medium">Saldo Terkini:</span>
+            <span className="text-sm sm:text-base font-bold text-primary font-mono">{formatCurrency(saldo)}</span>
+          </div>
         </div>
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex gap-2 mb-6 sm:mb-8 border-b border-outline-variant/30 pb-2 overflow-x-auto hide-scrollbar">
-        <button 
-          onClick={() => setActiveTab('Grafik Keuangan')}
-          className={activeTab === 'Grafik Keuangan' ? activeTabClass : inactiveTabClass}
-        >
-          Grafik Keuangan
-        </button>
-        <button 
-          onClick={() => setActiveTab('Analisis Program')}
-          className={activeTab === 'Analisis Program' ? activeTabClass : inactiveTabClass}
-        >
-          Analisis Program
-        </button>
-        <button 
-          onClick={() => setActiveTab('Export Laporan')}
-          className={activeTab === 'Export Laporan' ? activeTabClass : inactiveTabClass}
-        >
-          Export Laporan
-        </button>
+      <div className="flex gap-2 border-b border-outline-variant/30 pb-2 overflow-x-auto hide-scrollbar">
+        {[
+          { id: 'Grafik Keuangan', label: 'Grafik Keuangan', icon: 'monitoring' },
+          { id: 'Analisis Program', label: 'Analisis Program', icon: 'insights' },
+          { id: 'Export Laporan', label: 'Export Laporan', icon: 'file_download' },
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all whitespace-nowrap cursor-pointer ${
+              activeTab === tab.id
+                ? 'bg-primary text-slate-950 font-bold shadow-md shadow-primary/20'
+                : 'bg-surface-variant/50 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant'
+            }`}
+          >
+            <span className="material-symbols-outlined text-lg">{tab.icon}</span>
+            <span>{tab.label}</span>
+          </button>
+        ))}
       </div>
 
       {/* Tab Content Rendering */}
@@ -419,7 +422,6 @@ const LaporanPage = () => {
         {activeTab === 'Analisis Program' && renderAnalisisProgram()}
         {activeTab === 'Export Laporan' && renderExportLaporan()}
       </div>
-
     </div>
   );
 };

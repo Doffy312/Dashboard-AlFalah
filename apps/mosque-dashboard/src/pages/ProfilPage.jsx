@@ -1,4 +1,4 @@
-import { useState, Suspense, lazy } from 'react';
+import { useState, Suspense, lazy, useCallback } from 'react';
 import { 
   Sparkles, 
   CheckCircle2, 
@@ -7,9 +7,12 @@ import {
   ShieldCheck, 
   Heart, 
   Users,
-  Award
+  Award,
+  ArrowRight,
+  HeartHandshake
 } from 'lucide-react';
 import LandingHeader from '../components/landing/LandingHeader';
+import LandingHeroSection from '../components/landing/LandingHeroSection';
 import LandingFooter from '../components/landing/LandingFooter';
 import LandingContactSection from '../components/landing/LandingContactSection';
 import { useSettings } from '../contexts/SettingsContext';
@@ -27,6 +30,10 @@ export default function ProfilPage() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 3500);
   };
+
+  const handleScrollToVisi = useCallback(() => {
+    document.getElementById('visi-misi')?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
 
   const valuesList = [
     {
@@ -58,30 +65,37 @@ export default function ProfilPage() {
         onOpenDonasi={() => setActiveDonasiType('Infaq')}
       />
 
-      {/* Hero Header Profil */}
-      <section className="scroll-mt-24 pt-28 sm:pt-32 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto text-center relative overflow-hidden">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold uppercase tracking-widest mb-6">
-          <Building2 size={14} /> Tentang &amp; Visi Misi Masjid
-        </div>
-
-        <h1 className="text-2xl xs:text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6 break-words">
-          Profil &amp; Visi Misi
-          <span className="block text-emerald-400 mt-2 sm:mt-3 break-words">{orgName}</span>
-        </h1>
-
-        <p className="text-sm sm:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto mb-8 break-words px-2">
-          {profile?.description || 'Pusat peradaban, ibadah, dan pembinaan keagamaan jemaah yang berlandaskan al-Qur\'an dan as-Sunnah.'}
-        </p>
-
-        {/* Glow Sphere Decorations — same as beranda */}
-        <div className="hero-decoration">
-          <div className="glow-sphere sphere-1 absolute -top-10 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="glow-sphere sphere-2 absolute top-20 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        </div>
-      </section>
+      {/* Hero Header Profil — Istiqlal Style (matching Beranda) */}
+      <LandingHeroSection
+        id="profil-hero"
+        isSubpage
+        subtitle="Tentang & Visi Misi Masjid"
+        heading={<>Profil &amp; Visi Misi<span className="block text-emerald-400 mt-2 sm:mt-3">{orgName}</span></>}
+        taglineParts={[
+          { text: 'Menerangi Jemaah, ', className: 'text-green' },
+          { text: 'Menguatkan Ukhuwah.', className: 'text-gold' },
+        ]}
+        description={profile?.description || "Pusat peradaban, ibadah, dan pembinaan keagamaan jemaah yang berlandaskan al-Qur'an dan as-Sunnah."}
+        actions={<>
+          <button
+            onClick={handleScrollToVisi}
+            className="hero-cta-istiqlal w-full sm:w-auto"
+          >
+            <Building2 size={16} />
+            <span>Lihat Visi & Misi</span>
+            <ArrowRight size={16} />
+          </button>
+          <button
+            onClick={() => setActiveDonasiType('Infaq')}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white/10 hover:bg-white/15 text-white text-xs sm:text-sm font-semibold border border-white/15 backdrop-blur-md transition-all active:scale-[0.98]"
+          >
+            <HeartHandshake size={16} /> <span>Donasi Infaq</span>
+          </button>
+        </>}
+      />
 
       {/* Visi & Misi Cards */}
-      <section className="py-8 sm:py-12 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
+      <section id="visi-misi" className="py-8 sm:py-12 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto scroll-mt-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {/* Visi Card */}
           <div className="p-5 sm:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md hover:border-amber-500/30 transition-all">

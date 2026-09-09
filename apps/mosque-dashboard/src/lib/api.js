@@ -92,6 +92,7 @@ export const dashboardApi = {
   getSummary: () => request("/dashboard/summary"),
   getCashflow: (year) => request(`/dashboard/cashflow${year ? `?year=${year}` : ''}`),
   getAllocation: (type) => request(`/dashboard/allocation${type ? `?type=${encodeURIComponent(type)}` : ''}`),
+  getCategoryTrends: (type, year) => request(`/dashboard/category-trends?type=${encodeURIComponent(type || 'Pemasukan')}${year ? `&year=${year}` : ''}`),
   getRecentActivity: () => request("/dashboard/recent-activity"),
   getUpcomingPrograms: () => request("/dashboard/upcoming-programs"),
   getCompletedPrograms: () => request("/dashboard/completed-programs"),
@@ -149,6 +150,8 @@ export const notificationApi = {
   getAll: () => request("/notifications"),
   markAsRead: (id) => request(`/notifications/${id}/read`, { method: "PATCH" }),
   markAllAsRead: () => request("/notifications/mark-all-read", { method: "PATCH" }),
+  delete: (id) => request(`/notifications/${id}`, { method: "DELETE" }),
+  deleteAll: () => request("/notifications/clear-all", { method: "DELETE" }),
 };
 
 export const settingsApi = {

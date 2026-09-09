@@ -21,6 +21,13 @@ export class DashboardController {
     res.json(result);
   }
 
+  async getCategoryTrends(req: Request, res: Response) {
+    const type = (req.query.type as string) || "Pemasukan";
+    const year = req.query.year ? parseInt(req.query.year as string, 10) : new Date().getFullYear();
+    const result = await dashboardService.getCategoryTrends(type, year);
+    res.json(result);
+  }
+
   async getRecentActivity(_req: Request, res: Response) {
     const result = await dashboardService.getRecentActivity();
     res.json(result);

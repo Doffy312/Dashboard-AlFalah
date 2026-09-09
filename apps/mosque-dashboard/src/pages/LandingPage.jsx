@@ -7,12 +7,12 @@ import {
   MapPin,
   Check,
   HeartHandshake,
-  Sparkles,
   Newspaper,
   ShieldCheck,
   UserPlus
 } from 'lucide-react';
 
+import LandingHeroSection from '../components/landing/LandingHeroSection';
 import LandingHeader from '../components/landing/LandingHeader';
 import LandingFooter from '../components/landing/LandingFooter';
 
@@ -28,13 +28,14 @@ import { useArticles } from '../hooks/useArticles';
 import { formatCurrency } from '../lib/utils';
 import { authClient } from '../lib/auth-client';
 import { MOCK_NEWS_ARTICLES } from '../lib/mockArticles';
+import { useLandingRealtimeSync } from '../hooks/useLandingRealtimeSync';
 
 // Lazy-load heavy components (Map & Modals) for fast page load
 const LandingDistributionMap = lazy(() => import('../components/landing/LandingDistributionMap'));
 const JemaahRegistrationModal = lazy(() => import('../components/landing/JemaahRegistrationModal'));
 const QRInfaqModal = lazy(() => import('../components/landing/QRInfaqModal'));
 
-const LANDING_QUERY_OPTIONS = { staleTime: 60000, gcTime: 300000, refetchOnWindowFocus: false };
+const LANDING_QUERY_OPTIONS = { staleTime: 10_000, gcTime: 300_000, refetchInterval: 60_000, refetchOnWindowFocus: false };
 
 const MapSkeleton = () => (
   <section id="sebaran-jemaah" className="scroll-mt-24 py-10 sm:py-16 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto text-white relative overflow-hidden">
@@ -85,6 +86,9 @@ const LandingPage = () => {
   const { profile } = useSettings();
   const { data: session } = authClient.useSession();
   const currentUser = session?.user;
+
+  // Enable realtime Socket.IO sync for finance data on this public page
+  useLandingRealtimeSync();
 
   const { data: summary } = useDashboardSummary(LANDING_QUERY_OPTIONS);
   const { data: kasSummary } = useTransactionSummary(LANDING_QUERY_OPTIONS);
@@ -148,49 +152,33 @@ const LandingPage = () => {
         onOpenRegistration={() => setIsRegistrationOpen(true)}
       />
 
-      {/* ===== HERO SECTION ===== */}
-      <main id="beranda" className="hero-section scroll-mt-24 pt-24 sm:pt-32 pb-8 sm:pb-16 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto text-center relative overflow-hidden">
-        <div className="hero-content relative z-10 max-w-4xl mx-auto">
-          <div className="hero-badge inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold uppercase tracking-widest mb-4 sm:mb-6">
-            <Sparkles size={14} /> Portal Informasi &amp; Transparansi Masjid
-          </div>
-          
-          <h1 className="hero-title text-2xl xs:text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-4 sm:mb-6 break-words">
-            Manajemen Masjid yang <span className="text-emerald-400">Modern</span>, Transparan &amp; Akuntabel
-          </h1>
-
-          <p className="hero-subtitle text-sm sm:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto mb-6 sm:mb-8 px-2 break-words">
-            Sentralisasi data keuangan, program kerja, dan keanggotaan jemaah {orgName} yang dapat diakses secara terbuka demi menjaga amanah umat.
-          </p>
-
-          <div className="hero-cta-group flex flex-wrap justify-center gap-2.5 sm:gap-4">
-            <button 
-              onClick={() => setIsRegistrationOpen(true)}
-              className="btn-primary-large bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold px-5 sm:px-8 py-3 rounded-xl text-xs sm:text-base transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 w-full xs:w-auto"
-            >
-              <UserPlus size={18} className="sm:w-5 sm:h-5" /> Form Pendaftaran Jemaah
-            </button>
-            <button 
-              onClick={() => setActiveDonasiType('Infaq')}
-              className="btn-primary-large bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 sm:px-8 py-3 rounded-xl text-xs sm:text-base transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 w-full xs:w-auto"
-            >
-              <HeartHandshake size={18} className="sm:w-5 sm:h-5" /> Donasi Infaq
-            </button>
-            <Link 
-              to="/transparansi-keuangan" 
-              className="btn-secondary-large bg-white/5 hover:bg-white/10 text-white border border-white/10 px-5 sm:px-8 py-3 rounded-xl text-xs sm:text-base font-semibold transition-all flex items-center justify-center gap-2 active:scale-95 w-full xs:w-auto"
-            >
-              Transparansi Kas
-            </Link>
-          </div>
-        </div>
-
-        {/* Glow Spheres */}
-        <div className="hero-decoration">
-          <div className="glow-sphere sphere-1 absolute -top-10 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="glow-sphere sphere-2 absolute top-20 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        </div>
-      </main>
+      {/* ===== HERO SECTION — Istiqlal Style ===== */}
+      <LandingHeroSection
+        id="beranda"
+        subtitle="Kebanggaan Umat Jemaah"
+        heading={orgName}
+        taglineParts={[
+          { text: 'Menerangi Jemaah, ', className: 'text-green' },
+          { text: 'Menguatkan Ukhuwah.', className: 'text-gold' },
+        ]}
+        description={<>Selamat datang di <strong>{orgName}</strong>, pusat ibadah dan pembinaan kegiatan keagamaan yang transparan, profesional, dan akuntabel. Melayani umat dengan penuh amanah demi kemaslahatan bersama.</>}
+        actions={<>
+          <button
+            onClick={() => setIsRegistrationOpen(true)}
+            className="hero-cta-istiqlal w-full sm:w-auto"
+          >
+            <UserPlus size={16} />
+            <span>Daftar Jemaah</span>
+            <ArrowRight size={16} />
+          </button>
+          <button
+            onClick={() => setActiveDonasiType('Infaq')}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white/10 hover:bg-white/15 text-white text-xs sm:text-sm font-semibold border border-white/15 backdrop-blur-md transition-all active:scale-[0.98]"
+          >
+            <HeartHandshake size={16} /> <span>Donasi Infaq</span>
+          </button>
+        </>}
+      />
 
       {/* ===== JADWAL SHALAT SECTION ===== */}
       <Suspense fallback={<div className="py-10 px-4 max-w-7xl mx-auto text-center text-slate-500 text-sm">Memuat Jadwal Shalat...</div>}>
@@ -198,7 +186,7 @@ const LandingPage = () => {
       </Suspense>
 
       {/* ===== PROFIL SHORT PREVIEW ===== */}
-      <section className="py-8 sm:py-12 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
+      <section id="profil-preview" className="py-8 sm:py-12 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto scroll-mt-24">
         <div className="p-5 sm:p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
           <div className="space-y-3 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold uppercase tracking-wider">
@@ -288,7 +276,7 @@ const LandingPage = () => {
           </div>
 
           {/* Ringkasan Jemaah Card */}
-          <div className="p-8 rounded-2xl border border-amber-500/20 bg-white/5 text-left backdrop-blur-md flex flex-col justify-between">
+          <div className="p-5 sm:p-8 rounded-2xl border border-amber-500/20 bg-white/5 text-left backdrop-blur-md flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 rounded-xl bg-emerald-500/15 text-emerald-400">
@@ -345,7 +333,7 @@ const LandingPage = () => {
       </Suspense>
 
       {/* ===== BERITA & KEGIATAN PREVIEW ===== */}
-      <section className="py-16 px-6 lg:px-12 max-w-7xl mx-auto">
+      <section className="py-10 sm:py-16 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">

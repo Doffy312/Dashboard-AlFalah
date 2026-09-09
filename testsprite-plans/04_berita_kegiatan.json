@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/TestSprite/testsprite-cli/v0.9.0/schemas/plan.schema.json",
+  "projectId": "f66794bc-7544-4814-b600-3beab11fce69",
+  "type": "frontend",
+  "name": "News & Activities — Article Search and Category Filters",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /berita-kegiatan"
+    },
+    {
+      "type": "assertion",
+      "description": "The search bar with placeholder 'Cari berita, kajian, atau kegiatan...' is displayed"
+    },
+    {
+      "type": "assertion",
+      "description": "Category filter buttons including 'Semua', 'Kegiatan Terlaksana', and 'Kajian' are visible"
+    },
+    {
+      "type": "assertion",
+      "description": "At least one article card is rendered showing title, date, and read time"
+    }
+  ]
+}

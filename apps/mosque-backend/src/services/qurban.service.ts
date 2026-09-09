@@ -164,6 +164,8 @@ export const qurbanService = {
   },
 
   async deleteKelompok(id: string) {
+    // Unlink any members belonging to this kelompok first to prevent FK constraint issues
+    await db.update(pequrban).set({ qurbanKelompokId: null }).where(eq(pequrban.qurbanKelompokId, id));
     await db.delete(qurbanKelompok).where(eq(qurbanKelompok.id, id));
     return true;
   },

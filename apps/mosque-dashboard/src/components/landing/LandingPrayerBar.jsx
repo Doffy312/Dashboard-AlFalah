@@ -291,7 +291,7 @@ const LandingPrayerBar = () => {
 
                   {/* Prayer Name */}
                   <span
-                    className={`text-xs sm:text-sm lg:text-base tracking-wide mb-1 sm:mb-1.5 ${
+                    className={`text-[11px] sm:text-sm lg:text-base tracking-wide mb-1 sm:mb-1.5 ${
                       isNext ? 'font-extrabold text-amber-300' : 'font-semibold text-slate-300'
                     }`}
                   >
@@ -300,7 +300,7 @@ const LandingPrayerBar = () => {
 
                   {/* Prayer Time */}
                   <span
-                    className={`text-sm sm:text-lg lg:text-xl font-bold tracking-tight ${
+                    className={`text-xs sm:text-lg lg:text-xl font-bold tracking-tight ${
                       isNext ? 'text-white font-black' : 'text-slate-200'
                     }`}
                   >
@@ -325,12 +325,12 @@ const LandingPrayerBar = () => {
         </div>
 
         {/* Floating Bottom Pill Badge (Prayer Countdown) */}
-        <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 z-20">
-          <div className="px-5 sm:px-7 py-2 rounded-full bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 font-extrabold text-xs sm:text-sm tracking-wide shadow-xl shadow-amber-500/30 flex items-center gap-2 border border-amber-300/40 shrink-0 whitespace-nowrap">
-            <Clock size={16} className="text-slate-950 animate-pulse" />
+        <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 z-20 w-max max-w-[92vw]">
+          <div className="px-3.5 sm:px-7 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 font-extrabold text-[11px] sm:text-sm tracking-wide shadow-xl shadow-amber-500/30 flex items-center gap-1.5 sm:gap-2 border border-amber-300/40 shrink-0 whitespace-nowrap">
+            <Clock size={14} className="text-slate-950 animate-pulse sm:w-4 sm:h-4" />
             <span>
               Prayer Countdown:{' '}
-              <strong className="font-mono text-sm sm:text-base text-slate-950 font-black tracking-widest ml-1">
+              <strong className="font-mono text-xs sm:text-base text-slate-950 font-black tracking-widest ml-1">
                 {countdown}
               </strong>
             </span>

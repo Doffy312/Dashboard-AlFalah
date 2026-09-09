@@ -19,6 +19,8 @@ const DEFAULT_SETTINGS: Record<string, any> = {
       "Mengembangkan pemberdayaan jemaah, anak yatim, dan dhuafa."
     ],
     logo: '',
+    lat: -6.91746,
+    lng: 107.61912,
   },
   finance: {
     categories: [

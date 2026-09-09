@@ -17,6 +17,20 @@ export class NotificationController {
     await notificationService.markAllAsRead();
     res.json({ success: true, message: "All notifications marked as read" });
   }
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    const id = req.params.id as string;
+    const deleted = await notificationService.delete(id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Notifikasi tidak ditemukan" });
+    }
+    res.json({ success: true, message: "Notifikasi berhasil dihapus" });
+  }
+
+  async deleteAll(req: Request, res: Response, next: NextFunction) {
+    await notificationService.deleteAll();
+    res.json({ success: true, message: "Semua notifikasi berhasil dihapus" });
+  }
 }
 
 export const notificationController = new NotificationController();

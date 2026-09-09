@@ -7,6 +7,7 @@ import { runTC006 } from "./TC006_database_atomic_transactions_and_rollback.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { pool } from "../src/config/db.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -90,14 +91,16 @@ async function main() {
     "utf8"
   );
 
+  try {
+    await pool.end();
+  } catch {}
+
   if (failedCount > 0) {
-    process.exit(1);
-  } else {
-    process.exit(0);
+    process.exitCode = 1;
   }
 }
 
 main().catch((err) => {
   console.error("Fatal Error running database test suite:", err);
-  process.exit(1);
+  process.exitCode = 1;
 });

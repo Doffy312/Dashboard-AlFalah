@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/TestSprite/testsprite-cli/v0.9.0/schemas/plan.schema.json",
+  "projectId": "f66794bc-7544-4814-b600-3beab11fce69",
+  "type": "frontend",
+  "name": "DKM Admin Portal — Secure Login Form and Validation",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /portal-dkm"
+    },
+    {
+      "type": "assertion",
+      "description": "The login page renders with title 'Portal Pengurus DKM'"
+    },
+    {
+      "type": "assertion",
+      "description": "The email and password inputs and the 'Masuk ke Dashboard' button are visible"
+    }
+  ]
+}

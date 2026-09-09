@@ -1,0 +1,1857 @@
+[
+  {
+    "id": "TC001",
+    "title": "View prayer times and financial snapshot on the landing page",
+    "description": "A visitor can open the public homepage, review the prayer schedule and financial snapshot, and see the main public overview content.",
+    "category": "Public Landing Page & Interactive Overview",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the prayer schedule section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify prayer times are displayed"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the financial snapshot section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify financial summary data is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Login to the DKM dashboard",
+    "description": "A staff member can sign in through the portal and reach the main dashboard overview.",
+    "category": "DKM Staff Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the staff email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the staff password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dashboard overview is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify summary metrics are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Submit a jemaah registration from the landing page",
+    "description": "A visitor can complete and submit the public jemaah registration form and receive a confirmation state.",
+    "category": "Public Landing Page & Interactive Overview",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the jemaah registration form"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the jemaah registration form with valid details"
+      },
+      {
+        "type": "action",
+        "description": "Submit the jemaah registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a registration confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Add an income transaction",
+    "description": "Verify a user can create a new income transaction and see it appear in the financial ledger.",
+    "category": "Financial Cash Flow Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the financial cash flow section"
+      },
+      {
+        "type": "action",
+        "description": "Add a new transaction"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the required transaction details for an income record"
+      },
+      {
+        "type": "action",
+        "description": "Submit the transaction form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new income transaction is displayed in the ledger"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Open donation information from the landing page",
+    "description": "A visitor can open the donation information from the public homepage and see donation details for contributing to the mosque.",
+    "category": "Public Landing Page & Interactive Overview",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the donation information"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify donation details are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "View dashboard summary after login",
+    "description": "A logged-in DKM user can open the dashboard and review the key operational summary at a glance.",
+    "category": "Executive Dashboard Overview",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the staff email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the staff password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the cash balance summary is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the jemaah and program summary metrics are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Require authentication before accessing settings",
+    "description": "This test verifies that the settings page is protected and prompts for authentication when accessed without an active session.",
+    "category": "System Settings & User RBAC Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a login prompt or access restriction is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the settings content is not accessible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Submit a contact inquiry from the landing page",
+    "description": "A visitor can complete and submit the public contact form and receive a confirmation state.",
+    "category": "Public Landing Page & Interactive Overview",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the contact form"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the contact form with valid details"
+      },
+      {
+        "type": "action",
+        "description": "Submit the contact form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a contact submission confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Inspect the jemaah map on the landing page",
+    "description": "A visitor can view the public jemaah map on the homepage and see community location markers or clusters displayed.",
+    "category": "Public Landing Page & Interactive Overview",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the jemaah map section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the jemaah map is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify jemaah location markers are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Add an expense transaction",
+    "description": "Verify a user can create a new expense transaction and see it appear in the financial ledger.",
+    "category": "Financial Cash Flow Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the financial cash flow section"
+      },
+      {
+        "type": "action",
+        "description": "Add a new transaction"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the required transaction details for an expense record"
+      },
+      {
+        "type": "action",
+        "description": "Submit the transaction form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new expense transaction is displayed in the ledger"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Review the public financial transparency page",
+    "description": "A visitor can open the financial transparency page and view cash reserves, income and expense summaries, and official bank account details.",
+    "category": "Public Financial Transparency",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /transparansi-keuangan"
+      },
+      {
+        "type": "action",
+        "description": "Scroll through the financial summary content"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify cash reserve and transaction summary data are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify official bank account details are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Create a work program",
+    "description": "Verify a user can create a new work program with budget and PIC details and see it in the Kanban board.",
+    "category": "Work Program & Kanban Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the work program section"
+      },
+      {
+        "type": "action",
+        "description": "Add a new work program"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the required work program details including budget and PIC"
+      },
+      {
+        "type": "action",
+        "description": "Submit the program form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new program card is displayed in the Kanban board"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Update mosque profile, bank details, categories, and user role",
+    "description": "This test verifies that an authorized user can update mosque settings, manage financial metadata, add a DKM user, change the user's role, and save the changes successfully.",
+    "category": "System Settings & User RBAC Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_USER}} into the username field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/settings"
+      },
+      {
+        "type": "action",
+        "description": "Update the mosque profile information"
+      },
+      {
+        "type": "action",
+        "description": "Manage the official bank accounts and cash categories"
+      },
+      {
+        "type": "action",
+        "description": "Add a new DKM user"
+      },
+      {
+        "type": "action",
+        "description": "Change the new user's role"
+      },
+      {
+        "type": "action",
+        "description": "Save the settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated settings are shown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new user appears with the selected role"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Add a jemaah record",
+    "description": "Verify a user can create a new jemaah record and see it in the database list.",
+    "category": "Jemaah Database & GIS Mapping",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the jemaah management section"
+      },
+      {
+        "type": "action",
+        "description": "Add a new jemaah record"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the required jemaah details"
+      },
+      {
+        "type": "action",
+        "description": "Submit the jemaah form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new jemaah record is displayed in the database"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "Complete a work program and create the related ledger record",
+    "description": "Verify completing a program with budget realization creates the related financial record and marks the program done.",
+    "category": "Work Program & Kanban Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the work program section"
+      },
+      {
+        "type": "action",
+        "description": "Complete an existing program"
+      },
+      {
+        "type": "action",
+        "description": "Enter the budget realization details"
+      },
+      {
+        "type": "action",
+        "description": "Confirm completion"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the program is marked as completed and the related financial record is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC016",
+    "title": "Edit a transaction",
+    "description": "Verify a user can update an existing transaction and see the edited data in the ledger.",
+    "category": "Financial Cash Flow Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the financial cash flow section"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing transaction for editing"
+      },
+      {
+        "type": "action",
+        "description": "Update the transaction details"
+      },
+      {
+        "type": "action",
+        "description": "Save the transaction changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated transaction is displayed in the ledger"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC017",
+    "title": "Review the public mosque profile page",
+    "description": "A visitor can open the mosque profile page and view the history, vision and mission, organization structure, and facilities information.",
+    "category": "Public Mosque Profile",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /profil"
+      },
+      {
+        "type": "action",
+        "description": "Scroll through the profile content"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify mosque history and vision mission content are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify organization structure and facilities content are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC018",
+    "title": "Edit a jemaah record",
+    "description": "Verify a user can update an existing jemaah record and see the changes in the database.",
+    "category": "Jemaah Database & GIS Mapping",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the jemaah management section"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing jemaah record for editing"
+      },
+      {
+        "type": "action",
+        "description": "Update the jemaah details"
+      },
+      {
+        "type": "action",
+        "description": "Save the jemaah changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated jemaah record is displayed in the database"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC019",
+    "title": "Move a program across Kanban stages",
+    "description": "Verify a user can move a work program through the Kanban workflow and see its status change.",
+    "category": "Work Program & Kanban Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the work program section"
+      },
+      {
+        "type": "action",
+        "description": "Move a program card to the next Kanban column"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the program appears in the new Kanban stage"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC020",
+    "title": "Review cash flow and prayer schedule on the dashboard",
+    "description": "A logged-in DKM user can inspect the dashboard charts and today's prayer schedule in one session.",
+    "category": "Executive Dashboard Overview",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the staff email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the staff password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify cash flow chart data is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify today's prayer schedule is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC021",
+    "title": "Filter transactions by ledger criteria",
+    "description": "Verify a user can narrow the financial ledger using date, category, or transaction type filters.",
+    "category": "Financial Cash Flow Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the financial cash flow section"
+      },
+      {
+        "type": "action",
+        "description": "Select ledger filter criteria"
+      },
+      {
+        "type": "action",
+        "description": "Apply the filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the ledger updates to show the filtered transactions"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC022",
+    "title": "Assign a prayer duty schedule",
+    "description": "A DKM user can create a duty assignment with staff, topic, and contact details and see the new schedule entry appear.",
+    "category": "Duty & Prayer Staff Schedule",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the prayer staff schedule link"
+      },
+      {
+        "type": "action",
+        "description": "Start a new duty assignment"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the staff name field with a valid name"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid duty role"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the sermon topic field with a valid topic"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the contact details field with a valid phone number"
+      },
+      {
+        "type": "action",
+        "description": "Submit the assignment form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new schedule entry is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC023",
+    "title": "Delete a transaction",
+    "description": "Verify a user can remove an existing transaction from the financial ledger.",
+    "category": "Financial Cash Flow Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the financial cash flow section"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing transaction for deletion"
+      },
+      {
+        "type": "action",
+        "description": "Confirm deletion of the transaction"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the transaction is no longer displayed in the ledger"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC024",
+    "title": "Use dashboard quick navigation to open a module",
+    "description": "A logged-in DKM user can move from the dashboard to a work module using the quick navigation actions.",
+    "category": "Executive Dashboard Overview",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the staff email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the staff password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the quick navigation action for the financial module"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the financial management page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify transaction controls are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC025",
+    "title": "Create a news article draft",
+    "description": "A DKM user can create a news article with the required content and see it appear in the CMS list.",
+    "category": "News CMS & Publication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the news management link"
+      },
+      {
+        "type": "action",
+        "description": "Start a new article"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the title field with a valid article title"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid category"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the summary field with a valid summary"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the content field with valid article content"
+      },
+      {
+        "type": "action",
+        "description": "Attach a valid image"
+      },
+      {
+        "type": "action",
+        "description": "Submit the article form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the article appears in the news list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC026",
+    "title": "Change a user's role and keep the change on the list",
+    "description": "This test verifies that an existing DKM user's role can be updated and the updated role is reflected in the user list.",
+    "category": "System Settings & User RBAC Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_USER}} into the username field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/settings"
+      },
+      {
+        "type": "action",
+        "description": "Select an existing DKM user"
+      },
+      {
+        "type": "action",
+        "description": "Change the user's role"
+      },
+      {
+        "type": "action",
+        "description": "Save the settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user's updated role is shown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the settings save confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC027",
+    "title": "Show validation for invalid staff login",
+    "description": "A staff member sees a validation error when signing in with invalid credentials.",
+    "category": "DKM Staff Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the staff email field with invalid@example.com"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the staff password field with invalid-password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify access to the dashboard is not granted"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC028",
+    "title": "Export the financial report",
+    "description": "Verify a user can export the financial report from the ledger view.",
+    "category": "Financial Cash Flow Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the financial cash flow section"
+      },
+      {
+        "type": "action",
+        "description": "Export the financial report"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the export action completes and the report is available in the export flow"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC029",
+    "title": "Read a public article in the detail modal",
+    "description": "A visitor can open a news article and read its details in the modal view.",
+    "category": "Public News & Activities Portal",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /berita-kegiatan"
+      },
+      {
+        "type": "action",
+        "description": "Click an article card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the article reading modal is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the article publication date and reading time are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC030",
+    "title": "Filter jemaah by category",
+    "description": "Verify a user can filter the jemaah database by category and see only matching records.",
+    "category": "Jemaah Database & GIS Mapping",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the jemaah management section"
+      },
+      {
+        "type": "action",
+        "description": "Select a jemaah category filter"
+      },
+      {
+        "type": "action",
+        "description": "Apply the filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the database list shows only the filtered jemaah records"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC031",
+    "title": "Update only the mosque profile without changing user management data",
+    "description": "This test verifies that profile edits can be saved independently while existing bank accounts, categories, and users remain intact.",
+    "category": "System Settings & User RBAC Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_USER}} into the username field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/settings"
+      },
+      {
+        "type": "action",
+        "description": "Update the mosque profile information"
+      },
+      {
+        "type": "action",
+        "description": "Save the settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the mosque profile updates are shown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the existing bank accounts, cash categories, and users remain available"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC032",
+    "title": "Record a new ZISWAF donation",
+    "description": "This test verifies that a DKM user can create a new ZISWAF donation entry and see it appear in the records list.",
+    "category": "ZISWAF Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/ziswaf"
+      },
+      {
+        "type": "action",
+        "description": "Record a new ZISWAF donation entry"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new donation record is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC033",
+    "title": "Search public news articles by keyword",
+    "description": "A visitor can find relevant news articles on the public news portal using search.",
+    "category": "Public News & Activities Portal",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /berita-kegiatan"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the search field with a relevant keyword"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify matching article cards are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify unrelated results are hidden"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC034",
+    "title": "View jemaah locations on the map",
+    "description": "Verify a user can open the GIS map and see geotagged jemaah locations displayed.",
+    "category": "Jemaah Database & GIS Mapping",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the jemaah management section"
+      },
+      {
+        "type": "action",
+        "description": "Open the map view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify geotagged jemaah locations are displayed on the map"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC035",
+    "title": "Unpublish a published news article",
+    "description": "A DKM user can unpublish an existing article and see it removed from the published state in the CMS.",
+    "category": "News CMS & Publication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the news management link"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing published article"
+      },
+      {
+        "type": "action",
+        "description": "Change the article publication status to unpublished"
+      },
+      {
+        "type": "action",
+        "description": "Save the article changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the article is no longer published"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC036",
+    "title": "Filter public news by category",
+    "description": "A visitor can narrow the news feed to a chosen category and see only matching articles.",
+    "category": "Public News & Activities Portal",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /berita-kegiatan"
+      },
+      {
+        "type": "action",
+        "description": "Select a news category filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify articles from the selected category are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify other categories are not shown in the filtered results"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC037",
+    "title": "Export jemaah data",
+    "description": "Verify a user can export jemaah data from the database view.",
+    "category": "Jemaah Database & GIS Mapping",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the jemaah management section"
+      },
+      {
+        "type": "action",
+        "description": "Export the jemaah data"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the export action completes and the spreadsheet export is available in the export flow"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC038",
+    "title": "Add a new inventory asset with complete details",
+    "description": "This test verifies that a DKM user can create a new inventory item with location and condition details and see it appear in the asset list.",
+    "category": "Mosque Inventory & Asset Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/inventaris"
+      },
+      {
+        "type": "action",
+        "description": "Add a new asset with location and condition"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new asset is displayed in the inventory list"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC039",
+    "title": "Filter the schedule by role or date",
+    "description": "A DKM user can narrow the duty schedule using role or date filters and see only matching assignments.",
+    "category": "Duty & Prayer Staff Schedule",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the prayer staff schedule link"
+      },
+      {
+        "type": "action",
+        "description": "Select a duty role filter"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid date filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the schedule list is filtered to matching assignments"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC040",
+    "title": "Show validation errors for incomplete settings data",
+    "description": "This test verifies that incomplete or invalid settings input is rejected and validation errors are shown before changes can be saved.",
+    "category": "System Settings & User RBAC Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_USER}} into the username field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/settings"
+      },
+      {
+        "type": "action",
+        "description": "Clear required profile and user fields"
+      },
+      {
+        "type": "action",
+        "description": "Submit the settings form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify validation errors are visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the settings are not saved"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC041",
+    "title": "Manage an active qurban year and review group progress",
+    "description": "This test verifies that a DKM user can open Qurban management, work with the active year, and see qurban group progress reflected in the interface.",
+    "category": "Qurban Grouping & Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/qurban"
+      },
+      {
+        "type": "action",
+        "description": "Manage the active qurban year"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify qurban groups and their progress are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC042",
+    "title": "Show validation for incomplete transaction input",
+    "description": "Verify the transaction form blocks submission when required information is missing and shows validation feedback.",
+    "category": "Financial Cash Flow Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the financial cash flow section"
+      },
+      {
+        "type": "action",
+        "description": "Open the add transaction form"
+      },
+      {
+        "type": "action",
+        "description": "Submit the empty transaction form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a transaction validation error is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC043",
+    "title": "Search and filter public news together",
+    "description": "A visitor can combine search and category filtering to narrow the public news feed to the desired articles.",
+    "category": "Public News & Activities Portal",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /berita-kegiatan"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the search field with a relevant keyword"
+      },
+      {
+        "type": "action",
+        "description": "Select a news category filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the news feed is narrowed to matching articles"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the filtered results remain visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC044",
+    "title": "Show validation for incomplete program details",
+    "description": "Verify the work program form blocks submission when required information is missing and shows validation feedback.",
+    "category": "Work Program & Kanban Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the work program section"
+      },
+      {
+        "type": "action",
+        "description": "Open the new work program form"
+      },
+      {
+        "type": "action",
+        "description": "Submit the empty program form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a work program validation error is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC045",
+    "title": "Review incoming contact messages and update status",
+    "description": "A DKM user can filter public inquiries, open a message, update its status, and see the updated state in the inbox.",
+    "category": "Public Contact Inquiries & Direct WhatsApp Reply",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the contact inbox link"
+      },
+      {
+        "type": "action",
+        "description": "Filter messages by status"
+      },
+      {
+        "type": "action",
+        "description": "Open an incoming message"
+      },
+      {
+        "type": "action",
+        "description": "Update the message status"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the message appears with the updated status"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC046",
+    "title": "Keep existing settings visible after reopening the page",
+    "description": "This test verifies that saved mosque settings remain available when the settings page is revisited after a successful update.",
+    "category": "System Settings & User RBAC Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_USER}} into the username field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/settings"
+      },
+      {
+        "type": "action",
+        "description": "Save the current settings"
+      },
+      {
+        "type": "action",
+        "description": "Navigate away from the settings page"
+      },
+      {
+        "type": "action",
+        "description": "Return to the settings page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the previously saved mosque profile data is still displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the previously saved users and roles are still displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC047",
+    "title": "Reject an invalid new DKM user role or incomplete user details",
+    "description": "This test verifies that the user management form blocks incomplete or invalid user data and shows a validation error instead of creating the account.",
+    "category": "System Settings & User RBAC Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_USER}} into the username field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/settings"
+      },
+      {
+        "type": "action",
+        "description": "Start adding a new DKM user"
+      },
+      {
+        "type": "action",
+        "description": "Leave one or more required user fields empty"
+      },
+      {
+        "type": "action",
+        "description": "Submit the user form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a user validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user is not added"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC048",
+    "title": "Show validation for invalid jemaah import data",
+    "description": "Verify importing an invalid spreadsheet format shows validation feedback and blocks the import.",
+    "category": "Jemaah Database & GIS Mapping",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the jemaah management section"
+      },
+      {
+        "type": "action",
+        "description": "Open the jemaah import flow"
+      },
+      {
+        "type": "action",
+        "description": "Submit an invalid spreadsheet import"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a jemaah import validation error is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC049",
+    "title": "Assign a pequrban to a cow group successfully",
+    "description": "This test verifies that a DKM user can add a pequrban to a cow group and see the assignment reflected in the group list.",
+    "category": "Qurban Grouping & Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/qurban"
+      },
+      {
+        "type": "action",
+        "description": "Create or open a cow group"
+      },
+      {
+        "type": "action",
+        "description": "Add a pequrban to the cow group"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the pequrban appears in the cow group"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC050",
+    "title": "Update an inventory item's condition",
+    "description": "This test verifies that a DKM user can change an existing asset's condition and see the updated condition reflected in inventory.",
+    "category": "Mosque Inventory & Asset Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /portal-dkm"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard/inventaris"
+      },
+      {
+        "type": "action",
+        "description": "Select an existing inventory item"
+      },
+      {
+        "type": "action",
+        "description": "Update the asset condition"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated condition is displayed"
+      }
+    ],
+    "priority": "Low"
+  }
+]
+

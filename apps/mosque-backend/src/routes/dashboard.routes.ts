@@ -8,13 +8,14 @@ const router = Router();
 // Public endpoints for Landing Page & transparency
 router.get("/summary", asyncHandler(dashboardController.getSummary));
 router.get("/cashflow", asyncHandler(dashboardController.getCashflow));
+router.get("/allocation", asyncHandler(dashboardController.getAllocation));
+router.get("/category-trends", asyncHandler(dashboardController.getCategoryTrends));
 router.get("/upcoming-programs", asyncHandler(dashboardController.getUpcomingPrograms));
 router.get("/completed-programs", asyncHandler(dashboardController.getCompletedPrograms));
 
 // Protected dashboard routes require authentication
 router.use(requireAuth);
 
-router.get("/allocation", asyncHandler(dashboardController.getAllocation));
 router.get("/recent-activity", asyncHandler(dashboardController.getRecentActivity));
 
 export default router;

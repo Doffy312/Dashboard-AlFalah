@@ -48,10 +48,23 @@ export function useAllocation(typeOrOptions = "Pengeluaran", options = {}) {
 
       return data.map(item => ({
         label: item.category,
+        total: Number(item.total),
         percentage: Math.round((Number(item.total) / totalSum) * 100)
       }));
     },
     ...queryOptions,
+  });
+}
+
+export function useCategoryTrends(type = "Pemasukan", year, options = {}) {
+  const selectedYear = year || new Date().getFullYear();
+  return useQuery({
+    queryKey: ["dashboardCategoryTrends", type, selectedYear],
+    queryFn: async () => {
+      const data = await dashboardApi.getCategoryTrends(type, selectedYear);
+      return Array.isArray(data) ? data : [];
+    },
+    ...options,
   });
 }
 

@@ -10,6 +10,7 @@ const QurbanGroupAccordion = ({
   canEdit = false,
   onEdit,
   onDelete,
+  onDeleteGroup,
   onDetail,
   onAddMemberToGroup,
 }) => {
@@ -104,6 +105,19 @@ const QurbanGroupAccordion = ({
                   >
                     <UserPlus size={14} />
                     <span className="hidden md:inline">Tambah</span>
+                  </button>
+                )}
+
+                {(showEditDelete || showAddMember) && onDeleteGroup && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteGroup(group);
+                    }}
+                    className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-500 transition-colors"
+                    title="Hapus Kelompok Ini"
+                  >
+                    <Trash2 size={18} />
                   </button>
                 )}
 

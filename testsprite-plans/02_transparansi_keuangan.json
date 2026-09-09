@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/TestSprite/testsprite-cli/v0.9.0/schemas/plan.schema.json",
+  "projectId": "f66794bc-7544-4814-b600-3beab11fce69",
+  "type": "frontend",
+  "name": "Public Navigation — Financial Transparency & Bank Account Details",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /transparansi-keuangan"
+    },
+    {
+      "type": "assertion",
+      "description": "The page displays the badge 'Laporan Transparansi Keuangan Real-Time'"
+    },
+    {
+      "type": "assertion",
+      "description": "The financial metrics show 'Total Saldo Kas', 'Total Pemasukan', and 'Total Pengeluaran'"
+    },
+    {
+      "type": "assertion",
+      "description": "The official bank account information for Bank Syariah Indonesia is visible"
+    }
+  ]
+}

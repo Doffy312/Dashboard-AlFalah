@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/TestSprite/testsprite-cli/v0.9.0/schemas/plan.schema.json",
+  "projectId": "f66794bc-7544-4814-b600-3beab11fce69",
+  "type": "frontend",
+  "name": "Public Landing Page — Prayer Times and Financial Overview",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /"
+    },
+    {
+      "type": "assertion",
+      "description": "The page displays the navigation bar with 'Beranda', 'Profil', 'Transparansi', 'Berita & Kegiatan', and 'Kontak'"
+    },
+    {
+      "type": "assertion",
+      "description": "The prayer times section displays daily prayer intervals including Subuh, Dzuhur, Ashar, Maghrib, and Isya"
+    },
+    {
+      "type": "assertion",
+      "description": "The financial snapshot card shows the current balance label and a non-empty currency amount"
+    }
+  ]
+}

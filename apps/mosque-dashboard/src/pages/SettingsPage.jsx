@@ -20,6 +20,7 @@ const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [toast, setToast] = useState(null);
+  const [resetKey, setResetKey] = useState(0);
   const { saveTabSettings } = useSettings();
   
   const { data: session } = authClient.useSession();
@@ -81,8 +82,8 @@ const SettingsPage = () => {
     if (hasUnsavedChanges) {
       if (window.confirm('Batalkan perubahan?')) {
         setHasUnsavedChanges(false);
-        // Force re-render tabs so they re-read from context
-        setActiveTab(prev => prev);
+        // Increment resetKey to force remount tabs, resetting local state to context values
+        setResetKey(prev => prev + 1);
       }
     }
   };
@@ -90,11 +91,11 @@ const SettingsPage = () => {
   const renderActiveTab = () => {
     const commonProps = { setHasUnsavedChanges, tabDataRef };
     switch (activeTab) {
-      case 'profile': return <TabProfile {...commonProps} />;
-      case 'users': return <TabUsers {...commonProps} />;
-      case 'finance': return <TabFinance {...commonProps} />;
-      case 'customData': return <TabCustomData {...commonProps} />;
-      case 'security': return <TabSecurity {...commonProps} />;
+      case 'profile': return <TabProfile key={resetKey} {...commonProps} />;
+      case 'users': return <TabUsers key={resetKey} {...commonProps} />;
+      case 'finance': return <TabFinance key={resetKey} {...commonProps} />;
+      case 'customData': return <TabCustomData key={resetKey} {...commonProps} />;
+      case 'security': return <TabSecurity key={resetKey} {...commonProps} />;
       default: return null;
     }
   };
@@ -113,20 +114,25 @@ const SettingsPage = () => {
         </div>
       )}
 
-      {/* Standard Header Section matching other dashboard pages */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-display-sm font-display-sm text-on-surface m-0">Pengaturan</h1>
-          <p className="font-body-md text-on-surface-variant m-0 mt-xs">Kelola konfigurasi sistem dan preferensi organisasi.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-on-surface flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-primary text-3xl">settings</span>
+            Pengaturan
+          </h1>
+          <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
+            Kelola konfigurasi sistem, profil masjid, dan preferensi organisasi.
+          </p>
         </div>
-        <div className="flex w-full sm:w-auto gap-3">
+        <div className="flex w-full sm:w-auto items-center gap-3 shrink-0 self-start sm:self-auto">
           <button 
             onClick={handleCancel}
             disabled={!hasUnsavedChanges}
-            className={`flex-1 sm:flex-none px-4 py-2 rounded-lg font-label-md transition-colors ${
+            className={`flex-1 sm:flex-none px-4 py-2.5 rounded-xl border font-semibold text-xs sm:text-sm transition-all ${
               hasUnsavedChanges 
-                ? 'bg-surface-variant text-on-surface hover:bg-surface-variant/80 cursor-pointer' 
-                : 'bg-surface-variant/50 text-on-surface-variant cursor-not-allowed opacity-60'
+                ? 'bg-surface-variant/80 border-outline-variant text-on-surface hover:bg-surface-variant cursor-pointer' 
+                : 'bg-surface-variant/40 border-outline-variant/30 text-on-surface-variant/50 cursor-not-allowed opacity-60'
             }`}
           >
             Batal
@@ -134,14 +140,14 @@ const SettingsPage = () => {
           <button 
             onClick={handleSave}
             disabled={!hasUnsavedChanges}
-            className={`flex-1 sm:flex-none px-4 py-2 rounded-lg font-label-md flex items-center justify-center gap-2 transition-colors ${
+            className={`flex-1 sm:flex-none px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
               hasUnsavedChanges
-                ? 'bg-primary text-white hover:bg-primary/90 cursor-pointer shadow-md shadow-primary/20'
-                : 'bg-primary/50 text-white/70 cursor-not-allowed opacity-60'
+                ? 'bg-primary text-slate-950 hover:bg-primary/90 cursor-pointer shadow-md shadow-primary/20'
+                : 'bg-primary/40 text-slate-950/60 cursor-not-allowed opacity-60'
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">save</span>
-            Simpan
+            <span className="material-symbols-outlined text-xl">save</span>
+            Simpan Perubahan
           </button>
         </div>
       </div>

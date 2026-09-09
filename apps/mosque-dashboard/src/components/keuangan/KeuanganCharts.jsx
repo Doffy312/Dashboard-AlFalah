@@ -101,8 +101,42 @@ const CategoryBreakdownList = ({ data, totalSum }) => {
   );
 };
 
+const MONTH_NAMES = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+  'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'
+];
+
 const KeuanganCharts = ({ transactions }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const currentYear = new Date().getFullYear();
+
+  // Dynamic list of available years derived from transactions
+  const availableYears = useMemo(() => {
+    const yearsSet = new Set([currentYear]);
+    (transactions || []).forEach(t => {
+      if (!t.date) return;
+      try {
+        const dateObj = typeof t.date === 'string' ? parseISO(t.date) : new Date(t.date);
+        if (!isNaN(dateObj.getTime())) {
+          yearsSet.add(dateObj.getFullYear());
+        }
+      } catch {
+        // ignore invalid date
+      }
+    });
+    return Array.from(yearsSet).sort((a, b) => b - a);
+  }, [transactions, currentYear]);
+
+  const [selectedYear, setSelectedYear] = useState(() => {
+    return availableYears[0] || currentYear;
+  });
+
+  // Keep selectedYear in sync if availableYears changes
+  useEffect(() => {
+    if (availableYears.length > 0 && !availableYears.includes(selectedYear)) {
+      setSelectedYear(availableYears[0]);
+    }
+  }, [availableYears, selectedYear]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -115,6 +149,18 @@ const KeuanganCharts = ({ transactions }) => {
 
   const chartData = useMemo(() => {
     const monthlyDataMap = new Map();
+    for (let m = 1; m <= 12; m++) {
+      const mStr = String(m).padStart(2, '0');
+      const monthKey = `${selectedYear}-${mStr}`;
+      const monthLabel = MONTH_NAMES[m - 1];
+      monthlyDataMap.set(monthKey, {
+        monthKey,
+        name: monthLabel,
+        Pemasukan: 0,
+        Pengeluaran: 0
+      });
+    }
+
     const incomeByCategory = new Map();
     const expenseByCategory = new Map();
 
@@ -130,32 +176,29 @@ const KeuanganCharts = ({ transactions }) => {
       }
 
       if (isNaN(dateObj.getTime())) return;
+      const tYear = dateObj.getFullYear();
+      if (tYear !== selectedYear) return; // Filter strictly by selected year
 
       const monthKey = format(dateObj, 'yyyy-MM');
-      const monthLabel = format(dateObj, 'MMM yyyy', { locale: id });
-      
-      if (!monthlyDataMap.has(monthKey)) {
-        monthlyDataMap.set(monthKey, {
-          monthKey,
-          name: monthLabel,
-          Pemasukan: 0,
-          Pengeluaran: 0
-        });
-      }
-
-      const monthData = monthlyDataMap.get(monthKey);
       const amount = Number(t.amount) || 0;
 
       // Normalize category (trim & proper capital case)
       let rawCat = (t.category || 'Lainnya').trim();
       const category = rawCat ? (rawCat.charAt(0).toUpperCase() + rawCat.slice(1)) : 'Lainnya';
 
+      if (monthlyDataMap.has(monthKey)) {
+        const monthData = monthlyDataMap.get(monthKey);
+        if (t.type === 'Pemasukan') {
+          monthData.Pemasukan += amount;
+        } else if (t.type === 'Pengeluaran') {
+          monthData.Pengeluaran += amount;
+        }
+      }
+
       if (t.type === 'Pemasukan') {
-        monthData.Pemasukan += amount;
         incomeByCategory.set(category, (incomeByCategory.get(category) || 0) + amount);
         totalIncomeSum += amount;
       } else if (t.type === 'Pengeluaran') {
-        monthData.Pengeluaran += amount;
         expenseByCategory.set(category, (expenseByCategory.get(category) || 0) + amount);
         totalExpenseSum += amount;
       }
@@ -204,7 +247,7 @@ const KeuanganCharts = ({ transactions }) => {
       .sort((a, b) => b.value - a.value);
 
     return { monthlyTrend, incomePie, expensePie, totalIncomeSum, totalExpenseSum, yTicks, maxVal };
-  }, [transactions]);
+  }, [transactions, selectedYear]);
 
   if (!transactions || transactions.length === 0) {
     return (
@@ -223,11 +266,34 @@ const KeuanganCharts = ({ transactions }) => {
     <div className="flex flex-col gap-md sm:gap-lg mb-lg">
       {/* Monthly Cashflow Bar Chart */}
       <div className="glass-panel p-3.5 sm:p-md rounded-xl overflow-hidden">
-        <div className="flex items-center justify-between mb-sm sm:mb-md">
-          <h3 className="font-label-lg sm:text-base font-semibold text-on-surface">Tren Kas Bulanan</h3>
-          <span className="text-[11px] sm:text-xs font-normal text-on-surface-variant bg-surface-variant/40 px-2 py-0.5 rounded-md border border-outline/20">
-            Real-time Data
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-sm sm:mb-md">
+          <div className="flex items-center gap-2">
+            <h3 className="font-label-lg sm:text-base font-semibold text-on-surface">Tren Kas Bulanan</h3>
+            <span className="text-[11px] sm:text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+              Tahun {selectedYear}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 bg-surface-variant/60 border border-outline/30 rounded-lg px-2.5 py-1 text-xs text-on-surface">
+              <span className="text-on-surface-variant font-medium">Tahun:</span>
+              <select
+                id="select-keuangan-year"
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                className="bg-transparent text-on-surface font-semibold focus:outline-none cursor-pointer text-xs"
+              >
+                {availableYears.map((year) => (
+                  <option key={year} value={year} className="bg-surface text-on-surface">
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <span className="text-[11px] sm:text-xs font-normal text-on-surface-variant bg-surface-variant/40 px-2 py-0.5 rounded-md border border-outline/20">
+              Real-time Data
+            </span>
+          </div>
         </div>
 
         {/* Scrollable Container for Mobile to Prevent Clipping */}
@@ -289,9 +355,14 @@ const KeuanganCharts = ({ transactions }) => {
         {/* Income by Category */}
         <div className="glass-panel p-3.5 sm:p-md rounded-xl flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-sm">
-              <h3 className="font-label-lg sm:text-base font-semibold text-on-surface">Pemasukan Berdasarkan Kategori</h3>
-              <span className="text-[11px] sm:text-xs font-semibold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+            <div className="flex items-center justify-between mb-sm gap-2">
+              <div className="min-w-0">
+                <h3 className="font-label-lg sm:text-base font-semibold text-on-surface truncate">
+                  Pemasukan Berdasarkan Kategori (Per-Tahun)
+                </h3>
+                <p className="text-[11px] text-on-surface-variant font-normal">Tahun {selectedYear}</p>
+              </div>
+              <span className="text-[11px] sm:text-xs font-semibold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shrink-0">
                 {chartData.incomePie.length} Kategori
               </span>
             </div>
@@ -316,7 +387,9 @@ const KeuanganCharts = ({ transactions }) => {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="text-on-surface-variant text-xs sm:text-sm">Tidak ada data pemasukan</div>
+                <div className="text-on-surface-variant text-xs sm:text-sm">
+                  Tidak ada data pemasukan pada tahun {selectedYear}
+                </div>
               )}
             </div>
           </div>
@@ -326,9 +399,14 @@ const KeuanganCharts = ({ transactions }) => {
         {/* Expense by Category */}
         <div className="glass-panel p-3.5 sm:p-md rounded-xl flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-sm">
-              <h3 className="font-label-lg sm:text-base font-semibold text-on-surface">Pengeluaran Berdasarkan Kategori</h3>
-              <span className="text-[11px] sm:text-xs font-semibold text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
+            <div className="flex items-center justify-between mb-sm gap-2">
+              <div className="min-w-0">
+                <h3 className="font-label-lg sm:text-base font-semibold text-on-surface truncate">
+                  Pengeluaran Berdasarkan Kategori (Per-Tahun)
+                </h3>
+                <p className="text-[11px] text-on-surface-variant font-normal">Tahun {selectedYear}</p>
+              </div>
+              <span className="text-[11px] sm:text-xs font-semibold text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20 shrink-0">
                 {chartData.expensePie.length > 0 ? `${chartData.expensePie.length} Kategori` : '0 Kategori'}
               </span>
             </div>
@@ -353,7 +431,9 @@ const KeuanganCharts = ({ transactions }) => {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="text-on-surface-variant text-xs sm:text-sm">Tidak ada data pengeluaran</div>
+                <div className="text-on-surface-variant text-xs sm:text-sm">
+                  Tidak ada data pengeluaran pada tahun {selectedYear}
+                </div>
               )}
             </div>
           </div>

@@ -2,6 +2,7 @@ import { useState, useMemo, Suspense, lazy } from 'react';
 import { useTransactions, useTransactionSummary, useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '../hooks/useTransactions';
 import { authClient } from '../lib/auth-client';
 import TransactionForm from '../components/keuangan/TransactionForm';
+import InvoiceModal from '../components/keuangan/InvoiceModal';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import AutoFitText from '../components/common/AutoFitText';
 import { formatCurrency } from '../lib/utils';
@@ -31,6 +32,9 @@ const KeuanganPage = () => {
   
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
+
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+  const [invoiceTransaction, setInvoiceTransaction] = useState(null);
 
   const isKetua = session?.user?.role === 'Ketua';
   const canAdd = ['Ketua', 'Bendahara'].includes(session?.user?.role);
@@ -96,6 +100,11 @@ const KeuanganPage = () => {
       setTransactionToDelete(null);
       setIsDeleteOpen(false);
     }
+  };
+
+  const handleOpenInvoice = (transaction) => {
+    setInvoiceTransaction(transaction);
+    setIsInvoiceOpen(true);
   };
 
   const handleSubmit = (data) => {
@@ -284,7 +293,7 @@ const KeuanganPage = () => {
                 <th className="py-sm px-md font-label-md text-label-md text-on-surface-variant">Deskripsi</th>
                 <th className="py-sm px-md font-label-md text-label-md text-on-surface-variant">Kategori</th>
                 <th className="py-sm px-md font-label-md text-label-md text-on-surface-variant text-right">Nominal</th>
-                {isKetua && <th className="py-sm px-md font-label-md text-label-md text-on-surface-variant text-center">Aksi</th>}
+                <th className="py-sm px-md font-label-md text-label-md text-on-surface-variant text-center">Aksi</th>
               </tr>
             </thead>
             <tbody className="font-body-sm text-body-sm">
@@ -303,29 +312,43 @@ const KeuanganPage = () => {
                     <td className={`py-sm px-md text-right font-semibold ${t.type === 'Pemasukan' ? 'text-emerald-600' : 'text-red-600'}`}>
                       {t.type === 'Pemasukan' ? '+' : '-'} {formatCurrency(t.amount)}
                     </td>
-                    {isKetua && (
-                      <td className="py-sm px-md text-center">
-                        <div className="relative group inline-block">
-                          <button className="text-on-surface-variant hover:text-primary transition-colors cursor-pointer focus:outline-none">
-                            <span className="material-symbols-outlined text-sm">more_vert</span>
-                          </button>
-                          {/* Simple Dropdown for actions using group-hover */}
-                          <div className="absolute right-0 top-full mt-1 w-32 bg-surface border border-outline shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 flex flex-col overflow-hidden">
-                            <button onClick={() => handleEdit(t)} className="px-3 py-2 text-left hover:bg-surface-variant text-sm flex items-center gap-2 text-on-surface">
-                              <span className="material-symbols-outlined text-[16px]">edit</span> Edit
+                    <td className="py-sm px-md text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <button
+                          onClick={() => handleOpenInvoice(t)}
+                          className="px-2.5 py-1 rounded-lg text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-all cursor-pointer flex items-center gap-1 text-xs font-semibold"
+                          title="Cetak Kuitansi / Bukti Transaksi"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">receipt_long</span>
+                          <span className="hidden sm:inline">Kuitansi</span>
+                        </button>
+
+                        {isKetua && (
+                          <div className="relative group inline-block">
+                            <button className="p-1 rounded-lg text-on-surface-variant hover:text-primary transition-colors cursor-pointer focus:outline-none">
+                              <span className="material-symbols-outlined text-[18px]">more_vert</span>
                             </button>
-                            <button onClick={() => handleDeleteClick(t)} className="px-3 py-2 text-left hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 text-sm flex items-center gap-2">
-                              <span className="material-symbols-outlined text-[16px]">delete</span> Hapus
-                            </button>
+                            {/* Simple Dropdown for actions using group-hover */}
+                            <div className="absolute right-0 top-full mt-1 w-36 bg-surface border border-outline shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 flex flex-col overflow-hidden">
+                              <button onClick={() => handleOpenInvoice(t)} className="px-3 py-2 text-left hover:bg-surface-variant text-sm flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium">
+                                <span className="material-symbols-outlined text-[16px]">print</span> Cetak
+                              </button>
+                              <button onClick={() => handleEdit(t)} className="px-3 py-2 text-left hover:bg-surface-variant text-sm flex items-center gap-2 text-on-surface">
+                                <span className="material-symbols-outlined text-[16px]">edit</span> Edit
+                              </button>
+                              <button onClick={() => handleDeleteClick(t)} className="px-3 py-2 text-left hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 text-sm flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[16px]">delete</span> Hapus
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                    )}
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={isKetua ? 5 : 4} className="py-md text-center text-on-surface-variant">
+                  <td colSpan={5} className="py-md text-center text-on-surface-variant">
                     Tidak ada transaksi yang ditemukan.
                   </td>
                 </tr>
@@ -385,6 +408,13 @@ const KeuanganPage = () => {
         onConfirm={confirmDelete}
         title="Hapus Transaksi"
         message={`Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan.`}
+      />
+
+      <InvoiceModal
+        isOpen={isInvoiceOpen}
+        onClose={() => setIsInvoiceOpen(false)}
+        transaction={invoiceTransaction}
+        allTransactions={transactions}
       />
     </>
   );

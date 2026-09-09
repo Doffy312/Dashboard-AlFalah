@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { X } from 'lucide-react';
 
-const Modal = ({ isOpen, onClose, title, children }) => {
+const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }) => {
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') onClose();
@@ -30,7 +30,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
       
       {/* Modal Card */}
       <div 
-        className="relative w-full max-w-lg max-h-[92vh] overflow-hidden flex flex-col bg-surface/95 dark:bg-surface-variant/95 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-[24px] shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-200"
+        className={`relative w-full ${maxWidth} max-h-[92vh] overflow-hidden flex flex-col bg-surface/95 dark:bg-surface-variant/95 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-[24px] shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-200`}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3.5 sm:px-6 sm:py-4 border-b border-white/20 dark:border-white/10 shrink-0">

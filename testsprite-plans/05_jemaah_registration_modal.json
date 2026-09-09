@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/TestSprite/testsprite-cli/v0.9.0/schemas/plan.schema.json",
+  "projectId": "f66794bc-7544-4814-b600-3beab11fce69",
+  "type": "frontend",
+  "name": "Jemaah Public Registration — Open and Verify Form Fields",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /#daftar"
+    },
+    {
+      "type": "assertion",
+      "description": "The registration modal opens with heading 'Formulir Pendaftaran Jemaah'"
+    },
+    {
+      "type": "assertion",
+      "description": "Input fields for 'Nama Lengkap', 'Kategori Jemaah', and 'Alamat Lengkap' are present"
+    },
+    {
+      "type": "action",
+      "description": "Click the close button on the registration modal"
+    },
+    {
+      "type": "assertion",
+      "description": "The modal closes and the main landing page content is interactive"
+    }
+  ]
+}

@@ -33,7 +33,6 @@ const TabCustomData = ({ setHasUnsavedChanges, tabDataRef }) => {
   };
 
   const handleDeleteJemaah = (status) => {
-     
     setJemaahStatus(jemaahStatus.filter(s => s !== status));
     setHasUnsavedChanges(true);
   };

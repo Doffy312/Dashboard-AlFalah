@@ -236,6 +236,24 @@ export class TransactionService {
 
     return result;
   }
+
+  /**
+   * Monthly category distribution for category growth trends on public transparency page.
+   */
+  async getCategoryMonthlyTrends(type: string = "Pemasukan", year: number) {
+    const result = await db
+      .select({
+        month: sql<string>`DATE_FORMAT(${transaction.date}, '%m')`,
+        category: transaction.category,
+        total: sql<string>`sum(${transaction.amount})`,
+      })
+      .from(transaction)
+      .where(sql`${transaction.type} = ${type} AND YEAR(${transaction.date}) = ${year}`)
+      .groupBy(sql`DATE_FORMAT(${transaction.date}, '%m')`, transaction.category)
+      .orderBy(sql`DATE_FORMAT(${transaction.date}, '%m')`);
+
+    return result;
+  }
 }
 
 export const transactionService = new TransactionService();

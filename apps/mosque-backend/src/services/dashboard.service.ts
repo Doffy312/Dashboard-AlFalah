@@ -44,6 +44,13 @@ export class DashboardService {
   }
 
   /**
+   * Monthly category trends for public chart.
+   */
+  async getCategoryTrends(type: string = "Pemasukan", year: number) {
+    return transactionService.getCategoryMonthlyTrends(type, year);
+  }
+
+  /**
    * Recent transactions for the activity timeline.
    */
   async getRecentActivity(limit = 5) {

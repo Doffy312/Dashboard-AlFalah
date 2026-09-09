@@ -1,4 +1,4 @@
-import { useState, Suspense, lazy } from 'react';
+import { useState, Suspense, lazy, useCallback } from 'react';
 import { 
   Wallet, 
   TrendingUp, 
@@ -8,20 +8,25 @@ import {
   Building
 } from 'lucide-react';
 import LandingHeader from '../components/landing/LandingHeader';
+import LandingHeroSection from '../components/landing/LandingHeroSection';
 import LandingFooter from '../components/landing/LandingFooter';
 import IncomeCategoryGrowthChart from '../components/landing/IncomeCategoryGrowthChart';
 import { useSettings } from '../contexts/SettingsContext';
 import { useDashboardSummary } from '../hooks/useDashboard';
 import { useTransactionSummary } from '../hooks/useTransactions';
 import { formatCurrency } from '../lib/utils';
+import { useLandingRealtimeSync } from '../hooks/useLandingRealtimeSync';
 
 const QRInfaqModal = lazy(() => import('../components/landing/QRInfaqModal'));
 
-const LANDING_QUERY_OPTIONS = { staleTime: 60000, gcTime: 300000, refetchOnWindowFocus: false };
+const LANDING_QUERY_OPTIONS = { staleTime: 10_000, gcTime: 300_000, refetchInterval: 60_000, refetchOnWindowFocus: false };
 
 export default function TransparansiKeuanganPage() {
   const { profile, finance } = useSettings();
   const orgName = profile?.orgName || 'Masjid Al-Falah';
+
+  // Enable realtime Socket.IO sync for finance data on this public page
+  useLandingRealtimeSync();
 
   // Fetch real-time financial data
   const { data: summary } = useDashboardSummary(LANDING_QUERY_OPTIONS);
@@ -34,6 +39,10 @@ export default function TransparansiKeuanganPage() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 3500);
   };
+
+  const handleScrollToKas = useCallback(() => {
+    document.getElementById('kas-summary')?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
 
   // Real-Time Computations
   const rawKas = kasSummary?.data || kasSummary || summary?.finance || summary?.keuangan || {};
@@ -48,30 +57,37 @@ export default function TransparansiKeuanganPage() {
         onOpenDonasi={() => setActiveDonasiType('Infaq')}
       />
 
-      {/* Hero Header */}
-      <section className="scroll-mt-24 pt-24 sm:pt-32 pb-6 sm:pb-12 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto text-center relative overflow-hidden">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold uppercase tracking-widest mb-4 sm:mb-6">
-          <Wallet size={14} /> Laporan Transparansi Keuangan Real-Time
-        </div>
-
-        <h1 className="text-2xl xs:text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-4 sm:mb-6 break-words">
-          Transparansi Keuangan
-          <span className="block text-emerald-400 mt-2 sm:mt-3 break-words">{orgName}</span>
-        </h1>
-
-        <p className="text-sm sm:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto mb-6 sm:mb-8 px-2 break-words">
-          Pencatatan kas, arus dana infaq, dan pertumbuhan pemasukan masjid yang dilaporkan secara otomatis demi menjaga amanah jemaah.
-        </p>
-
-        {/* Glow Sphere Decorations — same as beranda */}
-        <div className="hero-decoration">
-          <div className="glow-sphere sphere-1 absolute -top-10 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="glow-sphere sphere-2 absolute top-20 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        </div>
-      </section>
+      {/* Hero Header — Istiqlal Style (matching Beranda) */}
+      <LandingHeroSection
+        id="transparansi-hero"
+        isSubpage
+        subtitle="Laporan Transparansi Keuangan"
+        heading={<>Transparansi Keuangan<span className="block text-emerald-400 mt-2 sm:mt-3">{orgName}</span></>}
+        taglineParts={[
+          { text: 'Amanah Dijaga, ', className: 'text-green' },
+          { text: 'Laporan Terbuka.', className: 'text-gold' },
+        ]}
+        description="Pencatatan kas, arus dana infaq, dan pertumbuhan pemasukan masjid yang dilaporkan secara otomatis demi menjaga amanah jemaah."
+        actions={<>
+          <button
+            onClick={() => setActiveDonasiType('Infaq')}
+            className="hero-cta-istiqlal w-full sm:w-auto"
+          >
+            <HeartHandshake size={16} />
+            <span>Infaq Sekarang</span>
+            <ArrowRight size={16} />
+          </button>
+          <button
+            onClick={handleScrollToKas}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white/10 hover:bg-white/15 text-white text-xs sm:text-sm font-semibold border border-white/15 backdrop-blur-md transition-all active:scale-[0.98]"
+          >
+            <Wallet size={16} /> <span>Lihat Laporan Kas</span>
+          </button>
+        </>}
+      />
 
       {/* Real-time Kas Summary Cards */}
-      <section className="py-6 sm:py-8 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
+      <section id="kas-summary" className="py-6 sm:py-8 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto scroll-mt-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Ringkasan Kas Card — matching beranda style */}
           <div className="p-5 sm:p-8 rounded-2xl border border-emerald-500/20 bg-white/5 text-left backdrop-blur-md flex flex-col justify-between">
