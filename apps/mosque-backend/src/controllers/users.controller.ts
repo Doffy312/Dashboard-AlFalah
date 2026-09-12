@@ -58,6 +58,10 @@ export class UsersController {
   async delete(req: Request, res: Response) {
     try {
       const id = req.params.id as string;
+      if (req.user?.id === id) {
+        res.status(400).json({ error: "Anda tidak dapat menghapus akun Anda sendiri demi keamanan." });
+        return;
+      }
       await usersService.delete(id);
       res.json({ message: "User deleted" });
     } catch (error: any) {

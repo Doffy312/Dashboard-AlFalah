@@ -35,6 +35,7 @@ export const program = mysqlTable("programs", {
 }, (table) => ({
   statusIdx: index("status_idx").on(table.status),
   dateIdx: index("date_idx").on(table.date),
+  createdAtIdx: index("program_created_at_idx").on(table.createdAt),
 }));
 
 export const programRelations = relations(program, ({ one, many }) => ({

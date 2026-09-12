@@ -31,6 +31,7 @@ export const jemaah = mysqlTable("jemaah", {
 }, (table) => ({
   nameIdx: index("name_idx").on(table.name),
   categoryIdx: index("category_idx").on(table.category),
+  createdAtIdx: index("jemaah_created_at_idx").on(table.createdAt),
 }));
 
 export const jemaahRelations = relations(jemaah, ({ one }) => ({

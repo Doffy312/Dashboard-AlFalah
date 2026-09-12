@@ -76,7 +76,7 @@ export default function LandingHeader({ onOpenDonasi, onOpenRegistration }) {
 
   // Close mobile menu on route change
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Sync UI with route change
+     
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 

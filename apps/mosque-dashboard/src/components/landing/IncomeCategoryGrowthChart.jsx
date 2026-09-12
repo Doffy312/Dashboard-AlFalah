@@ -109,7 +109,6 @@ export default function IncomeCategoryGrowthChart() {
   // Calculate real month-over-month growth for category badges
   const categoryGrowthMap = useMemo(() => {
     if (!Array.isArray(trendsRawData) || trendsRawData.length === 0) return {};
-    const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
     const currentMonthNum = new Date().getMonth() + 1;
     const curMonthStr = String(currentMonthNum).padStart(2, '0');
     const prevMonthStr = String(currentMonthNum > 1 ? currentMonthNum - 1 : 12).padStart(2, '0');

@@ -52,7 +52,7 @@ const QRInfaqModal = ({ isOpen, onClose, defaultType = 'Infaq', onSuccessCallbac
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Legitimate modal state reset
+       
       setDonasiType(defaultType || 'Infaq');
       setTransactionSuccess(null);
       setShowSimulasiForm(false);

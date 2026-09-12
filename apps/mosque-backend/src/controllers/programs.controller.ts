@@ -5,10 +5,11 @@ import { calendarService } from "../services/calendar.service.js";
 
 export class ProgramController {
   async findAll(req: Request, res: Response) {
-    const { search, status } = req.query;
+    const { search, status, limit } = req.query;
     const result = await programService.findAll({
       search: search as string,
       status: status as string,
+      limit: limit ? Number(limit) : undefined,
     });
     res.json(result);
   }

@@ -4,6 +4,7 @@ import {
   text,
   varchar,
   timestamp,
+  index,
 } from "drizzle-orm/mysql-core";
 
 // ─── Audit Log Table ───────────────────────────────────────────────────
@@ -21,4 +22,9 @@ export const auditLog = mysqlTable("audit_log", {
   ipAddress: varchar("ip_address", { length: 45 }),      // Mampu menyimpan IPv4 dan IPv6
   userAgent: varchar("user_agent", { length: 255 }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+}, (table) => ({
+  actionIdx: index("audit_action_idx").on(table.action),
+  entityIdx: index("audit_entity_idx").on(table.entity),
+  userIdIdx: index("audit_user_id_idx").on(table.userId),
+  createdAtIdx: index("audit_created_at_idx").on(table.createdAt),
+}));

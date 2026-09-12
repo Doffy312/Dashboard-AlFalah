@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createQurbanTahunSchema = z.object({
-  tahun: z.number({ required_error: "Tahun harus diisi" }).int().min(2000).max(2100),
+  tahun: z.coerce.number({ required_error: "Tahun harus diisi" }).int().min(2000).max(2100),
   statusAktif: z.boolean().optional().default(true),
 });
 
@@ -9,7 +9,7 @@ export const createQurbanKelompokSchema = z.object({
   qurbanTahunId: z.string().min(1, "Tahun Qurban ID harus diisi"),
   namaKelompok: z.string().trim().min(1, "Nama Kelompok harus diisi"),
   jenisHewan: z.enum(["Sapi", "Kambing"]).default("Sapi"),
-  nomorUrut: z.number().int().optional().default(1),
+  nomorUrut: z.coerce.number().int().optional().default(1),
 });
 
 export const createPequrbanSchema = z.object({

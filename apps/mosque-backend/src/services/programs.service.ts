@@ -22,13 +22,14 @@ export interface CreateProgramInput {
 export interface ProgramFilters {
   search?: string;
   status?: string;
+  limit?: number;
 }
 
 // ─── Service ─────────────────────────────────────────────────────────
 
 export class ProgramService {
   async findAll(filters: ProgramFilters = {}) {
-    const { search, status } = filters;
+    const { search, status, limit } = filters;
     const conditions = [];
 
     if (search) {
@@ -41,12 +42,14 @@ export class ProgramService {
     }
 
     const where = conditions.length > 0 ? and(...conditions) : undefined;
+    const safeLimit = Math.min(Number(limit) || 1000, 2000);
 
     const data = await db
       .select()
       .from(program)
       .where(where)
-      .orderBy(desc(program.createdAt));
+      .orderBy(desc(program.createdAt))
+      .limit(safeLimit);
 
     return data;
   }

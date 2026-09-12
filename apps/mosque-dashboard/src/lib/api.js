@@ -1,4 +1,16 @@
-const API_BASE = "/api";
+function getApiBase() {
+  const raw = import.meta.env.VITE_API_URL;
+  if (!raw) return "/api";
+  const trimmed = raw.trim().replace(/\/+$/, "");
+  // Backend API routes are all mounted under /api (e.g. /api/transactions)
+  // If the provided URL does not end with /api, append /api
+  if (!trimmed.endsWith("/api")) {
+    return `${trimmed}/api`;
+  }
+  return trimmed;
+}
+
+export const API_BASE = getApiBase();
 
 async function request(path, options = {}) {
   const isFormData = options.body instanceof FormData;

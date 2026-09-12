@@ -12,7 +12,7 @@ const JadwalForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   useEffect(() => {
     if (initialData) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setFormData({
         date: initialData.date,
         role: initialData.role,

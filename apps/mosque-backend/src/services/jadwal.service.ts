@@ -3,8 +3,13 @@ import { db } from "../config/db.js";
 import { jadwalPetugas } from "../db/schema/jadwal.js";
 
 export const jadwalService = {
-  async findAll() {
-    return db.select().from(jadwalPetugas).orderBy(desc(jadwalPetugas.date), desc(jadwalPetugas.createdAt));
+  async findAll(options: { limit?: number } = {}) {
+    const safeLimit = Math.min(Number(options.limit) || 1000, 2000);
+    return db
+      .select()
+      .from(jadwalPetugas)
+      .orderBy(desc(jadwalPetugas.date), desc(jadwalPetugas.createdAt))
+      .limit(safeLimit);
   },
 
   async findById(id: string) {

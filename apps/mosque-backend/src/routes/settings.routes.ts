@@ -3,6 +3,7 @@ import { settingsController } from "../controllers/settings.controller.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
 import { requireRole } from "../middlewares/rbac.middleware.js";
 import { sanitizeBody } from "../middlewares/sanitize.middleware.js";
+import { validateSettingBody } from "../validations/settings.validation.js";
 
 const router = Router();
 
@@ -10,7 +11,14 @@ const router = Router();
 router.get("/", settingsController.getAll);
 router.get("/:key", settingsController.getByKey);
 
-// Protected endpoints: Updating settings requires auth & manager roles
-router.put("/:key", requireAuth, requireRole("Ketua", "Bendahara", "Sekretaris", "Pengurus"), sanitizeBody, settingsController.update);
+// Protected endpoints: Updating settings requires auth & manager roles + Zod validation
+router.put(
+  "/:key",
+  requireAuth,
+  requireRole("Ketua", "Bendahara", "Sekretaris", "Pengurus"),
+  sanitizeBody,
+  validateSettingBody,
+  settingsController.update
+);
 
 export default router;

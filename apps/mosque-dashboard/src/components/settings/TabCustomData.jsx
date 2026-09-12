@@ -11,7 +11,7 @@ const TabCustomData = ({ setHasUnsavedChanges, tabDataRef }) => {
 
   // Sync from context when it changes
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setJemaahStatus([...customData.jemaahStatus]);
     setProkerStatus([...customData.prokerStatus]);
   }, [customData]);

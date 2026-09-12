@@ -4,11 +4,12 @@ import { getSocketIO } from "../lib/socket.js";
 
 export class InventarisController {
   async findAll(req: Request, res: Response) {
-    const { search, condition, location } = req.query;
+    const { search, condition, location, limit } = req.query;
     const result = await inventarisService.findAll({
       search: search as string,
       condition: condition as string,
       location: location as string,
+      limit: limit ? Number(limit) : undefined,
     });
     res.json(result);
   }

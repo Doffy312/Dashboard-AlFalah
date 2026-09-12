@@ -2,10 +2,12 @@ import { useState, useMemo, Suspense, lazy } from 'react';
 import { useTransactions, useTransactionSummary, useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '../hooks/useTransactions';
 import { authClient } from '../lib/auth-client';
 import TransactionForm from '../components/keuangan/TransactionForm';
-import InvoiceModal from '../components/keuangan/InvoiceModal';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import AutoFitText from '../components/common/AutoFitText';
 import { formatCurrency } from '../lib/utils';
+
+// Lazy-load InvoiceModal — only downloaded when generating/previewing an invoice
+const InvoiceModal = lazy(() => import('../components/keuangan/InvoiceModal'));
 
 // Lazy-load the charts component — recharts (~400KB) only downloads
 // when this page renders, not on initial app load.
@@ -410,12 +412,16 @@ const KeuanganPage = () => {
         message={`Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan.`}
       />
 
-      <InvoiceModal
-        isOpen={isInvoiceOpen}
-        onClose={() => setIsInvoiceOpen(false)}
-        transaction={invoiceTransaction}
-        allTransactions={transactions}
-      />
+      {isInvoiceOpen && (
+        <Suspense fallback={null}>
+          <InvoiceModal
+            isOpen={isInvoiceOpen}
+            onClose={() => setIsInvoiceOpen(false)}
+            transaction={invoiceTransaction}
+            allTransactions={transactions}
+          />
+        </Suspense>
+      )}
     </>
   );
 };

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../../contexts/SettingsContext';
 
 const NAV_LINKS = [
@@ -12,7 +11,6 @@ const NAV_LINKS = [
 ];
 
 const LandingNav = ({ orgName: customOrgName, logo: customLogo }) => {
-  const navigate = useNavigate();
   const { profile } = useSettings();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 

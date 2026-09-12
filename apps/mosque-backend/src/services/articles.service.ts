@@ -25,16 +25,21 @@ function calculateReadTime(content: string): string {
 function deriveTypeFromCategory(category: string): string {
   const catLower = (category || "").toLowerCase();
   if (catLower.includes("edukasi") || catLower.includes("artikel")) return "edukasi";
-  if (catLower.includes("mendatang") || catLower.includes("agenda")) return "mendatang";
   return "terlaksana";
 }
 
+export interface ArticleFilters {
+  limit?: number;
+}
+
 export class ArticlesService {
-  async findAll() {
+  async findAll(filters: ArticleFilters = {}) {
+    const safeLimit = Math.min(Number(filters.limit) || 100, 500);
     return await db
       .select()
       .from(article)
-      .orderBy(desc(article.date));
+      .orderBy(desc(article.date))
+      .limit(safeLimit);
   }
 
   async findById(id: string) {

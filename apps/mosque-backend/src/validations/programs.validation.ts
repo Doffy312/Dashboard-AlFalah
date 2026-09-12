@@ -10,3 +10,9 @@ export const createProgramSchema = z.object({
   description: z.string().trim().min(1, "Deskripsi tidak boleh kosong").max(2000, "Deskripsi terlalu panjang"),
   evaluation: z.string().trim().max(2000, "Evaluasi terlalu panjang").optional(),
 });
+
+export const updateProgramStatusSchema = z.object({
+  status: z.enum(["Direncanakan", "Sedang Berjalan", "Selesai", "Dibatalkan"], {
+    errorMap: () => ({ message: "Status harus salah satu dari: Direncanakan, Sedang Berjalan, Selesai, Dibatalkan" }),
+  }),
+});

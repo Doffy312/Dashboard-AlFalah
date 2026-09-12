@@ -9,7 +9,7 @@ const TabProfile = ({ setHasUnsavedChanges, tabDataRef }) => {
 
   // When context profile changes (e.g. cancel/reset), sync local state
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setFormData({ ...profile });
   }, [profile]);
 

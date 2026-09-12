@@ -26,7 +26,7 @@ const ArticleFormModal = ({ isOpen, onClose, onSubmit, initialData, isSubmitting
 
   useEffect(() => {
     if (initialData) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Legitimate form reset on modal open
+       
       setFormData({
         title: initialData.title || '',
         category: initialData.category || 'Kegiatan Terlaksana',

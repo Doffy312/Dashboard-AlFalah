@@ -22,7 +22,7 @@ const JemaahForm = ({ isOpen, onClose, onSubmit, initialData, isPending = false 
 
   useEffect(() => {
     if (initialData) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Legitimate form reset on modal open
+       
       setFormData({
         name: initialData.name || '',
         address: initialData.address || '',

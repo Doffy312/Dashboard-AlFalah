@@ -21,4 +21,5 @@ export const ziswafTransaction = mysqlTable("ziswaf_transactions", {
 }, (table) => ({
   dateIdx: index("ziswaf_date_idx").on(table.date),
   typeIdx: index("ziswaf_type_idx").on(table.type),
+  createdAtIdx: index("ziswaf_created_at_idx").on(table.createdAt),
 }));

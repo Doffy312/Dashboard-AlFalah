@@ -5,7 +5,6 @@ import {
 } from 'recharts';
 import { formatCurrency } from '../../lib/utils';
 import { format, parseISO } from 'date-fns';
-import { id } from 'date-fns/locale';
 
 // Dynamic vibrant color palette for flexible categories
 const COLORS = [

@@ -6,6 +6,7 @@ import {
   varchar,
   int,
   timestamp,
+  index,
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 import { user } from "./auth.js";
@@ -25,7 +26,12 @@ export const inventaris = mysqlTable("inventaris", {
   }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (table) => ({
+  nameIdx: index("inventaris_name_idx").on(table.name),
+  dateIdx: index("inventaris_date_idx").on(table.date),
+  locationIdx: index("inventaris_location_idx").on(table.location),
+  createdAtIdx: index("inventaris_created_at_idx").on(table.createdAt),
+}));
 
 export const inventarisRelations = relations(inventaris, ({ one }) => ({
   creator: one(user, {

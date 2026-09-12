@@ -16,7 +16,8 @@ export class UsersService {
         emailVerified: user.emailVerified,
         createdAt: user.createdAt,
       })
-      .from(user);
+      .from(user)
+      .limit(500);
     return data;
   }
 
@@ -152,6 +153,16 @@ export class UsersService {
   }
 
   async updateRole(id: string, role: string) {
+    const target = await db.select().from(user).where(eq(user.id, id));
+    if (!target.length) {
+      throw new Error("Pengguna tidak ditemukan.");
+    }
+    if (target[0].role === "Ketua" && role !== "Ketua") {
+      const ketuaList = await db.select().from(user).where(eq(user.role, "Ketua"));
+      if (ketuaList.length <= 1) {
+        throw new Error("Tidak dapat mengubah peran Ketua terakhir. Harus ada minimal satu Ketua dalam sistem.");
+      }
+    }
     const result = await db
       .update(user)
       .set({ role, updatedAt: new Date() })
@@ -160,6 +171,16 @@ export class UsersService {
   }
 
   async delete(id: string) {
+    const target = await db.select().from(user).where(eq(user.id, id));
+    if (!target.length) {
+      throw new Error("Pengguna tidak ditemukan.");
+    }
+    if (target[0].role === "Ketua") {
+      const ketuaList = await db.select().from(user).where(eq(user.role, "Ketua"));
+      if (ketuaList.length <= 1) {
+        throw new Error("Tidak dapat menghapus Ketua terakhir. Harus ada minimal satu Ketua dalam sistem.");
+      }
+    }
     const result = await db.delete(user).where(eq(user.id, id));
     return result[0];
   }

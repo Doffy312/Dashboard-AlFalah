@@ -18,13 +18,14 @@ export interface InventarisFilters {
   search?: string;
   condition?: string;
   location?: string;
+  limit?: number;
 }
 
 // ─── Service ─────────────────────────────────────────────────────────
 
 export class InventarisService {
   async findAll(filters: InventarisFilters = {}) {
-    const { search, condition, location } = filters;
+    const { search, condition, location, limit } = filters;
     const conditions = [];
 
     if (search) {
@@ -38,12 +39,14 @@ export class InventarisService {
     }
 
     const where = conditions.length > 0 ? and(...conditions) : undefined;
+    const safeLimit = Math.min(Number(limit) || 1000, 2000);
 
     const data = await db
       .select()
       .from(inventaris)
       .where(where)
-      .orderBy(desc(inventaris.createdAt));
+      .orderBy(desc(inventaris.createdAt))
+      .limit(safeLimit);
 
     return data;
   }

@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
-import { formatCurrency } from '../../lib/utils';
 import { terbilang, generateReceiptNumber } from '../../lib/terbilang';
 
 const InvoicePreview = ({
@@ -19,13 +18,11 @@ const InvoicePreview = ({
     return generateReceiptNumber(transaction, allTransactions);
   }, [transaction, allTransactions]);
 
-  if (!transaction) return null;
-
-  const isPemasukan = transaction.type === 'Pemasukan';
+  const isPemasukan = transaction?.type === 'Pemasukan';
 
   // Robust date formatting without UTC timezone day-shift
   const formattedDate = useMemo(() => {
-    if (!transaction.date) return '';
+    if (!transaction?.date) return '';
     try {
       const cleanDate = String(transaction.date).split('T')[0];
       const parts = cleanDate.split('-');
@@ -47,33 +44,30 @@ const InvoicePreview = ({
     } catch {
       return String(transaction.date);
     }
-  }, [transaction.date]);
-
-  const terbilangText = terbilang(transaction.amount);
-  const signatures = finance?.signatures || {};
+  }, [transaction?.date]);
 
   // Intelligent detection for donor or recipient name (excluding 'untuk' which indicates purpose)
   const detectedParty = useMemo(() => {
     if (customPartyName && customPartyName.trim()) {
       return customPartyName.trim();
     }
-    const desc = transaction.description || '';
+    const desc = transaction?.description || '';
 
     // 1. Scan QR pattern: e.g. "Donasi Infaq Scan QR - Bpk. Hendra Pratama (Kajian)"
-    const qrMatch = desc.match(/(?:Scan QR|QRIS)\s*-\s*([A-Za-z0-9\s.]+?)(?:\(|\-|,|$)/i);
+    const qrMatch = desc.match(/(?:Scan QR|QRIS)\s*-\s*([A-Za-z0-9\s.]+?)(?:\(|-|,|$)/i);
     if (qrMatch && qrMatch[1]?.trim()) {
       return qrMatch[1].trim();
     }
 
     // 2. Preposition pattern: "dari X", "kepada X", "oleh X", "a/n X", "atas nama X"
-    const prepMatch = desc.match(/(?:dari|kepada|oleh|a\/n|atas nama)\s+([A-Za-z0-9\s.]+?)(?:\(|\-|,|$)/i);
+    const prepMatch = desc.match(/(?:dari|kepada|oleh|a\/n|atas nama)\s+([A-Za-z0-9\s.]+?)(?:\(|-|,|$)/i);
     if (prepMatch && prepMatch[1]?.trim()) {
       return prepMatch[1].trim();
     }
 
     // 3. Fallback
     return isPemasukan ? 'Jemaah / Donatur' : 'Penerima Kas / Rekanan';
-  }, [transaction.description, isPemasukan, customPartyName]);
+  }, [transaction?.description, isPemasukan, customPartyName]);
 
   // Intelligent city detection for Titimangsa tempat
   const detectedCity = useMemo(() => {
@@ -109,6 +103,10 @@ const InvoicePreview = ({
     }).format(amt);
   }, [transaction?.amount]);
 
+  if (!transaction) return null;
+
+  const terbilangText = terbilang(transaction.amount);
+  const signatures = finance?.signatures || {};
   const isA5 = paperSize === 'a5';
 
   return (

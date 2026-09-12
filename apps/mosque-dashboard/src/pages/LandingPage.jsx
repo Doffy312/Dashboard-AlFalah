@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   Users, 
   Wallet, 
@@ -26,7 +26,6 @@ import { useTransactionSummary } from '../hooks/useTransactions';
 import { useJemaahSummary } from '../hooks/useJemaah';
 import { useArticles } from '../hooks/useArticles';
 import { formatCurrency } from '../lib/utils';
-import { authClient } from '../lib/auth-client';
 import { MOCK_NEWS_ARTICLES } from '../lib/mockArticles';
 import { useLandingRealtimeSync } from '../hooks/useLandingRealtimeSync';
 
@@ -60,8 +59,12 @@ const formatDate = (dateStr) => {
 };
 
 const LandingPage = () => {
-  const navigate = useNavigate();
   const location = useLocation();
+
+  // State Modals & Toast (declared before useEffect to avoid TDZ)
+  const [activeDonasiType, setActiveDonasiType] = useState(null);
+  const [toastMessage, setToastMessage] = useState('');
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
 
   // Handle hash scrolling (e.g. /#kontak) & direct modal trigger (e.g. /#daftar)
   useEffect(() => {
@@ -84,8 +87,6 @@ const LandingPage = () => {
 
   // Context & Real-Time Hooks
   const { profile } = useSettings();
-  const { data: session } = authClient.useSession();
-  const currentUser = session?.user;
 
   // Enable realtime Socket.IO sync for finance data on this public page
   useLandingRealtimeSync();
@@ -97,11 +98,6 @@ const LandingPage = () => {
   const articlesList = (articlesFromApi && articlesFromApi.length > 0) ? articlesFromApi : MOCK_NEWS_ARTICLES;
 
   const orgName = profile?.orgName || 'Masjid Al-Falah';
-
-  // State Modals & Toast
-  const [activeDonasiType, setActiveDonasiType] = useState(null);
-  const [toastMessage, setToastMessage] = useState('');
-  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e) => {

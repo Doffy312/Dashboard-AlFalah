@@ -37,12 +37,14 @@ export class ContactMessagesService {
     }
   }
 
-  async findAll() {
+  async findAll(options: { limit?: number } = {}) {
     await this.ensureTable();
+    const safeLimit = Math.min(Number(options.limit) || 500, 1000);
     const data = await db
       .select()
       .from(contactMessages)
-      .orderBy(desc(contactMessages.createdAt));
+      .orderBy(desc(contactMessages.createdAt))
+      .limit(safeLimit);
     return data;
   }
 

@@ -3,6 +3,14 @@ import { qurbanController } from "../controllers/qurban.controller.js";
 import { asyncHandler } from "../lib/asyncHandler.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
 import { requireRole } from "../middlewares/rbac.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import { sanitizeBody } from "../middlewares/sanitize.middleware.js";
+import {
+  createQurbanTahunSchema,
+  createQurbanKelompokSchema,
+  createPequrbanSchema,
+  updatePequrbanSchema,
+} from "../validations/qurban.validation.js";
 
 const router = Router();
 
@@ -14,18 +22,42 @@ router.get("/summary", asyncHandler(qurbanController.getSummary));
 
 // Qurban Years
 router.get("/tahun", asyncHandler(qurbanController.getAllTahun));
-router.post("/tahun", requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"), asyncHandler(qurbanController.createTahun));
+router.post(
+  "/tahun",
+  requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"),
+  sanitizeBody,
+  validate(createQurbanTahunSchema),
+  asyncHandler(qurbanController.createTahun)
+);
 
 // Qurban Groups
 router.get("/kelompok", asyncHandler(qurbanController.getKelompok));
-router.post("/kelompok", requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"), asyncHandler(qurbanController.createKelompok));
+router.post(
+  "/kelompok",
+  requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"),
+  sanitizeBody,
+  validate(createQurbanKelompokSchema),
+  asyncHandler(qurbanController.createKelompok)
+);
 router.delete("/kelompok/:id", requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"), asyncHandler(qurbanController.deleteKelompok));
 
 // Pequrban Data CRUD
 router.get("/", asyncHandler(qurbanController.getAll));
 router.get("/:id", asyncHandler(qurbanController.getById));
-router.post("/", requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"), asyncHandler(qurbanController.create));
-router.put("/:id", requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"), asyncHandler(qurbanController.update));
+router.post(
+  "/",
+  requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"),
+  sanitizeBody,
+  validate(createPequrbanSchema),
+  asyncHandler(qurbanController.create)
+);
+router.put(
+  "/:id",
+  requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"),
+  sanitizeBody,
+  validate(updatePequrbanSchema),
+  asyncHandler(qurbanController.update)
+);
 router.delete("/:id", requireRole("Ketua", "Sekretaris", "Bendahara", "Pengurus"), asyncHandler(qurbanController.remove));
 
 export default router;

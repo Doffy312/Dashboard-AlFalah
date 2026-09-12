@@ -6,8 +6,9 @@ import {
 } from "../validations/contactMessages.validation.js";
 
 export class ContactMessagesController {
-  async getAll(req: Request, res: Response, next: NextFunction) {
-    const data = await contactMessagesService.findAll();
+  async getAll(req: Request, res: Response, _next: NextFunction) {
+    const { limit } = req.query;
+    const data = await contactMessagesService.findAll({ limit: limit ? Number(limit) : undefined });
     res.json(data);
   }
 

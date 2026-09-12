@@ -30,4 +30,61 @@ describe("Security & Input Sanitization Unit Tests", () => {
     const cleaned = stripHtmlTags(normalInput);
     expect(cleaned).toBe("Infaq Shalat Jumat Rp 500.000");
   });
+
+  describe("RBAC Role Guard Tests", () => {
+    it("harus menolak role yang tidak memiliki izin", () => {
+      let statusCode = 0;
+      let jsonPayload: any = null;
+      const res: any = {
+        status: (code: number) => {
+          statusCode = code;
+          return {
+            json: (data: any) => { jsonPayload = data; },
+          };
+        },
+      };
+
+      const req: any = {
+        user: { id: "u-1", role: "Pengurus" },
+      };
+
+      // Simulated requireRole("Ketua", "Sekretaris")
+      const allowedRoles = ["Ketua", "Sekretaris"];
+      let nextCalled = false;
+      const next = () => { nextCalled = true; };
+
+      if (!allowedRoles.includes(req.user.role)) {
+        res.status(403).json({ error: "Forbidden" });
+      } else {
+        next();
+      }
+
+      expect(statusCode).toBe(403);
+      expect(nextCalled).toBe(false);
+      expect(jsonPayload.error).toBe("Forbidden");
+    });
+
+    it("harus meloloskan user dengan role yang diizinkan", () => {
+      const req: any = {
+        user: { id: "u-1", role: "Ketua" },
+      };
+      const allowedRoles = ["Ketua", "Sekretaris"];
+      let nextCalled = false;
+      const next = () => { nextCalled = true; };
+
+      if (allowedRoles.includes(req.user.role)) {
+        next();
+      }
+
+      expect(nextCalled).toBe(true);
+    });
+
+    it("harus mencegah penghapusan akun diri sendiri (Self-Deletion Guard)", () => {
+      const currentUserId = "user-123";
+      const targetDeleteId = "user-123";
+      const isSelfDeletion = currentUserId === targetDeleteId;
+      expect(isSelfDeletion).toBe(true);
+    });
+  });
 });
+

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useLayoutEffect, useEffect, useCallback } from 'react';
+import { useRef, useState, useLayoutEffect, useEffect, useCallback } from 'react';
 
 /**
  * AutoFitText component
@@ -12,6 +12,8 @@ import React, { useRef, useState, useLayoutEffect, useEffect, useCallback } from
  * @param {string} className - Additional CSS classes
  * @param {string} as - Element tag name ('div', 'h3', 'span', etc.)
  */
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
 export default function AutoFitText({
   children,
   maxFontSize = 24,
@@ -67,16 +69,15 @@ export default function AutoFitText({
     }
   }, [children, maxFontSize, minFontSize]);
 
-  const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
-
   useIsomorphicLayoutEffect(() => {
     calculateFit();
 
-    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+    const element = containerRef.current;
+    if (typeof ResizeObserver !== 'undefined' && element) {
       const observer = new ResizeObserver(() => {
         calculateFit();
       });
-      observer.observe(containerRef.current);
+      observer.observe(element);
       return () => observer.disconnect();
     }
   }, [calculateFit]);

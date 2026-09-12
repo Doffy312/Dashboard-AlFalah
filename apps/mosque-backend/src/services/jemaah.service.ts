@@ -30,13 +30,15 @@ export interface PublicRegisterInput {
 export interface JemaahFilters {
   search?: string;
   category?: string;
+  limit?: number;
+  page?: number;
 }
 
 // ─── Service ─────────────────────────────────────────────────────────
 
 export class JemaahService {
   async findAll(filters: JemaahFilters = {}) {
-    const { search, category } = filters;
+    const { search, category, limit } = filters;
     const conditions = [];
 
     if (search) {
@@ -52,12 +54,14 @@ export class JemaahService {
     }
 
     const where = conditions.length > 0 ? and(...conditions) : undefined;
+    const safeLimit = Math.min(Number(limit) || 1000, 2000);
 
     const data = await db
       .select()
       .from(jemaah)
       .where(where)
-      .orderBy(desc(jemaah.createdAt));
+      .orderBy(desc(jemaah.createdAt))
+      .limit(safeLimit);
 
     return data;
   }

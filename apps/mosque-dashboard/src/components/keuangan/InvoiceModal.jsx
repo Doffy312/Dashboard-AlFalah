@@ -4,8 +4,6 @@ import Modal from '../common/Modal';
 import InvoicePreview from './InvoicePreview';
 import toast from 'react-hot-toast';
 import { generateReceiptNumber } from '../../lib/terbilang';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 
 const InvoiceModal = ({ isOpen, onClose, transaction, allTransactions = [] }) => {
   const [paperSize, setPaperSize] = useState('a4');
@@ -31,11 +29,11 @@ const InvoiceModal = ({ isOpen, onClose, transaction, allTransactions = [] }) =>
     const desc = transaction.description || '';
     const isPemasukan = transaction.type === 'Pemasukan';
 
-    const qrMatch = desc.match(/(?:Scan QR|QRIS)\s*-\s*([A-Za-z0-9\s.]+?)(?:\(|\-|,|$)/i);
+    const qrMatch = desc.match(/(?:Scan QR|QRIS)\s*-\s*([A-Za-z0-9\s.]+?)(?:\(|-|,|$)/i);
     if (qrMatch && qrMatch[1]?.trim()) {
       setPartyName(qrMatch[1].trim());
     } else {
-      const prepMatch = desc.match(/(?:dari|kepada|oleh|a\/n|atas nama)\s+([A-Za-z0-9\s.]+?)(?:\(|\-|,|$)/i);
+      const prepMatch = desc.match(/(?:dari|kepada|oleh|a\/n|atas nama)\s+([A-Za-z0-9\s.]+?)(?:\(|-|,|$)/i);
       if (prepMatch && prepMatch[1]?.trim()) {
         setPartyName(prepMatch[1].trim());
       } else {
@@ -51,7 +49,7 @@ const InvoiceModal = ({ isOpen, onClose, transaction, allTransactions = [] }) =>
 
   const handlePrint = () => {
     const originalTitle = document.title;
-    const cleanNo = (receiptNo || 'KWT').replace(/[\/\\]/g, '-');
+    const cleanNo = (receiptNo || 'KWT').replace(/[/\\]/g, '-');
     document.title = `Kwitansi-${cleanNo}`;
     window.print();
     setTimeout(() => {
@@ -68,6 +66,13 @@ const InvoiceModal = ({ isOpen, onClose, transaction, allTransactions = [] }) =>
     let wrapper = null;
 
     try {
+      // Dynamic import jspdf & html2canvas on-demand only when downloading
+      const [html2canvasModule, { jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ]);
+      const html2canvas = html2canvasModule.default || html2canvasModule;
+
       // Small pause to allow React state update & isExportMode to propagate
       await new Promise((resolve) => setTimeout(resolve, 200));
 
@@ -186,7 +191,7 @@ const InvoiceModal = ({ isOpen, onClose, transaction, allTransactions = [] }) =>
 
       pdf.addImage(imgData, 'PNG', posX, posY, imgWidth, imgHeight, undefined, 'FAST');
 
-      const cleanNo = (receiptNo || 'KWT').replace(/[\/\\]/g, '-');
+      const cleanNo = (receiptNo || 'KWT').replace(/[/\\]/g, '-');
       const filename = `Kwitansi-${cleanNo}.pdf`;
 
       pdf.save(filename);

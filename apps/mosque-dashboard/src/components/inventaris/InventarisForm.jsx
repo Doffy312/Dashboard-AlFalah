@@ -13,7 +13,7 @@ const InventarisForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   useEffect(() => {
     if (initialData) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Legitimate form reset on modal open
+       
       setFormData({
         name: initialData.name || '',
         quantity: initialData.quantity !== undefined && initialData.quantity !== null ? String(initialData.quantity) : '',

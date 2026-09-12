@@ -1,4 +1,4 @@
-import { eq, desc, asc, count, sql, and, like } from "drizzle-orm";
+import { eq, desc, asc, count, sql, and, like, inArray } from "drizzle-orm";
 import { db } from "../config/db.js";
 import { qurbanTahun, qurbanKelompok, pequrban } from "../db/schema/qurban.js";
 import { jemaah } from "../db/schema/jemaah.js";
@@ -43,38 +43,39 @@ export const qurbanService = {
       });
     }
 
-    // Yearly trend chart dataset
+    // Yearly trend chart dataset — optimized single aggregation query (no N+1)
     const allYears = await db.select().from(qurbanTahun).orderBy(asc(qurbanTahun.tahun));
-    const yearlyTrend = await Promise.all(
-      allYears.map(async (y) => {
-        const pequrbanInYear = await db
-          .select({
-            jenisHewan: pequrban.jenisHewan,
-            cnt: count(pequrban.id),
-          })
-          .from(pequrban)
-          .where(eq(pequrban.qurbanTahunId, y.id))
-          .groupBy(pequrban.jenisHewan);
-
-        let total = 0;
-        let sapi = 0;
-        let kambing = 0;
-
-        pequrbanInYear.forEach((row) => {
-          const c = Number(row.cnt);
-          total += c;
-          if (row.jenisHewan === 'Sapi') sapi += c;
-          if (row.jenisHewan === 'Kambing') kambing += c;
-        });
-
-        return {
-          tahun: y.tahun,
-          total,
-          sapi,
-          kambing,
-        };
+    const yearlyCounts = await db
+      .select({
+        qurbanTahunId: pequrban.qurbanTahunId,
+        jenisHewan: pequrban.jenisHewan,
+        cnt: count(pequrban.id),
       })
-    );
+      .from(pequrban)
+      .groupBy(pequrban.qurbanTahunId, pequrban.jenisHewan);
+
+    const countsByYear = new Map<string, { sapi: number; kambing: number; total: number }>();
+    for (const row of yearlyCounts) {
+      const yearId = row.qurbanTahunId;
+      if (!countsByYear.has(yearId)) {
+        countsByYear.set(yearId, { sapi: 0, kambing: 0, total: 0 });
+      }
+      const entry = countsByYear.get(yearId)!;
+      const c = Number(row.cnt);
+      entry.total += c;
+      if (row.jenisHewan === "Sapi") entry.sapi += c;
+      if (row.jenisHewan === "Kambing") entry.kambing += c;
+    }
+
+    const yearlyTrend = allYears.map((y) => {
+      const entry = countsByYear.get(y.id) || { total: 0, sapi: 0, kambing: 0 };
+      return {
+        tahun: y.tahun,
+        total: entry.total,
+        sapi: entry.sapi,
+        kambing: entry.kambing,
+      };
+    });
 
     return {
       selectedYear: targetYear,
@@ -120,33 +121,64 @@ export const qurbanService = {
       .where(eq(qurbanKelompok.qurbanTahunId, qurbanTahunId))
       .orderBy(asc(qurbanKelompok.nomorUrut), asc(qurbanKelompok.namaKelompok));
 
-    // For each kelompok, get member count and member list
-    const result = await Promise.all(
-      kelompokList.map(async (kel) => {
-        const members = await db
-          .select({
-            id: pequrban.id,
-            jemaahId: pequrban.jemaahId,
-            jemaahName: jemaah.name,
-            jemaahPhone: jemaah.phone,
-            status: pequrban.status,
-            catatan: pequrban.catatan,
-            createdAt: pequrban.createdAt,
-          })
-          .from(pequrban)
-          .innerJoin(jemaah, eq(pequrban.jemaahId, jemaah.id))
-          .where(eq(pequrban.qurbanKelompokId, kel.id));
+    if (kelompokList.length === 0) {
+      return [];
+    }
 
-        return {
-          ...kel,
-          memberCount: members.length,
-          isFull: kel.jenisHewan === 'Sapi' && members.length >= 7,
-          members,
-        };
+    const kelompokIds = kelompokList.map((k) => k.id);
+
+    // Batch fetch: get all members for all groups in a single query (eliminates N+1)
+    const allMembers = await db
+      .select({
+        id: pequrban.id,
+        qurbanKelompokId: pequrban.qurbanKelompokId,
+        jemaahId: pequrban.jemaahId,
+        jemaahName: jemaah.name,
+        jemaahPhone: jemaah.phone,
+        status: pequrban.status,
+        catatan: pequrban.catatan,
+        createdAt: pequrban.createdAt,
       })
-    );
+      .from(pequrban)
+      .innerJoin(jemaah, eq(pequrban.jemaahId, jemaah.id))
+      .where(inArray(pequrban.qurbanKelompokId, kelompokIds));
 
-    return result;
+    // Map members by kelompokId in memory
+    const membersByKelompok = new Map<string, Array<{
+      id: string;
+      jemaahId: string;
+      jemaahName: string;
+      jemaahPhone: string;
+      status: string;
+      catatan: string | null;
+      createdAt: Date;
+    }>>();
+
+    for (const m of allMembers) {
+      if (!m.qurbanKelompokId) continue;
+      if (!membersByKelompok.has(m.qurbanKelompokId)) {
+        membersByKelompok.set(m.qurbanKelompokId, []);
+      }
+      membersByKelompok.get(m.qurbanKelompokId)!.push({
+        id: m.id,
+        jemaahId: m.jemaahId,
+        jemaahName: m.jemaahName,
+        jemaahPhone: m.jemaahPhone,
+        status: m.status,
+        catatan: m.catatan,
+        createdAt: m.createdAt,
+      });
+    }
+
+    return kelompokList.map((kel) => {
+      const members = membersByKelompok.get(kel.id) || [];
+      return {
+        ...kel,
+        memberCount: members.length,
+        isFull: kel.jenisHewan === "Sapi" && members.length >= 7,
+        members,
+      };
+    });
   },
 
   async createKelompok(data: { qurbanTahunId: string; namaKelompok: string; jenisHewan?: string; nomorUrut?: number }) {

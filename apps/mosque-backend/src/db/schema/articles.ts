@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, longtext, timestamp } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, longtext, timestamp, index } from "drizzle-orm/mysql-core";
 
 export const article = mysqlTable("articles", {
   id: varchar("id", { length: 36 }).primaryKey(),
@@ -13,5 +13,10 @@ export const article = mysqlTable("articles", {
   content: longtext("content").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
-});
+}, (table) => ({
+  categoryIdx: index("article_category_idx").on(table.category),
+  typeIdx: index("article_type_idx").on(table.type),
+  dateIdx: index("article_date_idx").on(table.date),
+  createdAtIdx: index("article_created_at_idx").on(table.createdAt),
+}));
 

@@ -8,6 +8,7 @@ import ConfirmDialog from '../components/common/ConfirmDialog';
 import ProgramCompletionModal from '../components/program/ProgramCompletionModal';
 import ProgramDetailModal from '../components/program/ProgramDetailModal';
 import { formatCurrency } from '../lib/utils';
+import { API_BASE } from '../lib/api';
 
 export default function ProgramKerjaPage() {
   const [viewMode, setViewMode] = useState('kanban'); // kanban | table
@@ -155,7 +156,7 @@ export default function ProgramKerjaPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2 shrink-0">
           <a
-            href="/api/programs/feed.ics"
+            href={`${API_BASE}/programs/feed.ics`}
             target="_blank"
             rel="noopener noreferrer"
             className="px-3 py-2 rounded-xl bg-surface-variant/80 hover:bg-surface-variant text-on-surface border border-outline-variant text-xs font-semibold flex items-center gap-1.5 transition-all"

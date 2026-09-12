@@ -18,7 +18,7 @@ const JemaahRegistrationModal = ({ isOpen, onClose, onSuccess }) => {
   const [displayId, setDisplayId] = useState(generateDisplayId);
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Legitimate ID generation on modal open
+       
       setDisplayId(generateDisplayId());
     }
   }, [isOpen]);
@@ -47,7 +47,7 @@ const JemaahRegistrationModal = ({ isOpen, onClose, onSuccess }) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Legitimate form reset on modal open
+       
       setFormData({
         name: '',
         category: 'Umum',

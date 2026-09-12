@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
 import { authClient } from '../../lib/auth-client';
 
-const TabSecurity = ({ setHasUnsavedChanges, tabDataRef }) => {
+const TabSecurity = ({ tabDataRef }) => {
   const { profile, finance, customData, theme, setTheme } = useSettings();
 
   const [passwords, setPasswords] = useState({

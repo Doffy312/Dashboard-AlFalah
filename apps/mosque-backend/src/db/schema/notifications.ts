@@ -5,6 +5,7 @@ import {
   varchar,
   timestamp,
   boolean,
+  index,
 } from "drizzle-orm/mysql-core";
 
 // ─── Database Notifications ──────────────────────────────────────────
@@ -16,4 +17,8 @@ export const notification = mysqlTable("notification", {
   description: text("description").notNull(),
   isRead: boolean("is_read").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+}, (table) => ({
+  isReadIdx: index("notif_is_read_idx").on(table.isRead),
+  createdAtIdx: index("notif_created_at_idx").on(table.createdAt),
+  typeIdx: index("notif_type_idx").on(table.type),
+}));

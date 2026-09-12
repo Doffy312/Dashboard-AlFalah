@@ -5,7 +5,7 @@ import { programController } from "../controllers/programs.controller.js";
 import { uploadMiddleware } from "../middlewares/upload.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { sanitizeBody } from "../middlewares/sanitize.middleware.js";
-import { createProgramSchema } from "../validations/programs.validation.js";
+import { createProgramSchema, updateProgramStatusSchema } from "../validations/programs.validation.js";
 
 const router = Router();
 
@@ -39,6 +39,8 @@ router.put(
 router.patch(
   "/:id/status",
   requireRole("Ketua", "Sekretaris"),
+  sanitizeBody,
+  validate(updateProgramStatusSchema),
   programController.updateStatus
 );
 

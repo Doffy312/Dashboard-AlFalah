@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { eq, like, and, sql, desc } from "drizzle-orm";
 import { db } from "../config/db.js";
-import { transaction } from "../db/schema/index.js";
+import { transaction, ziswafTransaction } from "../db/schema/index.js";
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -27,6 +27,8 @@ export interface TransactionFilters {
 export class TransactionService {
   async findAll(filters: TransactionFilters = {}) {
     const { search, category, month, page = 1, limit = 1000 } = filters;
+    const safePage = Math.max(1, Number(page) || 1);
+    const safeLimit = Math.min(Math.max(1, Number(limit) || 1000), 2000);
     const conditions = [];
 
     if (search) {
@@ -43,7 +45,7 @@ export class TransactionService {
     }
 
     const where = conditions.length > 0 ? and(...conditions) : undefined;
-    const offset = (page - 1) * limit;
+    const offset = (safePage - 1) * safeLimit;
 
     const [data, countResult] = await Promise.all([
       db
@@ -51,7 +53,7 @@ export class TransactionService {
         .from(transaction)
         .where(where)
         .orderBy(desc(transaction.date), desc(transaction.createdAt))
-        .limit(limit)
+        .limit(safeLimit)
         .offset(offset),
       db
         .select({ count: sql<number>`count(*)` })
@@ -60,7 +62,7 @@ export class TransactionService {
     ]);
 
     const total = countResult[0]?.count ?? 0;
-    return { data, total, page, limit };
+    return { data, total, page: safePage, limit: safeLimit };
   }
 
   async findById(id: string) {
@@ -112,6 +114,72 @@ export class TransactionService {
     });
 
     return newTransaction;
+  }
+
+  async createPublicDonation(data: {
+    amount: string | number;
+    donorName?: string;
+    type?: string;
+    description?: string;
+  }) {
+    const today = new Date().toISOString().split("T")[0];
+    const donorName = data.donorName?.trim() || "Hamba Allah";
+    const type = data.type?.trim() || "Infaq";
+    const description = data.description?.trim() || "";
+    const amountStr = String(data.amount);
+
+    const txDescription = description
+      ? `Donasi ${type} Scan QR - ${donorName} (${description})`
+      : `Donasi ${type} Scan QR - ${donorName}`;
+
+    const txId = crypto.randomUUID();
+    const ziswafId = crypto.randomUUID();
+
+    // Atomic database transaction: writes to both tables must succeed or rollback together
+    await db.transaction(async (tx) => {
+      await tx.insert(transaction).values({
+        id: txId,
+        date: today,
+        type: "Pemasukan",
+        category: type,
+        amount: amountStr,
+        description: txDescription,
+        programId: null,
+        createdBy: null,
+      });
+
+      await tx.insert(ziswafTransaction).values({
+        id: ziswafId,
+        date: today,
+        type: type,
+        donorName: donorName,
+        amount: amountStr,
+        description: description || "Donasi via Scan QR Code",
+      });
+    });
+
+    const newTx = await this.findById(txId);
+
+    import("./notifications.service.js").then((ns) => {
+      const formattedAmount = Number(amountStr).toLocaleString("id-ID");
+      ns.notificationService.create({
+        type: "Donasi",
+        title: `Donasi ${type} Scan QR Masuk`,
+        description: `Rp ${formattedAmount} dari ${donorName} melalui Scan QR Code QRIS`,
+      });
+    });
+
+    import("./auditLog.service.js").then((als) => {
+      als.auditLogService.logActivity({
+        userId: null,
+        action: "PUBLIC_DONATION",
+        entity: "transaction",
+        entityId: txId,
+        details: { type, donorName, amount: amountStr, description: txDescription, ziswafId },
+      });
+    });
+
+    return newTx;
   }
 
   async update(id: string, data: Partial<CreateTransactionInput>, isSystemSync = false) {

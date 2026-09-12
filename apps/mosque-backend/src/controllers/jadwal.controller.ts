@@ -4,7 +4,8 @@ import { getSocketIO } from "../lib/socket.js";
 
 export const jadwalController = {
   async getAll(req: Request, res: Response) {
-    const records = await jadwalService.findAll();
+    const { limit } = req.query;
+    const records = await jadwalService.findAll({ limit: limit ? Number(limit) : undefined });
     res.json(records);
   },
 

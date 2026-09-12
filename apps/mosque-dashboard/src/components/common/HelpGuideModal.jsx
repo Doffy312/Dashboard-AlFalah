@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { X, Search, ChevronDown, ChevronUp, BookOpen, ShieldCheck, Sparkles, HelpCircle, CheckCircle2, Phone, Mail } from 'lucide-react';
 

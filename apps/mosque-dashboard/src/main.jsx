@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.jsx'
 
 // Lazy-load Toaster — not needed for initial render
+// eslint-disable-next-line react-refresh/only-export-components
 const Toaster = lazy(() => import('react-hot-toast').then(m => ({ default: m.Toaster })));
 
 const queryClient = new QueryClient({

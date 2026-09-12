@@ -47,7 +47,7 @@ const QurbanForm = ({ isOpen, onClose, onSubmit, initialData, defaultGroup }) =>
   // Reset form when modal opens/closes or initialData changes
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Legitimate form reset on modal open
+       
       setFormData(buildInitialFormData());
       setIsNewGroup(false);
       setSearchJemaah('');

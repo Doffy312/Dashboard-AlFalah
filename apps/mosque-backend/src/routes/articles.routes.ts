@@ -8,9 +8,10 @@ import { createArticleSchema, updateArticleSchema } from "../validations/article
 const router = Router();
 
 // Public route for Landing Page
-router.get("/", async (_req, res, next) => {
+router.get("/", async (req, res, next) => {
   try {
-    const articles = await articlesService.findAll();
+    const { limit } = req.query;
+    const articles = await articlesService.findAll({ limit: limit ? Number(limit) : undefined });
     res.json(articles);
   } catch (error) {
     next(error);

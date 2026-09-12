@@ -1,31 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
 
+const DEFAULT_SIGNATURES = {
+  bendaharaName: 'Ahmad Dahlan',
+  bendaharaTitle: 'Bendahara DKM',
+  bendaharaSignature: '',
+  ketuaName: 'H. Abdullah',
+  ketuaTitle: 'Ketua DKM',
+  ketuaSignature: '',
+};
+
 const TabFinance = ({ setHasUnsavedChanges, tabDataRef }) => {
   const { finance } = useSettings();
-
-  const defaultSignatures = {
-    bendaharaName: 'Ahmad Dahlan',
-    bendaharaTitle: 'Bendahara DKM',
-    bendaharaSignature: '',
-    ketuaName: 'H. Abdullah',
-    ketuaTitle: 'Ketua DKM',
-    ketuaSignature: '',
-  };
 
   const [categories, setCategories] = useState([...finance.categories]);
   const [newCat, setNewCat] = useState({ name: '', type: 'income' });
   const [bankInfo, setBankInfo] = useState({ ...finance.bankInfo });
-  const [signatures, setSignatures] = useState({ ...defaultSignatures, ...(finance.signatures || {}) });
+  const [signatures, setSignatures] = useState({ ...DEFAULT_SIGNATURES, ...(finance.signatures || {}) });
 
   // Sync from context when it changes (e.g. cancel/reset)
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCategories([...finance.categories]);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setBankInfo({ ...finance.bankInfo });
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSignatures({ ...defaultSignatures, ...(finance.signatures || {}) });
+    setSignatures({ ...DEFAULT_SIGNATURES, ...(finance.signatures || {}) });
   }, [finance]);
 
   // Expose current data to parent via ref

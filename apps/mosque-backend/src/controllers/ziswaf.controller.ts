@@ -4,7 +4,8 @@ import { getSocketIO } from "../lib/socket.js";
 
 export const ziswafController = {
   async getAll(req: Request, res: Response) {
-    const records = await ziswafService.findAll();
+    const { limit } = req.query;
+    const records = await ziswafService.findAll({ limit: limit ? Number(limit) : undefined });
     res.json(records);
   },
 

@@ -33,6 +33,7 @@ export const transaction = mysqlTable("transactions", {
   dateIdx: index("date_idx").on(table.date),
   typeIdx: index("type_idx").on(table.type),
   categoryIdx: index("category_idx").on(table.category),
+  createdAtIdx: index("transaction_created_at_idx").on(table.createdAt),
 }));
 
 export const transactionRelations = relations(transaction, ({ one }) => ({

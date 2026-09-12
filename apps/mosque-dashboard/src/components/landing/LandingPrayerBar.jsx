@@ -148,7 +148,7 @@ const LandingPrayerBar = () => {
       month: 'long',
       year: 'numeric'
     });
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Date formatting needs to be in effect for timezone accuracy
+     
     setGregorianDate(formattedGregorian);
 
     // Fetch dari Aladhan API menggunakan koordinat presisi Tinggede Selatan, Sigi (Lat: -0.9254, Long: 119.8732)

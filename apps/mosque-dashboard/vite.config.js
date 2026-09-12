@@ -14,7 +14,7 @@ function stripLazyModulePreload() {
     enforce: 'post',
     transformIndexHtml(html) {
       return html.replace(
-        /\s*<link\s+rel="modulepreload"[^>]*href="[^"]*(?:vendor-charts|vendor-socketio|vendor-datefns|vendor-icons|vendor-map)[^"]*"[^>]*>\s*/g,
+        /\s*<link\s+rel="modulepreload"[^>]*href="[^"]*(?:vendor-charts|vendor-socketio|vendor-datefns|vendor-icons|vendor-map|vendor-pdf)[^"]*"[^>]*>\s*/g,
         '\n'
       );
     },
@@ -100,6 +100,10 @@ export default defineConfig({
             // ── 8. Date utilities ────────────────────────────────────
             if (id.includes('date-fns')) {
               return 'vendor-datefns';
+            }
+            // ── 9. PDF generation (~550KB) — dynamic import only ─────
+            if (id.includes('jspdf') || id.includes('html2canvas') || id.includes('html2pdf') || id.includes('canvg') || id.includes('purify')) {
+              return 'vendor-pdf';
             }
           }
         },

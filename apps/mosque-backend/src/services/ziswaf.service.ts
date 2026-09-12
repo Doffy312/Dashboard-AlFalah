@@ -4,8 +4,13 @@ import { db } from "../config/db.js";
 import { ziswafTransaction } from "../db/schema/ziswaf.js";
 
 export const ziswafService = {
-  async findAll() {
-    return db.select().from(ziswafTransaction).orderBy(desc(ziswafTransaction.date), desc(ziswafTransaction.createdAt));
+  async findAll(options: { limit?: number } = {}) {
+    const safeLimit = Math.min(Number(options.limit) || 1000, 2000);
+    return db
+      .select()
+      .from(ziswafTransaction)
+      .orderBy(desc(ziswafTransaction.date), desc(ziswafTransaction.createdAt))
+      .limit(safeLimit);
   },
 
   async findById(id: string) {

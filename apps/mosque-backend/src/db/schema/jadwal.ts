@@ -20,4 +20,5 @@ export const jadwalPetugas = mysqlTable("jadwal_petugas", {
 }, (table) => ({
   dateIdx: index("jadwal_date_idx").on(table.date),
   roleIdx: index("jadwal_role_idx").on(table.role),
+  createdAtIdx: index("jadwal_created_at_idx").on(table.createdAt),
 }));
