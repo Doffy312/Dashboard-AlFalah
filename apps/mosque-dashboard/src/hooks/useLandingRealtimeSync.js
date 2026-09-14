@@ -39,9 +39,19 @@ export function useLandingRealtimeSync() {
         // Guard: component may have unmounted while we were importing
         if (!mountedRef.current) return;
 
-        const backendUrl = import.meta.env.VITE_API_URL
-          ? new URL(import.meta.env.VITE_API_URL).origin
-          : undefined;
+        let backendUrl = undefined;
+        const rawApiUrl = import.meta.env.VITE_API_URL;
+        if (rawApiUrl) {
+          try {
+            let trimmed = rawApiUrl.trim();
+            if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://') && !trimmed.startsWith('/')) {
+              trimmed = `https://${trimmed}`;
+            }
+            backendUrl = new URL(trimmed, typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000').origin;
+          } catch {
+            backendUrl = undefined;
+          }
+        }
 
         const socket = io(backendUrl, {
           withCredentials: true,

@@ -1,35 +1,36 @@
-import { Suspense, lazy } from 'react';
+import { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { authClient } from './lib/auth-client';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
+import { lazyWithRetry } from './lib/lazyWithRetry';
 
 // Lazy-load DashboardLayout — it imports useRealtimeSync (socket.io ~50KB)
 // so deferring it keeps socket.io out of the initial critical bundle.
-const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'));
+const DashboardLayout = lazyWithRetry(() => import('./layouts/DashboardLayout'));
 
 // --- Route-level Code Splitting ---
 // Each page is lazy-loaded as a separate chunk, only fetched when the route is visited.
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const LandingPage = lazy(() => import('./pages/LandingPage'));
-const ProfilPage = lazy(() => import('./pages/ProfilPage'));
-const TransparansiKeuanganPage = lazy(() => import('./pages/TransparansiKeuanganPage'));
-const BeritaKegiatanPage = lazy(() => import('./pages/BeritaKegiatanPage'));
-const LoginPage = lazy(() => import('./pages/LoginPage'));
-const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'));
-const KeuanganPage = lazy(() => import('./pages/KeuanganPage'));
-const ProgramKerjaPage = lazy(() => import('./pages/ProgramKerjaPage'));
-const JemaahPage = lazy(() => import('./pages/JemaahPage'));
-const LaporanPage = lazy(() => import('./pages/LaporanPage'));
-const InventarisPage = lazy(() => import('./pages/InventarisPage'));
-const NotificationPage = lazy(() => import('./pages/NotificationPage'));
-const SettingsPage = lazy(() => import('./pages/SettingsPage'));
-const ZiswafPage = lazy(() => import('./pages/ZiswafPage'));
-const QurbanPage = lazy(() => import('./pages/QurbanPage'));
-const JadwalPage = lazy(() => import('./pages/JadwalPage'));
-const BeritaPage = lazy(() => import('./pages/BeritaPage'));
-const PesanPage = lazy(() => import('./pages/PesanPage'));
+const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
+const LandingPage = lazyWithRetry(() => import('./pages/LandingPage'));
+const ProfilPage = lazyWithRetry(() => import('./pages/ProfilPage'));
+const TransparansiKeuanganPage = lazyWithRetry(() => import('./pages/TransparansiKeuanganPage'));
+const BeritaKegiatanPage = lazyWithRetry(() => import('./pages/BeritaKegiatanPage'));
+const LoginPage = lazyWithRetry(() => import('./pages/LoginPage'));
+const VerifyEmailPage = lazyWithRetry(() => import('./pages/VerifyEmailPage'));
+const KeuanganPage = lazyWithRetry(() => import('./pages/KeuanganPage'));
+const ProgramKerjaPage = lazyWithRetry(() => import('./pages/ProgramKerjaPage'));
+const JemaahPage = lazyWithRetry(() => import('./pages/JemaahPage'));
+const LaporanPage = lazyWithRetry(() => import('./pages/LaporanPage'));
+const InventarisPage = lazyWithRetry(() => import('./pages/InventarisPage'));
+const NotificationPage = lazyWithRetry(() => import('./pages/NotificationPage'));
+const SettingsPage = lazyWithRetry(() => import('./pages/SettingsPage'));
+const ZiswafPage = lazyWithRetry(() => import('./pages/ZiswafPage'));
+const QurbanPage = lazyWithRetry(() => import('./pages/QurbanPage'));
+const JadwalPage = lazyWithRetry(() => import('./pages/JadwalPage'));
+const BeritaPage = lazyWithRetry(() => import('./pages/BeritaPage'));
+const PesanPage = lazyWithRetry(() => import('./pages/PesanPage'));
 
 // Lightweight loading spinner that matches the app's dark theme
 const PageLoadingFallback = () => (

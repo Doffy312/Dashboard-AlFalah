@@ -4,6 +4,19 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './index.css'
 import App from './App.jsx'
 
+// Auto-recover from deployment chunk mismatch (stale Vite asset cache)
+window.addEventListener('vite:preloadError', (event) => {
+  console.warn('Vite preload error detected, refreshing page with latest assets:', event);
+  const reloadKey = 'vite_preload_retry';
+  const lastReload = sessionStorage.getItem(reloadKey);
+  const now = Date.now();
+  // Prevent infinite reload loop if server is down: allow 1 reload per 10 seconds
+  if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+    sessionStorage.setItem(reloadKey, now.toString());
+    window.location.reload();
+  }
+});
+
 // Lazy-load Toaster — not needed for initial render
 // eslint-disable-next-line react-refresh/only-export-components
 const Toaster = lazy(() => import('react-hot-toast').then(m => ({ default: m.Toaster })));
