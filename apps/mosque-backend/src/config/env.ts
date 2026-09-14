@@ -69,8 +69,18 @@ export function getCorsOrigins(requestOrigin?: string): string[] {
     try {
       const parsedUrl = new URL(requestOrigin);
       const cleanOrigin = parsedUrl.origin;
-      if (!origins.includes(cleanOrigin) && (env.NODE_ENV === "development" || isLocalNetworkOrigin(cleanOrigin))) {
-        origins.push(cleanOrigin);
+      const hostname = parsedUrl.hostname;
+      // Allow any Vercel domain (*.vercel.app), localhost, LAN, or development
+      if (
+        hostname.endsWith(".vercel.app") ||
+        hostname === "localhost" ||
+        hostname === "127.0.0.1" ||
+        env.NODE_ENV === "development" ||
+        isLocalNetworkOrigin(cleanOrigin)
+      ) {
+        if (!origins.includes(cleanOrigin)) {
+          origins.push(cleanOrigin);
+        }
       }
     } catch {}
   }

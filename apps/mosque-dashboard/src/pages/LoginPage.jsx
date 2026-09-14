@@ -25,6 +25,11 @@ const LoginPage = () => {
     }
   }, [session, isSessionPending, navigate]);
 
+  const isMissingApiUrl = typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1' &&
+    !import.meta.env.VITE_API_URL;
+
   const handleLogin = async (e) => {
     e.preventDefault();
     if (isLoading) return;
@@ -33,7 +38,7 @@ const LoginPage = () => {
     setIsLoading(true);
     
     try {
-      const { error: loginError } = await authClient.signIn.email({
+      const { data, error: loginError } = await authClient.signIn.email({
         email,
         password,
       });
@@ -43,7 +48,12 @@ const LoginPage = () => {
         setIsLoading(false);
       } else {
         // Fetch session to populate authClient store, then navigate
-        await authClient.getSession();
+        const sessionRes = await authClient.getSession();
+        if (!sessionRes?.data?.user && !data?.user) {
+          setError('Browser tidak dapat menyimpan sesi login. Pastikan browser mengizinkan cookie cross-site atau periksa variabel FRONTEND_URL di backend.');
+          setIsLoading(false);
+          return;
+        }
         navigate('/dashboard', { replace: true });
       }
     } catch (err) {
@@ -85,6 +95,12 @@ const LoginPage = () => {
           </div>
 
           <form onSubmit={handleLogin} className="flex flex-col gap-md">
+            {isMissingApiUrl && (
+              <div className="bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 p-3 rounded-lg text-xs leading-relaxed text-center font-medium">
+                ⚠️ <strong>Variabel VITE_API_URL belum terdeteksi:</strong> Request API saat ini mengarah ke domain statis Vercel. Pastikan Anda telah menambahkan <code>VITE_API_URL</code> ke domain backend Railway di Environment Variables Vercel lalu Redeploy.
+              </div>
+            )}
+
             {error && (
               <div className="bg-error/10 text-error p-3 rounded-lg text-sm text-center font-medium">
                 {error}

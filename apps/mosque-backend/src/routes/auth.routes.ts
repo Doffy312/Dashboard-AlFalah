@@ -8,9 +8,9 @@ const router = Router();
 // Pasang rate limiter ketat untuk semua rute otentikasi (/api/auth/*)
 router.use(authRateLimiter);
 
-// Better Auth handles all routes under /api/auth/*
+// Better Auth handles all routes under /api/auth and /api/auth/*
 // This includes: sign-in, sign-up, sign-out, session, etc.
-router.all("/*splat", toNodeHandler(auth));
+router.all(["/", "/*splat"], toNodeHandler(auth));
 
 export default router;
 

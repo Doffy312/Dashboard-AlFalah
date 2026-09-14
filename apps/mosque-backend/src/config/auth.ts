@@ -10,17 +10,17 @@ import * as schema from "../db/schema/index.js";
 // Otherwise browsers silently block cookies on cross-origin fetch(),
 // breaking all authentication flows.
 function isCrossDomainDeployment(): boolean {
-  if (env.NODE_ENV !== "production") {
-    return false;
-  }
   try {
-    const frontendOrigin = new URL(env.FRONTEND_URL).origin;
-    const backendOrigin = new URL(env.BETTER_AUTH_URL).origin;
-    return (
-      frontendOrigin !== backendOrigin &&
-      frontendOrigin.startsWith("https://") &&
-      backendOrigin.startsWith("https://")
-    );
+    // If deployed on cloud (Railway, etc.) or backend URL is HTTPS, enable SameSite=None + Secure
+    // so any cross-origin frontend (Vercel, custom domain) can set and send session cookies
+    if (
+      process.env.RAILWAY_ENVIRONMENT ||
+      env.BETTER_AUTH_URL.startsWith("https://") ||
+      (env.NODE_ENV === "production" && !env.BETTER_AUTH_URL.includes("localhost"))
+    ) {
+      return true;
+    }
+    return false;
   } catch {
     return false;
   }

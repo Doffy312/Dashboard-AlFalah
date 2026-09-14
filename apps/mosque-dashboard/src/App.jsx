@@ -124,8 +124,8 @@ function App() {
               <LoginPage />
             </Suspense>
           } />
-          {/* Obscure default /login route by redirecting to home */}
-          <Route path="/login" element={<Navigate to="/" replace />} />
+          {/* Forward /login directly to private portal */}
+          <Route path="/login" element={<Navigate to="/portal-dkm" replace />} />
           <Route path="/verify-email" element={
             <Suspense fallback={<FullPageLoadingFallback />}>
               <VerifyEmailPage />
