@@ -1,13 +1,20 @@
-function getApiBase() {
-  const raw = import.meta.env.VITE_API_URL;
+export function normalizeApiUrl(raw) {
   if (!raw) return "/api";
-  const trimmed = raw.trim().replace(/\/+$/, "");
+  let trimmed = raw.trim();
+  // If protocol is missing (e.g. user pasted 'backend.up.railway.app'), auto-prefix https://
+  if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://") && !trimmed.startsWith("/")) {
+    trimmed = `https://${trimmed}`;
+  }
+  trimmed = trimmed.replace(/\/+$/, "");
   // Backend API routes are all mounted under /api (e.g. /api/transactions)
-  // If the provided URL does not end with /api, append /api
   if (!trimmed.endsWith("/api")) {
     return `${trimmed}/api`;
   }
   return trimmed;
+}
+
+export function getApiBase() {
+  return normalizeApiUrl(import.meta.env.VITE_API_URL);
 }
 
 export const API_BASE = getApiBase();

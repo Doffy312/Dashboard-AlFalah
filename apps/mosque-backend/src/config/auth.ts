@@ -11,12 +11,18 @@ import * as schema from "../db/schema/index.js";
 // breaking all authentication flows.
 function isCrossDomainDeployment(): boolean {
   try {
-    // If deployed on cloud (Railway, etc.) or backend URL is HTTPS, enable SameSite=None + Secure
+    // If deployed on cloud (Railway, Render, Vercel, etc.) or backend URL is HTTPS, enable SameSite=None + Secure
     // so any cross-origin frontend (Vercel, custom domain) can set and send session cookies
     if (
       process.env.RAILWAY_ENVIRONMENT ||
+      process.env.RAILWAY_ENVIRONMENT_NAME ||
+      process.env.RAILWAY_PROJECT_ID ||
+      process.env.RAILWAY_PUBLIC_DOMAIN ||
+      process.env.VERCEL ||
+      process.env.RENDER ||
+      env.NODE_ENV === "production" ||
       env.BETTER_AUTH_URL.startsWith("https://") ||
-      (env.NODE_ENV === "production" && !env.BETTER_AUTH_URL.includes("localhost"))
+      (env.FRONTEND_URL && !env.FRONTEND_URL.includes("localhost") && !env.FRONTEND_URL.includes("127.0.0.1"))
     ) {
       return true;
     }
@@ -66,9 +72,11 @@ export const auth = betterAuth({
   ...(crossDomain
     ? {
         advanced: {
+          useSecureCookies: true,
           defaultCookieAttributes: {
             sameSite: "none" as const,
             secure: true,
+            partitioned: true,
           },
         },
       }

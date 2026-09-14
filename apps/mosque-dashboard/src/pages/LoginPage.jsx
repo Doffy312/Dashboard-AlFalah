@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authClient } from '../lib/auth-client';
+import { API_BASE } from '../lib/api';
 import { useSettings } from '../contexts/SettingsContext';
 
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '2.0.4';
@@ -14,9 +15,33 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [backendStatus, setBackendStatus] = useState('checking'); // 'checking' | 'connected' | 'error'
+  const [backendUrl, setBackendUrl] = useState('');
   const navigate = useNavigate();
 
   const { data: session, isPending: isSessionPending } = authClient.useSession();
+
+  // Test backend connectivity on mount
+  useEffect(() => {
+    let isMounted = true;
+    const checkBackend = async () => {
+      try {
+        const rootUrl = API_BASE.replace(/\/api$/, '');
+        setBackendUrl(rootUrl || window.location.origin);
+        const healthEndpoint = `${rootUrl || ''}/api/health`;
+        const res = await fetch(healthEndpoint, { method: 'GET', credentials: 'omit' });
+        if (res.ok) {
+          if (isMounted) setBackendStatus('connected');
+        } else {
+          if (isMounted) setBackendStatus('error');
+        }
+      } catch {
+        if (isMounted) setBackendStatus('error');
+      }
+    };
+    checkBackend();
+    return () => { isMounted = false; };
+  }, []);
 
   // Automatically redirect if already authenticated or session turns valid
   useEffect(() => {
@@ -39,12 +64,16 @@ const LoginPage = () => {
     
     try {
       const { data, error: loginError } = await authClient.signIn.email({
-        email,
+        email: email.trim(),
         password,
       });
 
       if (loginError) {
-        setError(loginError.message || 'Gagal masuk. Periksa kembali email dan kata sandi Anda.');
+        let msg = loginError.message || 'Gagal masuk. Periksa kembali email dan kata sandi Anda.';
+        if (msg.toLowerCase().includes('invalid email or password')) {
+          msg = 'Email atau kata sandi salah. Gunakan akun default: admin_alfalah@example.com / password123 jika database baru di-deploy.';
+        }
+        setError(msg);
         setIsLoading(false);
       } else {
         // Fetch session to populate authClient store, then navigate
@@ -57,7 +86,12 @@ const LoginPage = () => {
         navigate('/dashboard', { replace: true });
       }
     } catch (err) {
-      setError(err?.message || 'Terjadi kesalahan sistem. Silakan coba beberapa saat lagi.');
+      const msg = err?.message || '';
+      if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Network Error')) {
+        setError('Gagal menghubungi server backend (Network Error / CORS). Pastikan backend Railway aktif dan VITE_API_URL di Vercel sudah benar.');
+      } else {
+        setError(msg || 'Terjadi kesalahan sistem. Silakan coba beberapa saat lagi.');
+      }
       setIsLoading(false);
     }
   };
@@ -89,9 +123,31 @@ const LoginPage = () => {
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent opacity-80"></div>
 
           {/* Brand Header */}
-          <div className="text-center mb-lg pt-sm">
+          <div className="text-center mb-md pt-sm flex flex-col items-center">
             <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight">{orgName}</h1>
             <p className="font-body-sm text-body-sm text-on-surface-variant mt-xs">Sistem Manajemen Masjid</p>
+
+            {/* Backend Connectivity Status Badge */}
+            <div className="mt-sm">
+              {backendStatus === 'connected' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Server API Terhubung
+                </span>
+              )}
+              {backendStatus === 'checking' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-slate-500/10 text-slate-500 dark:text-slate-400">
+                  <span className="w-2 h-2 rounded-full bg-slate-400 animate-pulse"></span>
+                  Memeriksa koneksi API...
+                </span>
+              )}
+              {backendStatus === 'error' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20" title={`Target API: ${backendUrl}`}>
+                  <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+                  Backend Belum Terhubung
+                </span>
+              )}
+            </div>
           </div>
 
           <form onSubmit={handleLogin} className="flex flex-col gap-md">
@@ -178,6 +234,24 @@ const LoginPage = () => {
               <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/20 to-transparent"></div>
             </button>
           </form>
+
+          {/* Default Takmir Credential Hint */}
+          <div className="mt-md p-3 rounded-lg bg-surface-variant/70 border border-outline-variant/60 text-xs text-on-surface-variant">
+            <div className="flex items-center gap-1.5 font-semibold text-primary mb-1">
+              <span className="material-symbols-outlined text-[16px]">info</span>
+              <span>Kredensial Default Takmir (Admin):</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-on-surface mt-1">
+              <div className="bg-background/80 px-2 py-1 rounded border border-outline-variant/40">
+                <span className="text-on-surface-variant block text-[9px] uppercase font-sans">Email</span>
+                <span className="select-all">admin_alfalah@example.com</span>
+              </div>
+              <div className="bg-background/80 px-2 py-1 rounded border border-outline-variant/40">
+                <span className="text-on-surface-variant block text-[9px] uppercase font-sans">Kata Sandi</span>
+                <span className="select-all">password123</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <p className="text-center font-body-sm text-body-sm text-on-surface-variant/70 mt-lg">

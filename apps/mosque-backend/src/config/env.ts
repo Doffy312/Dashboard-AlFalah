@@ -1,5 +1,14 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+import path from "path";
 import { z } from "zod";
+
+// Load .env from current directory and fallback to apps/mosque-backend/.env for monorepo root runs
+dotenv.config();
+dotenv.config({ path: path.resolve(process.cwd(), "apps/mosque-backend/.env") });
+
+const defaultAuthUrl = process.env.RAILWAY_PUBLIC_DOMAIN
+  ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+  : (process.env.PORT ? `http://localhost:${process.env.PORT}` : "http://localhost:3000");
 
 const envSchema = z.object({
   NODE_ENV: z
@@ -8,7 +17,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(3000),
   DATABASE_URL: z.string().url(),
   BETTER_AUTH_SECRET: z.string().min(16),
-  BETTER_AUTH_URL: z.string().url(),
+  BETTER_AUTH_URL: z.string().url().default(defaultAuthUrl),
   FRONTEND_URL: z.string().url().default("http://localhost:5173"),
   CORS_ORIGINS: z.string().optional(), // Comma-separated extra origins, e.g. "http://192.168.1.87:5173,https://staging.example.com"
   SMTP_HOST: z.string().optional(),

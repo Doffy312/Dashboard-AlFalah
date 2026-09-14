@@ -11,6 +11,7 @@ import { initializeSocket } from "./lib/socket.js";
 import { initBackupService } from "./services/backup.service.js";
 import { programService } from "./services/programs.service.js";
 import { syncProgramTable } from "./db/sync-program-db.js";
+import { autoInitDatabase } from "./db/auto-init.js";
 import { pool } from "./config/db.js";
 import path from "path";
 import fs from "fs";
@@ -105,11 +106,8 @@ app.use(errorHandler);
 // ─── Start Server ────────────────────────────────────────────────────
 httpServer.listen(env.PORT, () => {
   initBackupService();
-  syncProgramTable().catch((err) => {
-    console.error("Failed to sync program table schema on startup:", err);
-  });
-  programService.syncAllCompletedPrograms().catch((err) => {
-    console.error("Failed to sync completed programs on startup:", err);
+  autoInitDatabase().catch((err) => {
+    console.error("Failed to auto-init database on startup:", err);
   });
   console.log(`
   🕌 Mosque Dashboard Backend
