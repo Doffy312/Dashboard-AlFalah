@@ -16,6 +16,44 @@ describe("Backend Zod Validation Schemas", () => {
       expect(valid.success).toBe(true);
     });
 
+    it("harus meloloskan user baru dengan password kosong atau tanpa password", () => {
+      const withEmptyPass = createUserSchema.safeParse({
+        name: "Pengurus Baru",
+        email: "pengurus@masjid.id",
+        password: "",
+      });
+      expect(withEmptyPass.success).toBe(true);
+      if (withEmptyPass.success) {
+        expect(withEmptyPass.data.password).toBeUndefined();
+      }
+
+      const withoutPass = createUserSchema.safeParse({
+        name: "Pengurus Baru 2",
+        email: "pengurus2@masjid.id",
+      });
+      expect(withoutPass.success).toBe(true);
+    });
+
+    it("harus menolak directActivate jika kata sandi tidak diisi", () => {
+      const result = createUserSchema.safeParse({
+        name: "Pengurus Langsung",
+        email: "langsung@masjid.id",
+        directActivate: true,
+        password: "",
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it("harus meloloskan directActivate jika kata sandi valid", () => {
+      const result = createUserSchema.safeParse({
+        name: "Pengurus Langsung",
+        email: "langsung@masjid.id",
+        directActivate: true,
+        password: "passwordAman123",
+      });
+      expect(result.success).toBe(true);
+    });
+
     it("harus menolak user dengan email tidak valid", () => {
       const result = createUserSchema.safeParse({
         name: "Test User",

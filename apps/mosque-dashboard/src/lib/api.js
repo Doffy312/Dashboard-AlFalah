@@ -38,9 +38,10 @@ async function request(path, options = {}) {
     const err = await res.json().catch(() => ({}));
     let errMsg = err.error || err.message || `Request failed: ${res.status}`;
     
-    // If backend returns Zod validation details
-    if (err.details && Array.isArray(err.details)) {
-      const detailsMap = err.details.map(d => `• ${d.message}`).join("\n");
+    // If backend returns Zod validation errors/details
+    const validationIssues = err.errors || err.details;
+    if (validationIssues && Array.isArray(validationIssues)) {
+      const detailsMap = validationIssues.map(d => `• ${d.field ? `${d.field}: ` : ''}${d.message}`).join("\n");
       errMsg = `${errMsg}\n${detailsMap}`;
     }
     

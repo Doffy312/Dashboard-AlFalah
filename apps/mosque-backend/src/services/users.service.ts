@@ -4,6 +4,7 @@ import { db } from "../config/db.js";
 import { user, verification } from "../db/schema/index.js";
 import { auth } from "../config/auth.js";
 import { emailService } from "./email.service.js";
+import { env } from "../config/env.js";
 
 export class UsersService {
   async findAll() {
@@ -21,8 +22,8 @@ export class UsersService {
     return data;
   }
 
-  async create(data: { name: string; email: string; role?: string; password?: string }) {
-    // 1. Buat password acak jika admin tidak menentukan password awal
+  async create(data: { name: string; email: string; role?: string; password?: string; directActivate?: boolean }) {
+    // 1. Tentukan kata sandi awal
     const tempPassword = data.password && data.password.length >= 8 
       ? data.password 
       : `P@ss-${crypto.randomBytes(6).toString("hex")}`;
@@ -39,13 +40,28 @@ export class UsersService {
 
     const createdUser = result.user;
 
-    // 3. Pastikan emailVerified bernilai false (Unverified)
+    // 3. Jika directActivate dipilih admin: langsung verifikasi akun tanpa kirim email
+    if (data.directActivate) {
+      await db
+        .update(user)
+        .set({ emailVerified: true, updatedAt: new Date() })
+        .where(eq(user.id, createdUser.id));
+
+      return {
+        ...createdUser,
+        emailVerified: true,
+        directActivated: true,
+        message: "Pengguna berhasil ditambahkan dan akun langsung aktif.",
+      };
+    }
+
+    // 4. Mode Undangan: Pastikan emailVerified bernilai false (Unverified)
     await db
       .update(user)
       .set({ emailVerified: false })
       .where(eq(user.id, createdUser.id));
 
-    // 4. Generate token verifikasi & simpan di tabel verification
+    // 5. Generate token verifikasi & simpan di tabel verification
     const token = crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Masa berlaku 7 hari
 
@@ -56,8 +72,10 @@ export class UsersService {
       expiresAt,
     });
 
-    // 5. Kirim email undangan & verifikasi
-    await emailService.sendInvitationEmail({
+    const verifyUrl = `${env.FRONTEND_URL}/verify-email?token=${token}&email=${encodeURIComponent(createdUser.email)}`;
+
+    // 6. Kirim email undangan & verifikasi
+    const emailSent = await emailService.sendInvitationEmail({
       email: createdUser.email,
       name: createdUser.name,
       role: data.role || "Pengurus",
@@ -67,6 +85,11 @@ export class UsersService {
     return {
       ...createdUser,
       emailVerified: false,
+      emailSent,
+      verificationLink: verifyUrl,
+      message: emailSent
+        ? "Pengguna baru berhasil ditambahkan! Email undangan & verifikasi telah dikirim."
+        : "Pengguna baru berhasil ditambahkan! Email belum terkirim (kendala SMTP), Anda dapat langsung menyalin tautan verifikasi.",
     };
   }
 
@@ -98,15 +121,23 @@ export class UsersService {
       expiresAt,
     });
 
+    const verifyUrl = `${env.FRONTEND_URL}/verify-email?token=${token}&email=${encodeURIComponent(targetUser.email)}`;
+
     // 4. Kirim email ulang
-    await emailService.sendInvitationEmail({
+    const emailSent = await emailService.sendInvitationEmail({
       email: targetUser.email,
       name: targetUser.name,
       role: targetUser.role || "Pengurus",
       token,
     });
 
-    return { message: "Email verifikasi berhasil dikirim ulang!" };
+    return { 
+      message: emailSent 
+        ? "Email verifikasi berhasil dikirim ulang!" 
+        : "Email belum terkirim (kendala SMTP). Anda dapat menyalin tautan verifikasi langsung.",
+      emailSent,
+      verificationLink: verifyUrl,
+    };
   }
 
   async verifyAndSetPassword({ token, password }: { token: string; password: string }) {

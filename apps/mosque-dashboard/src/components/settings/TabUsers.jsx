@@ -18,22 +18,88 @@ const TabUsers = ({ tabDataRef }) => {
   const resendMutation = useResendVerification();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'Pengurus' });
+  const [newUser, setNewUser] = useState({
+    name: '',
+    email: '',
+    role: 'Pengurus',
+    password: '',
+    confirmPassword: '',
+    directActivate: true,
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [createdResultModal, setCreatedResultModal] = useState(null);
   const [editingUserId, setEditingUserId] = useState(null);
   const [actionMessage, setActionMessage] = useState(null);
 
   const showMessage = (msg, type = 'success') => {
     setActionMessage({ text: msg, type });
-    setTimeout(() => setActionMessage(null), 4000);
+    setTimeout(() => setActionMessage(null), 5000);
+  };
+
+  const copyToClipboard = async (text, successMsg = 'Tautan berhasil disalin ke papan klip!') => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        showMessage(successMsg);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showMessage(successMsg);
+      }
+    } catch {
+      showMessage('Gagal menyalin tautan otomatis. Silakan salin secara manual.', 'error');
+    }
   };
 
   const handleAddUser = (e) => {
     e.preventDefault();
-    createMutation.mutate(newUser, {
-      onSuccess: () => {
+    if (newUser.directActivate) {
+      if (!newUser.password || newUser.password.length < 8) {
+        showMessage('Kata sandi minimal 8 karakter.', 'error');
+        return;
+      }
+      if (newUser.password !== newUser.confirmPassword) {
+        showMessage('Konfirmasi kata sandi tidak cocok.', 'error');
+        return;
+      }
+    }
+
+    const payload = {
+      name: newUser.name.trim(),
+      email: newUser.email.trim(),
+      role: newUser.role,
+      directActivate: !!newUser.directActivate,
+      ...(newUser.directActivate ? { password: newUser.password } : {}),
+    };
+
+    createMutation.mutate(payload, {
+      onSuccess: (result) => {
         setIsModalOpen(false);
-        setNewUser({ name: '', email: '', password: '', role: 'Pengurus' });
-        showMessage('Pengguna baru berhasil ditambahkan! Email undangan & verifikasi telah dikirim.');
+        setNewUser({
+          name: '',
+          email: '',
+          role: 'Pengurus',
+          password: '',
+          confirmPassword: '',
+          directActivate: true,
+        });
+
+        if (result?.directActivated) {
+          showMessage('Pengguna baru berhasil ditambahkan dan akun langsung aktif!');
+        } else if (result?.verificationLink) {
+          setCreatedResultModal(result);
+          if (result.emailSent) {
+            showMessage('Pengguna berhasil ditambahkan & email undangan telah dikirim.');
+          } else {
+            showMessage('Pengguna berhasil ditambahkan. Silakan salin tautan verifikasi di bawah ini.', 'error');
+          }
+        } else {
+          showMessage('Pengguna baru berhasil ditambahkan!');
+        }
       },
       onError: (err) => {
         showMessage(err.message || 'Gagal menambahkan pengguna.', 'error');
@@ -41,10 +107,37 @@ const TabUsers = ({ tabDataRef }) => {
     });
   };
 
+  const handleCopyVerificationLink = (userItem) => {
+    resendMutation.mutate(userItem.id, {
+      onSuccess: (res) => {
+        if (res?.verificationLink) {
+          copyToClipboard(
+            res.verificationLink,
+            `Tautan verifikasi untuk ${userItem.email} berhasil disalin ke papan klip!`
+          );
+        } else {
+          showMessage('Tautan verifikasi berhasil diperbarui.');
+        }
+      },
+      onError: (err) => {
+        showMessage(err.message || 'Gagal mengambil tautan verifikasi.', 'error');
+      }
+    });
+  };
+
   const handleResendEmail = (userItem) => {
     resendMutation.mutate(userItem.id, {
-      onSuccess: () => {
-        showMessage(`Email verifikasi berhasil dikirim ulang ke ${userItem.email}`);
+      onSuccess: (res) => {
+        if (res?.emailSent) {
+          showMessage(`Email verifikasi berhasil dikirim ulang ke ${userItem.email}`);
+        } else if (res?.verificationLink) {
+          copyToClipboard(
+            res.verificationLink,
+            `Email belum terkirim via SMTP. Tautan verifikasi telah otomatis disalin ke papan klip!`
+          );
+        } else {
+          showMessage(res?.message || 'Permintaan verifikasi berhasil diproses.');
+        }
       },
       onError: (err) => {
         showMessage(err.message || 'Gagal mengirim ulang email verifikasi.', 'error');
@@ -170,15 +263,26 @@ const TabUsers = ({ tabDataRef }) => {
             {/* Bottom Row: Mobile Touch Action Buttons */}
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-outline-variant/30">
               {!user.emailVerified && (
-                <button
-                  className="flex items-center gap-1 text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors"
-                  title="Kirim Ulang Email Verifikasi"
-                  onClick={() => handleResendEmail(user)}
-                  disabled={resendMutation.isPending}
-                >
-                  <span className="material-symbols-outlined text-[16px]">forward_to_inbox</span>
-                  <span>Verifikasi</span>
-                </button>
+                <>
+                  <button
+                    className="flex items-center gap-1 text-primary hover:text-primary/80 bg-primary/10 hover:bg-primary/20 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                    title="Salin Tautan Verifikasi"
+                    onClick={() => handleCopyVerificationLink(user)}
+                    disabled={resendMutation.isPending}
+                  >
+                    <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                    <span>Salin Link</span>
+                  </button>
+                  <button
+                    className="flex items-center gap-1 text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                    title="Kirim Ulang Email Verifikasi"
+                    onClick={() => handleResendEmail(user)}
+                    disabled={resendMutation.isPending}
+                  >
+                    <span className="material-symbols-outlined text-[16px]">forward_to_inbox</span>
+                    <span>Kirim Email</span>
+                  </button>
+                </>
               )}
               <button 
                 className="flex items-center gap-1 text-on-surface-variant hover:text-primary bg-surface-variant/40 hover:bg-surface-variant/80 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors"
@@ -265,14 +369,24 @@ const TabUsers = ({ tabDataRef }) => {
                 </td>
                 <td className="py-3 px-4 text-right">
                   {!user.emailVerified && (
-                    <button
-                      className="text-amber-400 hover:text-amber-300 transition-colors p-1.5 rounded-lg hover:bg-amber-500/10 mr-1"
-                      title="Kirim Ulang Email Verifikasi"
-                      onClick={() => handleResendEmail(user)}
-                      disabled={resendMutation.isPending}
-                    >
-                      <span className="material-symbols-outlined text-[18px]">forward_to_inbox</span>
-                    </button>
+                    <>
+                      <button
+                        className="text-primary hover:text-primary/80 transition-colors p-1.5 rounded-lg hover:bg-primary/10 mr-1"
+                        title="Salin Tautan Verifikasi"
+                        onClick={() => handleCopyVerificationLink(user)}
+                        disabled={resendMutation.isPending}
+                      >
+                        <span className="material-symbols-outlined text-[18px]">content_copy</span>
+                      </button>
+                      <button
+                        className="text-amber-400 hover:text-amber-300 transition-colors p-1.5 rounded-lg hover:bg-amber-500/10 mr-1"
+                        title="Kirim Ulang Email Verifikasi"
+                        onClick={() => handleResendEmail(user)}
+                        disabled={resendMutation.isPending}
+                      >
+                        <span className="material-symbols-outlined text-[18px]">forward_to_inbox</span>
+                      </button>
+                    </>
                   )}
                   <button 
                     className="text-on-surface-variant hover:text-primary transition-colors p-1.5 rounded-lg hover:bg-surface-variant" 
@@ -314,11 +428,6 @@ const TabUsers = ({ tabDataRef }) => {
               </button>
             </div>
 
-            <div className="p-3 mb-4 rounded-lg bg-primary/10 border border-primary/20 text-xs text-primary flex items-start gap-2">
-              <span className="material-symbols-outlined text-[18px] shrink-0">info</span>
-              <span>Email undangan & link verifikasi akan otomatis dikirimkan. Pengguna akan mengatur kata sandi sendiri melalui link tersebut.</span>
-            </div>
-
             <form onSubmit={handleAddUser} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-md text-on-surface font-medium">Nama Lengkap <span className="text-error">*</span></label>
@@ -342,7 +451,7 @@ const TabUsers = ({ tabDataRef }) => {
                   required
                 />
               </div>
-              <div className="flex flex-col gap-1.5 mb-2">
+              <div className="flex flex-col gap-1.5">
                 <label className="font-label-md text-on-surface font-medium">Peran (Role) <span className="text-error">*</span></label>
                 <select 
                   value={newUser.role}
@@ -355,6 +464,78 @@ const TabUsers = ({ tabDataRef }) => {
                   ))}
                 </select>
               </div>
+
+              {/* Direct Activate Checkbox Option */}
+              <div className="pt-2 pb-1 border-t border-outline-variant/40">
+                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-primary/5 hover:bg-primary/10 border border-primary/20 transition-all select-none">
+                  <input
+                    type="checkbox"
+                    checked={newUser.directActivate}
+                    onChange={(e) => setNewUser({ ...newUser, directActivate: e.target.checked })}
+                    className="mt-0.5 w-4 h-4 rounded text-primary focus:ring-primary border-outline-variant"
+                  />
+                  <div className="text-xs">
+                    <span className="font-semibold text-on-surface block text-sm">
+                      Langsung aktifkan akun & buat kata sandi sekarang
+                    </span>
+                    <span className="text-on-surface-variant block mt-0.5">
+                      {newUser.directActivate
+                        ? 'Akun langsung aktif tanpa harus menunggu verifikasi email. Cocok untuk pendaftaran cepat.'
+                        : 'Pengguna akan menerima email/link verifikasi untuk mengatur kata sandinya sendiri.'}
+                    </span>
+                  </div>
+                </label>
+              </div>
+
+              {/* Conditional Password Inputs */}
+              {newUser.directActivate ? (
+                <div className="space-y-3 p-3 rounded-xl bg-surface-variant/30 border border-outline-variant/50 animate-in fade-in duration-200">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-label-md text-on-surface font-medium text-xs">
+                      Kata Sandi Awal <span className="text-error">*</span>
+                    </label>
+                    <div className="relative">
+                      <input 
+                        type={showPassword ? 'text' : 'password'}
+                        value={newUser.password}
+                        onChange={e => setNewUser({...newUser, password: e.target.value})}
+                        className="glass-input w-full px-3 py-2 rounded-lg text-on-surface font-body-md text-sm pr-10"
+                        placeholder="Minimal 8 karakter"
+                        required={newUser.directActivate}
+                        minLength={8}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">
+                          {showPassword ? 'visibility_off' : 'visibility'}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-label-md text-on-surface font-medium text-xs">
+                      Konfirmasi Kata Sandi <span className="text-error">*</span>
+                    </label>
+                    <input 
+                      type={showPassword ? 'text' : 'password'}
+                      value={newUser.confirmPassword}
+                      onChange={e => setNewUser({...newUser, confirmPassword: e.target.value})}
+                      className="glass-input w-full px-3 py-2 rounded-lg text-on-surface font-body-md text-sm"
+                      placeholder="Ulangi kata sandi"
+                      required={newUser.directActivate}
+                      minLength={8}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 text-xs text-primary flex items-start gap-2 animate-in fade-in duration-200">
+                  <span className="material-symbols-outlined text-[18px] shrink-0">info</span>
+                  <span>Email undangan & link verifikasi akan otomatis dikirimkan. Anda juga dapat langsung menyalin tautan verifikasi setelah disimpan.</span>
+                </div>
+              )}
 
               <div className="flex justify-end gap-3 mt-4">
                 <button 
@@ -370,10 +551,82 @@ const TabUsers = ({ tabDataRef }) => {
                   className="px-4 py-2 rounded-lg font-label-md bg-primary hover:bg-primary/90 text-white transition-colors flex items-center gap-2 shadow-lg shadow-primary/20"
                   disabled={createMutation.isPending}
                 >
-                  {createMutation.isPending ? 'Menyimpan & Mengirim Email...' : 'Tambah & Kirim Undangan'}
+                  {createMutation.isPending ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Menyimpan...</span>
+                    </>
+                  ) : (
+                    newUser.directActivate ? 'Tambah & Aktifkan Pengguna' : 'Tambah & Buat Tautan'
+                  )}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Verification Link Result Modal */}
+      {createdResultModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="glass-panel p-5 sm:p-6 w-[calc(100%-2rem)] max-w-lg rounded-2xl shadow-2xl border border-outline bg-surface animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 text-primary flex items-center justify-center font-bold">
+                <span className="material-symbols-outlined">mark_email_read</span>
+              </div>
+              <div>
+                <h3 className="text-title-md font-bold text-on-surface m-0">Tautan Verifikasi Akun</h3>
+                <p className="text-xs text-on-surface-variant m-0">
+                  Untuk: <strong>{createdResultModal.name}</strong> ({createdResultModal.email})
+                </p>
+              </div>
+            </div>
+
+            {createdResultModal.emailSent ? (
+              <div className="p-3 mb-4 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
+                <span className="material-symbols-outlined text-[18px] shrink-0">check_circle</span>
+                <span>Email undangan & verifikasi telah berhasil dikirim ke alamat email pengurus.</span>
+              </div>
+            ) : (
+              <div className="p-3 mb-4 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs flex items-start gap-2">
+                <span className="material-symbols-outlined text-[18px] shrink-0">warning</span>
+                <div>
+                  <span className="font-semibold block">Email otomatis belum terkirim via SMTP.</span>
+                  <span>Anda dapat menyalin tautan di bawah ini dan membagikannya secara langsung kepada pengurus via WhatsApp / pesan pribadi.</span>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-2 mb-5">
+              <label className="text-xs font-medium text-on-surface-variant block">Tautan Verifikasi Mandiri:</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={createdResultModal.verificationLink || ''}
+                  className="glass-input flex-1 px-3 py-2 rounded-lg text-xs text-on-surface font-mono select-all"
+                  onClick={(e) => e.target.select()}
+                />
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(createdResultModal.verificationLink, 'Tautan verifikasi disalin ke papan klip!')}
+                  className="bg-primary hover:bg-primary/90 text-white px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1 shrink-0 shadow-md shadow-primary/20"
+                >
+                  <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                  <span>Salin</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setCreatedResultModal(null)}
+                className="px-4 py-2 rounded-lg font-label-md bg-surface-variant hover:bg-surface-variant/80 text-on-surface text-sm font-medium transition-colors"
+              >
+                Selesai
+              </button>
+            </div>
           </div>
         </div>
       )}
