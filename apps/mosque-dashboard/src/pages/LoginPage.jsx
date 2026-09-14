@@ -15,32 +15,58 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [backendStatus, setBackendStatus] = useState('checking'); // 'checking' | 'connected' | 'error'
+  const [backendStatus, setBackendStatus] = useState('checking'); // 'checking' | 'connected' | 'missing_env' | 'error'
   const [backendUrl, setBackendUrl] = useState('');
+  const [backendErrorDetails, setBackendErrorDetails] = useState('');
   const navigate = useNavigate();
 
   const { data: session, isPending: isSessionPending } = authClient.useSession();
 
   // Test backend connectivity on mount
-  useEffect(() => {
-    let isMounted = true;
-    const checkBackend = async () => {
-      try {
-        const rootUrl = API_BASE.replace(/\/api$/, '');
-        setBackendUrl(rootUrl || window.location.origin);
-        const healthEndpoint = `${rootUrl || ''}/api/health`;
-        const res = await fetch(healthEndpoint, { method: 'GET', credentials: 'omit' });
-        if (res.ok) {
-          if (isMounted) setBackendStatus('connected');
-        } else {
-          if (isMounted) setBackendStatus('error');
+  const checkBackend = async () => {
+    setBackendStatus('checking');
+    setBackendErrorDetails('');
+    const rawApi = import.meta.env.VITE_API_URL;
+    const isVercelHost = typeof window !== 'undefined' && window.location.hostname.endsWith('.vercel.app');
+
+    if (!rawApi && isVercelHost) {
+      setBackendStatus('missing_env');
+      setBackendUrl(window.location.origin);
+      setBackendErrorDetails('Variabel VITE_API_URL belum diset pada Project Settings -> Environment Variables di Vercel.');
+      return;
+    }
+
+    const rootUrl = API_BASE.replace(/\/api$/, '');
+    setBackendUrl(rootUrl || (typeof window !== 'undefined' ? window.location.origin : ''));
+
+    try {
+      const healthEndpoint = `${rootUrl || ''}/api/health`;
+      const res = await fetch(healthEndpoint, { method: 'GET', credentials: 'omit' });
+      const contentType = res.headers.get('content-type') || '';
+
+      if (res.ok && contentType.includes('application/json')) {
+        const data = await res.json().catch(() => ({}));
+        if (data.status === 'ok') {
+          setBackendStatus('connected');
+          return;
         }
-      } catch {
-        if (isMounted) setBackendStatus('error');
       }
-    };
+
+      if (contentType.includes('text/html')) {
+        setBackendStatus('missing_env');
+        setBackendErrorDetails('Endpoint mengembalikan file HTML (bukan JSON API). VITE_API_URL di Vercel belum mengarah ke backend Railway.');
+      } else {
+        setBackendStatus('error');
+        setBackendErrorDetails(`Server Railway mengembalikan status HTTP ${res.status}`);
+      }
+    } catch (err) {
+      setBackendStatus('error');
+      setBackendErrorDetails(err?.message || 'Gagal terhubung ke backend (CORS atau Server Railway Offline)');
+    }
+  };
+
+  useEffect(() => {
     checkBackend();
-    return () => { isMounted = false; };
   }, []);
 
   // Automatically redirect if already authenticated or session turns valid

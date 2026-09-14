@@ -79,25 +79,11 @@ export function getCorsOrigins(requestOrigin?: string): string[] {
       const parsedUrl = new URL(requestOrigin);
       const cleanOrigin = parsedUrl.origin;
       const hostname = parsedUrl.hostname;
-      let isAllowedVercelDomain = false;
-      if (env.FRONTEND_URL && env.FRONTEND_URL.includes(".vercel.app")) {
-        try {
-          const frontendHost = new URL(env.FRONTEND_URL).hostname;
-          const projectName = frontendHost.split(".")[0];
-          // Allow exact frontend domain or legitimate project preview deployments (e.g. mosque-dashboard-git-main-xxx.vercel.app)
-          if (
-            hostname === frontendHost ||
-            (projectName && hostname.startsWith(`${projectName}-`) && hostname.endsWith(".vercel.app"))
-          ) {
-            isAllowedVercelDomain = true;
-          }
-        } catch {}
-      } else if (hostname.endsWith(".vercel.app") && env.NODE_ENV === "development") {
-        isAllowedVercelDomain = true;
-      }
+      // Allow any Vercel domain (*.vercel.app), localhost, or LAN network address
+      const isVercelDomain = hostname.endsWith(".vercel.app");
 
       if (
-        isAllowedVercelDomain ||
+        isVercelDomain ||
         hostname === "localhost" ||
         hostname === "127.0.0.1" ||
         env.NODE_ENV === "development" ||
