@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { eq, like, and, sql, desc, or } from "drizzle-orm";
+import { eq, like, and, sql, desc, or, isNotNull } from "drizzle-orm";
 import { db } from "../config/db.js";
 import { jemaah } from "../db/schema/index.js";
 
@@ -168,6 +168,27 @@ export class JemaahService {
       Yatim: Number(row.Yatim || 0),
       Fakir: Number(row.Fakir || 0),
     };
+  }
+
+  /**
+   * Anonymous map coordinates for Landing Page interactive map.
+   * Returns only id, category, lat, lng — NO personal data (name, phone, email, address).
+   * Only includes jemaah who explicitly consented to GPS access (lat/lng non-null).
+   */
+  async getMapCoordinates() {
+    const data = await db
+      .select({
+        id: jemaah.id,
+        category: jemaah.category,
+        lat: jemaah.lat,
+        lng: jemaah.lng,
+      })
+      .from(jemaah)
+      .where(and(isNotNull(jemaah.lat), isNotNull(jemaah.lng)))
+      .orderBy(desc(jemaah.createdAt))
+      .limit(200);
+
+    return data;
   }
 }
 

@@ -59,6 +59,11 @@ export class JemaahController {
     res.json({ message: "Jemaah deleted", data: result });
   }
 
+  async getMapCoordinates(req: Request, res: Response) {
+    const result = await jemaahService.getMapCoordinates();
+    res.json(result);
+  }
+
   async getSummary(req: Request, res: Response) {
     const result = await jemaahService.getSummary();
     res.json(result);

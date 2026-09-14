@@ -8,32 +8,45 @@ import {
   Building2, 
   Compass,
   Navigation,
-  Info
+  Info,
+  MapPinOff
 } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useSettings } from '../../contexts/SettingsContext';
-import { useJemaahSummary } from '../../hooks/useJemaah';
+import { useJemaahSummary, useJemaahMapCoordinates } from '../../hooks/useJemaah';
 
 // ─── Color Palette for Categories ──────────────────────────────────────────
 const CATEGORY_COLORS = {
   'Semua': '#10B981',
-  'Jamaah Rutin': '#10B981', // Emerald
-  'Muzakki': '#3B82F6',      // Blue
-  'Mustahik': '#F59E0B',     // Amber
-  'Lansia': '#8B5CF6'        // Purple
+  'Umum': '#10B981',       // Emerald (mapped from "Jamaah Rutin" display)
+  'Muzakki': '#3B82F6',    // Blue
+  'Mustahik': '#F59E0B',   // Amber
+  'Lansia': '#8B5CF6'      // Purple
 };
 
-// Deterministic pseudo-random number generator for stable point scattering
-function seededRandom(seed) {
-  const x = Math.sin(seed * 9999) * 10000;
-  return x - Math.floor(x);
-}
+// Display label mapping for categories
+const CATEGORY_DISPLAY = {
+  'Umum': 'Jemaah Rutin (Aktif)',
+  'Muzakki': 'Donatur & Muzakki ZISWAF',
+  'Mustahik': 'Penerima Manfaat / Mustahik',
+  'Lansia': 'Jemaah Lansia Terdata',
+};
+
+// Filter pill labels (display name → actual DB category)
+const FILTER_CATEGORIES = [
+  { display: 'Semua', value: 'Semua' },
+  { display: 'Jamaah Rutin', value: 'Umum' },
+  { display: 'Muzakki', value: 'Muzakki' },
+  { display: 'Mustahik', value: 'Mustahik' },
+  { display: 'Lansia', value: 'Lansia' },
+];
 
 
 const LandingDistributionMap = () => {
   const { profile } = useSettings();
   const { data: jemaahSummary } = useJemaahSummary();
+  const { data: mapCoordinates = [], isLoading: isLoadingCoords } = useJemaahMapCoordinates();
 
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -50,69 +63,54 @@ const LandingDistributionMap = () => {
   const mosqueName = profile?.orgName || 'Masjid Al-Falah';
   const mosqueAddress = profile?.address || 'Jl. Raya Pendidikan No. 123, Bandung';
 
-  // Statistics calculation based on real DB jemaahSummary
-  const totalTerdata = jemaahSummary ? (jemaahSummary.total || 0) : 485;
-  const countMuzakki = jemaahSummary ? (jemaahSummary.Muzakki || 0) : 6;
-  const countMustahik = jemaahSummary ? (jemaahSummary.Mustahik || 0) : 5;
-  const countLansia = jemaahSummary ? (jemaahSummary.Lansia || 0) : 4;
-  const countRutin = jemaahSummary ? (jemaahSummary.Umum || 0) : 11;
-  const totalRt = 14;
-  const radiusText = '150';
+  // Statistics from real DB jemaahSummary
+  const totalTerdata = jemaahSummary ? (jemaahSummary.total || 0) : 0;
+  const countMuzakki = jemaahSummary ? (jemaahSummary.Muzakki || 0) : 0;
+  const countMustahik = jemaahSummary ? (jemaahSummary.Mustahik || 0) : 0;
+  const countLansia = jemaahSummary ? (jemaahSummary.Lansia || 0) : 0;
+  const countRutin = jemaahSummary ? (jemaahSummary.Umum || 0) : 0;
 
-  // Generate dynamic pseudo scatter points centered strictly within a 150m radius of mosque coordinates
-  const generatedPoints = useMemo(() => {
-    const categories = [
-      { key: 'Jamaah Rutin', count: countRutin > 0 ? countRutin : 11, label: 'Jemaah Rutin (Aktif)' },
-      { key: 'Muzakki', count: countMuzakki > 0 ? countMuzakki : 6, label: 'Donatur & Muzakki ZISWAF' },
-      { key: 'Mustahik', count: countMustahik > 0 ? countMustahik : 5, label: 'Penerima Manfaat / Mustahik' },
-      { key: 'Lansia', count: countLansia > 0 ? countLansia : 4, label: 'Jemaah Lansia Terdata' },
-    ];
+  // Transform API data into map points with distance calculation
+  const realPoints = useMemo(() => {
+    if (!mapCoordinates || mapCoordinates.length === 0) return [];
 
-    const result = [];
-    let globalIdx = 1;
     const cosLat = Math.cos(mosqueLat * Math.PI / 180);
 
-    categories.forEach((catInfo) => {
-      // Cap visible markers per category to 25 to prevent performance bottlenecks on Leaflet
-      const visibleCount = Math.min(catInfo.count, 25);
+    return mapCoordinates.map((item, index) => {
+      // Calculate distance from mosque in meters using Haversine approximation
+      const dLat = (item.lat - mosqueLat) * 111320;
+      const dLng = (item.lng - mosqueLng) * 111320 * cosLat;
+      const distMeters = Math.round(Math.sqrt(dLat * dLat + dLng * dLng));
 
-      for (let i = 0; i < visibleCount; i++) {
-        const seed = globalIdx * 37 + i * 13;
-        const angle = seededRandom(seed) * Math.PI * 2;
-        // Strictly between 20 meters and 145 meters from mosque center (within 150m max radius)
-        const distMeters = Math.round(20 + seededRandom(seed + 1) * 125);
-
-        const latOffset = (distMeters / 111320) * Math.sin(angle);
-        const lngOffset = (distMeters / (111320 * cosLat)) * Math.cos(angle);
-
-        const pointLat = mosqueLat + latOffset;
-        const pointLng = mosqueLng + lngOffset;
-
-        const formattedDist = `${distMeters} m`;
-        const rtNum = (globalIdx % 12) + 1;
-        const rwNum = (globalIdx % 4) + 3;
-
-        result.push({
-          id: `JM-${String(globalIdx).padStart(3, '0')}`,
-          code: `JMH-RT${String(rtNum).padStart(2, '0')}-${String(i + 1).padStart(2, '0')}`,
-          rt: `RT ${String(rtNum).padStart(2, '0')} / RW ${String(rwNum).padStart(2, '0')}`,
-          lat: pointLat,
-          lng: pointLng,
-          category: catInfo.key,
-          label: catInfo.label,
-          distance: formattedDist,
-        });
-        globalIdx++;
-      }
+      return {
+        id: item.id,
+        code: `JMH-${String(index + 1).padStart(3, '0')}`,
+        lat: item.lat,
+        lng: item.lng,
+        category: item.category,
+        label: CATEGORY_DISPLAY[item.category] || item.category,
+        distance: `${distMeters} m`,
+        distanceMeters: distMeters,
+      };
     });
-
-    return result;
-  }, [mosqueLat, mosqueLng, countRutin, countMuzakki, countMustahik, countLansia]);
+  }, [mapCoordinates, mosqueLat, mosqueLng]);
 
   // Filtered Points based on selected Category Filter
   const filteredPoints = activeCategory === 'Semua' 
-    ? generatedPoints 
-    : generatedPoints.filter(p => p.category === activeCategory);
+    ? realPoints 
+    : realPoints.filter(p => p.category === activeCategory);
+
+  // Dynamic radius calculation from real data
+  const maxRadius = useMemo(() => {
+    if (realPoints.length === 0) return 0;
+    return Math.max(...realPoints.map(p => p.distanceMeters));
+  }, [realPoints]);
+
+  const radiusText = maxRadius > 0 ? (maxRadius > 1000 ? `${(maxRadius / 1000).toFixed(1)} km` : `${maxRadius}`) : '—';
+  const radiusUnit = maxRadius > 1000 ? '' : 'meter';
+
+  // Count of jemaah with GPS coordinates
+  const totalWithCoords = realPoints.length;
 
   // Initialize Leaflet Map
   useEffect(() => {
@@ -172,7 +170,7 @@ const LandingDistributionMap = () => {
     `);
     mosqueMarkerRef.current = mosqueMarker;
 
-    // Radius circle around mosque
+    // Radius circle around mosque — will be updated dynamically
     const mosqueCircle = L.circle([mosqueLat, mosqueLng], {
       color: '#10B981',
       fillColor: '#10B981',
@@ -231,12 +229,22 @@ const LandingDistributionMap = () => {
     }
   }, [mosqueLat, mosqueLng, mosqueName, mosqueAddress]);
 
+  // Update radius circle based on real data spread
+  useEffect(() => {
+    if (!mosqueCircleRef.current) return;
+    // Use the max radius from real data, with a minimum of 150m for visual aesthetics
+    const circleRadius = Math.max(maxRadius, 150);
+    mosqueCircleRef.current.setRadius(circleRadius);
+  }, [maxRadius]);
+
   // Update Markers when category filter or display mode changes
   useEffect(() => {
     if (!layerGroupRef.current || !mapInstanceRef.current) return;
 
     const layerGroup = layerGroupRef.current;
     layerGroup.clearLayers();
+
+    if (filteredPoints.length === 0) return;
 
     if (displayMode === 'pins') {
       filteredPoints.forEach((point) => {
@@ -264,14 +272,11 @@ const LandingDistributionMap = () => {
             <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-2 mb-2">
               <span class="text-xs font-semibold text-slate-500">${point.code}</span>
               <span class="px-2 py-0.5 text-[10px] font-bold rounded-full text-white" style="background-color: ${color}">
-                ${point.category}
+                ${point.category === 'Umum' ? 'Jamaah Rutin' : point.category}
               </span>
             </div>
             <div class="font-bold text-sm text-slate-900 mb-1">${point.label}</div>
             <div class="text-xs text-slate-600 space-y-1">
-              <div class="flex items-center gap-1.5">
-                <span class="text-slate-400">📍</span> ${point.rt}
-              </div>
               <div class="flex items-center gap-1.5">
                 <span class="text-slate-400">📏</span> <strong>${point.distance}</strong> dari Masjid
               </div>
@@ -297,7 +302,7 @@ const LandingDistributionMap = () => {
           radius: 30,
           weight: 1
         });
-        circle.bindTooltip(`${point.rt} - ${point.category}`, { permanent: false });
+        circle.bindTooltip(`${point.category === 'Umum' ? 'Jamaah Rutin' : point.category} — ${point.distance}`, { permanent: false });
         layerGroup.addLayer(circle);
       });
     }
@@ -333,25 +338,25 @@ const LandingDistributionMap = () => {
             <span className="text-[11px] sm:text-xs text-slate-400 font-medium flex items-center gap-1 sm:gap-1.5 pr-2 border-r border-white/10 shrink-0 whitespace-nowrap">
               <Filter className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400" /> Filter:
             </span>
-            {['Semua', 'Jamaah Rutin', 'Muzakki', 'Mustahik', 'Lansia'].map((cat) => {
-              const active = activeCategory === cat;
+            {FILTER_CATEGORIES.map(({ display, value }) => {
+              const active = activeCategory === value;
               return (
                 <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
+                  key={value}
+                  onClick={() => setActiveCategory(value)}
                   className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition-all duration-200 whitespace-nowrap flex items-center gap-1.5 sm:gap-2 shrink-0 ${
                     active
                       ? 'bg-emerald-500 text-slate-950 font-bold shadow-lg shadow-emerald-500/20'
                       : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white border border-white/10'
                   }`}
                 >
-                  {cat !== 'Semua' && (
+                  {value !== 'Semua' && (
                     <span 
                       className="w-2 h-2 rounded-full shrink-0" 
-                      style={{ backgroundColor: CATEGORY_COLORS[cat] }}
+                      style={{ backgroundColor: CATEGORY_COLORS[value] }}
                     />
                   )}
-                  {cat}
+                  {display}
                 </button>
               );
             })}
@@ -405,18 +410,18 @@ const LandingDistributionMap = () => {
                 <div className="text-2xl sm:text-3xl font-extrabold text-white mb-1">{totalTerdata} <span className="text-[10px] sm:text-xs font-normal text-emerald-400">Jiwa</span></div>
                 <div className="text-[10px] sm:text-xs text-slate-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
-                  <span>Terhubung ke Database</span>
+                  <span>{totalWithCoords} jemaah memiliki koordinat GPS</span>
                 </div>
               </div>
 
-              {/* Stat Card 2: Cakupan Wilayah */}
+              {/* Stat Card 2: Titik GPS Aktif */}
               <div className="bg-[#0d1820]/90 border border-white/10 rounded-2xl p-3.5 sm:p-5 shadow-lg min-w-[180px] sm:min-w-[220px] lg:min-w-0 shrink-0 lg:shrink">
                 <div className="flex items-center justify-between text-slate-400 text-[11px] sm:text-xs mb-1.5 sm:mb-2">
-                  <span>Cakupan Wilayah</span>
+                  <span>Titik GPS Aktif</span>
                   <Building2 className="w-4 h-4 text-blue-400 shrink-0" />
                 </div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-white mb-1">{totalRt} <span className="text-[10px] sm:text-xs font-normal text-blue-400">RT / 4 RW</span></div>
-                <p className="text-[10px] sm:text-xs text-slate-400 hidden sm:block">Tersebar di seluruh RW Kelurahan sekitar masjid.</p>
+                <div className="text-2xl sm:text-3xl font-extrabold text-white mb-1">{totalWithCoords} <span className="text-[10px] sm:text-xs font-normal text-blue-400">Titik</span></div>
+                <p className="text-[10px] sm:text-xs text-slate-400 hidden sm:block">Jemaah yang menyetujui akses lokasi GPS.</p>
               </div>
 
               {/* Stat Card 3: Radius */}
@@ -425,8 +430,8 @@ const LandingDistributionMap = () => {
                   <span>Radius Sebaran</span>
                   <Navigation className="w-4 h-4 text-amber-400 shrink-0" />
                 </div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-white mb-1">~{radiusText} <span className="text-[10px] sm:text-xs font-normal text-amber-400">meter</span></div>
-                <p className="text-[10px] sm:text-xs text-slate-400 hidden sm:block">Radius sebaran titik jemaah dari lokasi masjid.</p>
+                <div className="text-2xl sm:text-3xl font-extrabold text-white mb-1">~{radiusText} <span className="text-[10px] sm:text-xs font-normal text-amber-400">{radiusUnit}</span></div>
+                <p className="text-[10px] sm:text-xs text-slate-400 hidden sm:block">Radius sebaran terjauh titik jemaah dari lokasi masjid.</p>
               </div>
             </div>
 
@@ -472,11 +477,26 @@ const LandingDistributionMap = () => {
             {/* Map Canvas — explicit height for Leaflet to render correctly */}
             <div ref={mapContainerRef} className="w-full max-w-full h-[40vh] min-h-[260px] max-h-[440px] sm:h-[55vh] lg:h-[540px] lg:max-h-none z-10"></div>
 
+            {/* Empty State Overlay — shown when no jemaah have GPS coordinates */}
+            {!isLoadingCoords && realPoints.length === 0 && (
+              <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+                <div className="bg-[#0b131a]/95 border border-white/10 rounded-2xl p-6 sm:p-8 text-center max-w-sm mx-4 pointer-events-auto shadow-2xl">
+                  <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                    <MapPinOff className="w-7 h-7 text-emerald-400" />
+                  </div>
+                  <h3 className="text-sm font-bold text-white mb-2">Belum Ada Data Koordinat Jemaah</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Titik lokasi akan muncul secara otomatis setelah jemaah mendaftar melalui formulir pendaftaran dan menyetujui akses lokasi GPS mereka.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Privacy Protection Overlay Badge at Bottom */}
             <div className="bg-[#060b10]/90 border-t border-white/10 p-2.5 sm:p-3 px-3 sm:px-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 text-[10px] sm:text-xs text-slate-300 z-20 w-full max-w-full min-w-0 overflow-hidden">
               <div className="flex items-start sm:items-center gap-1.5 sm:gap-2 text-emerald-400 font-medium min-w-0">
                 <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-emerald-400 mt-0.5 sm:mt-0" />
-                <span className="break-words">Privasi Terjaga: Koordinat anonim berdasarkan statistik database.</span>
+                <span className="break-words">Privasi Terjaga: Hanya menampilkan jemaah yang menyetujui akses lokasi GPS.</span>
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2 text-slate-400 flex-wrap shrink-0">
                 <span>Pusat: <strong className="text-white">{mosqueName}</strong></span>

@@ -93,6 +93,7 @@ export const jemaahApi = {
   update: (id, data) => request(`/jemaah/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   delete: (id) => request(`/jemaah/${id}`, { method: "DELETE" }),
   getSummary: () => request("/jemaah/summary"),
+  getMapCoordinates: () => request("/jemaah/map-coordinates"),
 };
 
 export const inventarisApi = {

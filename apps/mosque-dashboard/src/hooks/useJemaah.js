@@ -27,6 +27,14 @@ export function useJemaahSummary(options = {}) {
   });
 }
 
+export function useJemaahMapCoordinates(options = {}) {
+  return useQuery({
+    queryKey: ["jemaahMapCoordinates"],
+    queryFn: () => jemaahApi.getMapCoordinates(),
+    ...options,
+  });
+}
+
 export function useCreateJemaah() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -36,6 +44,7 @@ export function useCreateJemaah() {
       queryClient.invalidateQueries({ queryKey: ["jemaah"] });
       queryClient.invalidateQueries({ queryKey: ["jemaahSummary"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["jemaahMapCoordinates"] });
     },
     onError: (error) => {
       toast.error(error.message || "Gagal menambahkan data jemaah");
@@ -52,6 +61,7 @@ export function usePublicRegisterJemaah() {
       queryClient.invalidateQueries({ queryKey: ["jemaah"] });
       queryClient.invalidateQueries({ queryKey: ["jemaahSummary"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["jemaahMapCoordinates"] });
     },
     onError: (error) => {
       toast.error(error.message || "Gagal mendaftar jemaah");
@@ -69,6 +79,7 @@ export function useUpdateJemaah() {
       queryClient.invalidateQueries({ queryKey: ["jemaah", variables.id] });
       queryClient.invalidateQueries({ queryKey: ["jemaahSummary"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["jemaahMapCoordinates"] });
     },
     onError: (error) => {
       toast.error(error.message || "Gagal memperbarui data jemaah");
@@ -85,6 +96,7 @@ export function useDeleteJemaah() {
       queryClient.invalidateQueries({ queryKey: ["jemaah"] });
       queryClient.invalidateQueries({ queryKey: ["jemaahSummary"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["jemaahMapCoordinates"] });
     },
     onError: (error) => {
       toast.error(error.message || "Gagal menghapus data jemaah");

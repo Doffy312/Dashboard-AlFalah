@@ -11,6 +11,10 @@ const router = Router();
 // Public aggregate jemaah category counts for Landing Page counter
 router.get("/summary", jemaahController.getSummary);
 
+// Public anonymous jemaah map coordinates for Landing Page interactive map
+// Returns only id, category, lat, lng — no PII exposed
+router.get("/map-coordinates", jemaahController.getMapCoordinates);
+
 // Public self-registration endpoint for landing page (Scan QR)
 router.post(
   "/public-register",
