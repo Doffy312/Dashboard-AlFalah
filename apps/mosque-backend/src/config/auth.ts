@@ -10,10 +10,17 @@ import * as schema from "../db/schema/index.js";
 // Otherwise browsers silently block cookies on cross-origin fetch(),
 // breaking all authentication flows.
 function isCrossDomainDeployment(): boolean {
+  if (env.NODE_ENV !== "production") {
+    return false;
+  }
   try {
     const frontendOrigin = new URL(env.FRONTEND_URL).origin;
     const backendOrigin = new URL(env.BETTER_AUTH_URL).origin;
-    return frontendOrigin !== backendOrigin;
+    return (
+      frontendOrigin !== backendOrigin &&
+      frontendOrigin.startsWith("https://") &&
+      backendOrigin.startsWith("https://")
+    );
   } catch {
     return false;
   }
