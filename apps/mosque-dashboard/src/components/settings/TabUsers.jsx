@@ -416,47 +416,56 @@ const TabUsers = ({ tabDataRef }) => {
 
       {/* Add User Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="glass-panel p-4 sm:p-6 w-[calc(100%-2rem)] max-w-md max-h-[90vh] overflow-y-auto rounded-2xl animate-in zoom-in-95 duration-200 shadow-2xl border border-outline bg-surface">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-title-md font-bold text-on-surface m-0">Tambah Pengguna Baru</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
+          <div className="w-full max-w-md my-auto flex flex-col max-h-[calc(100dvh-2rem)] sm:max-h-[88vh] rounded-2xl shadow-2xl border border-outline bg-surface overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Pinned Header */}
+            <div className="flex justify-between items-center px-5 py-4 border-b border-outline-variant/40 shrink-0 bg-surface">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[20px]">person_add</span>
+                </div>
+                <h3 className="text-title-md font-bold text-on-surface m-0">Tambah Pengguna Baru</h3>
+              </div>
               <button 
+                type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-on-surface-variant hover:text-primary p-1 rounded-lg hover:bg-surface-variant"
+                className="text-on-surface-variant hover:text-primary p-1.5 rounded-lg hover:bg-surface-variant transition-colors"
+                title="Tutup"
               >
-                <span className="material-symbols-outlined">close</span>
+                <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
 
-            <form onSubmit={handleAddUser} className="flex flex-col gap-4">
+            {/* Scrollable Form Body */}
+            <form id="addUserForm" onSubmit={handleAddUser} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 overscroll-contain">
               <div className="flex flex-col gap-1.5">
-                <label className="font-label-md text-on-surface font-medium">Nama Lengkap <span className="text-error">*</span></label>
+                <label className="font-label-md text-on-surface font-medium text-xs">Nama Lengkap <span className="text-error">*</span></label>
                 <input 
                   type="text" 
                   value={newUser.name}
                   onChange={e => setNewUser({...newUser, name: e.target.value})}
-                  className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md"
+                  className="glass-input w-full px-3.5 py-2.5 rounded-xl text-on-surface font-body-md text-sm"
                   placeholder="Masukkan nama lengkap pengurus"
                   required
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="font-label-md text-on-surface font-medium">Email <span className="text-error">*</span></label>
+                <label className="font-label-md text-on-surface font-medium text-xs">Email <span className="text-error">*</span></label>
                 <input 
                   type="email" 
                   value={newUser.email}
                   onChange={e => setNewUser({...newUser, email: e.target.value})}
-                  className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md"
+                  className="glass-input w-full px-3.5 py-2.5 rounded-xl text-on-surface font-body-md text-sm"
                   placeholder="email@contoh.com"
                   required
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="font-label-md text-on-surface font-medium">Peran (Role) <span className="text-error">*</span></label>
+                <label className="font-label-md text-on-surface font-medium text-xs">Peran (Role) <span className="text-error">*</span></label>
                 <select 
                   value={newUser.role}
                   onChange={e => setNewUser({...newUser, role: e.target.value})}
-                  className="glass-input w-full px-4 py-2.5 rounded-lg text-on-surface font-body-md appearance-none pr-10"
+                  className="glass-input w-full px-3.5 py-2.5 rounded-xl text-on-surface font-body-md text-sm appearance-none pr-10"
                   required
                 >
                   {ROLES.map(role => (
@@ -472,13 +481,13 @@ const TabUsers = ({ tabDataRef }) => {
                     type="checkbox"
                     checked={newUser.directActivate}
                     onChange={(e) => setNewUser({ ...newUser, directActivate: e.target.checked })}
-                    className="mt-0.5 w-4 h-4 rounded text-primary focus:ring-primary border-outline-variant"
+                    className="mt-0.5 w-4 h-4 rounded text-primary focus:ring-primary border-outline-variant shrink-0"
                   />
                   <div className="text-xs">
                     <span className="font-semibold text-on-surface block text-sm">
                       Langsung aktifkan akun & buat kata sandi sekarang
                     </span>
-                    <span className="text-on-surface-variant block mt-0.5">
+                    <span className="text-on-surface-variant block mt-0.5 leading-relaxed">
                       {newUser.directActivate
                         ? 'Akun langsung aktif tanpa harus menunggu verifikasi email. Cocok untuk pendaftaran cepat.'
                         : 'Pengguna akan menerima email/link verifikasi untuk mengatur kata sandinya sendiri.'}
@@ -489,7 +498,7 @@ const TabUsers = ({ tabDataRef }) => {
 
               {/* Conditional Password Inputs */}
               {newUser.directActivate ? (
-                <div className="space-y-3 p-3 rounded-xl bg-surface-variant/30 border border-outline-variant/50 animate-in fade-in duration-200">
+                <div className="space-y-3 p-3.5 rounded-xl bg-surface-variant/30 border border-outline-variant/50 animate-in fade-in duration-200">
                   <div className="flex flex-col gap-1.5">
                     <label className="font-label-md text-on-surface font-medium text-xs">
                       Kata Sandi Awal <span className="text-error">*</span>
@@ -507,7 +516,7 @@ const TabUsers = ({ tabDataRef }) => {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface p-1"
                       >
                         <span className="material-symbols-outlined text-[18px]">
                           {showPassword ? 'visibility_off' : 'visibility'}
@@ -531,98 +540,115 @@ const TabUsers = ({ tabDataRef }) => {
                   </div>
                 </div>
               ) : (
-                <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 text-xs text-primary flex items-start gap-2 animate-in fade-in duration-200">
-                  <span className="material-symbols-outlined text-[18px] shrink-0">info</span>
-                  <span>Email undangan & link verifikasi akan otomatis dikirimkan. Anda juga dapat langsung menyalin tautan verifikasi setelah disimpan.</span>
+                <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 text-xs text-primary flex items-start gap-2.5 animate-in fade-in duration-200">
+                  <span className="material-symbols-outlined text-[18px] shrink-0 mt-0.5">info</span>
+                  <span className="leading-relaxed">Email undangan & link verifikasi akan otomatis dikirimkan. Anda juga dapat langsung menyalin tautan verifikasi setelah disimpan.</span>
                 </div>
               )}
-
-              <div className="flex justify-end gap-3 mt-4">
-                <button 
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-lg font-label-md bg-surface-variant hover:bg-surface-variant/80 text-on-surface transition-colors"
-                  disabled={createMutation.isPending}
-                >
-                  Batal
-                </button>
-                <button 
-                  type="submit"
-                  className="px-4 py-2 rounded-lg font-label-md bg-primary hover:bg-primary/90 text-white transition-colors flex items-center gap-2 shadow-lg shadow-primary/20"
-                  disabled={createMutation.isPending}
-                >
-                  {createMutation.isPending ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Menyimpan...</span>
-                    </>
-                  ) : (
-                    newUser.directActivate ? 'Tambah & Aktifkan Pengguna' : 'Tambah & Buat Tautan'
-                  )}
-                </button>
-              </div>
             </form>
+
+            {/* Pinned Footer */}
+            <div className="px-5 py-3.5 border-t border-outline-variant/40 bg-surface/90 backdrop-blur-md flex items-center justify-end gap-3 shrink-0">
+              <button 
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 rounded-xl font-label-md bg-surface-variant hover:bg-surface-variant/80 text-on-surface text-sm transition-colors"
+                disabled={createMutation.isPending}
+              >
+                Batal
+              </button>
+              <button 
+                type="submit"
+                form="addUserForm"
+                className="px-4 py-2 rounded-xl font-label-md bg-primary hover:bg-primary/90 text-white text-sm transition-colors flex items-center gap-2 shadow-lg shadow-primary/20"
+                disabled={createMutation.isPending}
+              >
+                {createMutation.isPending ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Menyimpan...</span>
+                  </>
+                ) : (
+                  newUser.directActivate ? 'Tambah & Aktifkan Pengguna' : 'Tambah & Buat Tautan'
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Verification Link Result Modal */}
       {createdResultModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="glass-panel p-5 sm:p-6 w-[calc(100%-2rem)] max-w-lg rounded-2xl shadow-2xl border border-outline bg-surface animate-in zoom-in-95 duration-200">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-primary/20 text-primary flex items-center justify-center font-bold">
-                <span className="material-symbols-outlined">mark_email_read</span>
-              </div>
-              <div>
-                <h3 className="text-title-md font-bold text-on-surface m-0">Tautan Verifikasi Akun</h3>
-                <p className="text-xs text-on-surface-variant m-0">
-                  Untuk: <strong>{createdResultModal.name}</strong> ({createdResultModal.email})
-                </p>
-              </div>
-            </div>
-
-            {createdResultModal.emailSent ? (
-              <div className="p-3 mb-4 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
-                <span className="material-symbols-outlined text-[18px] shrink-0">check_circle</span>
-                <span>Email undangan & verifikasi telah berhasil dikirim ke alamat email pengurus.</span>
-              </div>
-            ) : (
-              <div className="p-3 mb-4 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs flex items-start gap-2">
-                <span className="material-symbols-outlined text-[18px] shrink-0">warning</span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
+          <div className="w-full max-w-lg my-auto flex flex-col max-h-[calc(100dvh-2rem)] sm:max-h-[85vh] rounded-2xl shadow-2xl border border-outline bg-surface overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Pinned Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-outline-variant/40 shrink-0 bg-surface">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-primary/20 text-primary flex items-center justify-center font-bold shrink-0">
+                  <span className="material-symbols-outlined text-[20px]">mark_email_read</span>
+                </div>
                 <div>
-                  <span className="font-semibold block">Email otomatis belum terkirim via SMTP.</span>
-                  <span>Anda dapat menyalin tautan di bawah ini dan membagikannya secara langsung kepada pengurus via WhatsApp / pesan pribadi.</span>
+                  <h3 className="text-title-md font-bold text-on-surface m-0">Tautan Verifikasi Akun</h3>
+                  <p className="text-xs text-on-surface-variant m-0 mt-0.5">
+                    Untuk: <strong>{createdResultModal.name}</strong> ({createdResultModal.email})
+                  </p>
                 </div>
               </div>
-            )}
-
-            <div className="space-y-2 mb-5">
-              <label className="text-xs font-medium text-on-surface-variant block">Tautan Verifikasi Mandiri:</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  readOnly
-                  value={createdResultModal.verificationLink || ''}
-                  className="glass-input flex-1 px-3 py-2 rounded-lg text-xs text-on-surface font-mono select-all"
-                  onClick={(e) => e.target.select()}
-                />
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(createdResultModal.verificationLink, 'Tautan verifikasi disalin ke papan klip!')}
-                  className="bg-primary hover:bg-primary/90 text-white px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1 shrink-0 shadow-md shadow-primary/20"
-                >
-                  <span className="material-symbols-outlined text-[16px]">content_copy</span>
-                  <span>Salin</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="flex justify-end">
               <button
                 type="button"
                 onClick={() => setCreatedResultModal(null)}
-                className="px-4 py-2 rounded-lg font-label-md bg-surface-variant hover:bg-surface-variant/80 text-on-surface text-sm font-medium transition-colors"
+                className="text-on-surface-variant hover:text-primary p-1.5 rounded-lg hover:bg-surface-variant transition-colors"
+                title="Tutup"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            {/* Scrollable Body */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 overscroll-contain">
+              {createdResultModal.emailSent ? (
+                <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2.5">
+                  <span className="material-symbols-outlined text-[20px] shrink-0">check_circle</span>
+                  <span>Email undangan & verifikasi telah berhasil dikirim ke alamat email pengurus.</span>
+                </div>
+              ) : (
+                <div className="p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs flex items-start gap-2.5">
+                  <span className="material-symbols-outlined text-[20px] shrink-0 mt-0.5">warning</span>
+                  <div>
+                    <span className="font-semibold block text-amber-300">Email otomatis belum terkirim via SMTP.</span>
+                    <span className="mt-0.5 block leading-relaxed">Anda dapat menyalin tautan di bawah ini dan membagikannya secara langsung kepada pengurus via WhatsApp / pesan pribadi.</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-on-surface-variant block">Tautan Verifikasi Mandiri:</label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={createdResultModal.verificationLink || ''}
+                    className="glass-input flex-1 px-3 py-2.5 rounded-xl text-xs text-on-surface font-mono select-all"
+                    onClick={(e) => e.target.select()}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(createdResultModal.verificationLink, 'Tautan verifikasi disalin ke papan klip!')}
+                    className="bg-primary hover:bg-primary/90 text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 shrink-0 shadow-md shadow-primary/20"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                    <span>Salin</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Pinned Footer */}
+            <div className="flex justify-end px-5 py-3.5 border-t border-outline-variant/40 bg-surface/90 backdrop-blur-md shrink-0">
+              <button
+                type="button"
+                onClick={() => setCreatedResultModal(null)}
+                className="px-5 py-2 rounded-xl font-label-md bg-surface-variant hover:bg-surface-variant/80 text-on-surface text-sm font-medium transition-colors"
               >
                 Selesai
               </button>
