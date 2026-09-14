@@ -416,10 +416,18 @@ const TabUsers = ({ tabDataRef }) => {
 
       {/* Add User Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
-          <div className="w-full max-w-md my-auto flex flex-col max-h-[calc(100dvh-2rem)] sm:max-h-[88vh] rounded-2xl shadow-2xl border border-outline bg-surface overflow-hidden animate-in zoom-in-95 duration-200">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsModalOpen(false);
+          }}
+        >
+          <div 
+            className="w-full max-w-md my-auto flex flex-col rounded-2xl shadow-2xl border border-outline bg-surface overflow-hidden animate-in zoom-in-95 duration-200"
+            style={{ maxHeight: 'min(88vh, 660px)' }}
+          >
             {/* Pinned Header */}
-            <div className="flex justify-between items-center px-5 py-4 border-b border-outline-variant/40 shrink-0 bg-surface">
+            <div className="flex justify-between items-center px-5 py-3.5 sm:py-4 border-b border-outline-variant/40 shrink-0 bg-surface">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[20px]">person_add</span>
@@ -436,36 +444,36 @@ const TabUsers = ({ tabDataRef }) => {
               </button>
             </div>
 
-            {/* Scrollable Form Body */}
-            <form id="addUserForm" onSubmit={handleAddUser} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 overscroll-contain">
-              <div className="flex flex-col gap-1.5">
+            {/* Scrollable Form Body with min-h-0 for proper flexbox scrolling */}
+            <form id="addUserForm" onSubmit={handleAddUser} className="flex-1 overflow-y-auto min-h-0 p-4 sm:p-5 space-y-3.5 overscroll-contain">
+              <div className="flex flex-col gap-1">
                 <label className="font-label-md text-on-surface font-medium text-xs">Nama Lengkap <span className="text-error">*</span></label>
                 <input 
                   type="text" 
                   value={newUser.name}
                   onChange={e => setNewUser({...newUser, name: e.target.value})}
-                  className="glass-input w-full px-3.5 py-2.5 rounded-xl text-on-surface font-body-md text-sm"
+                  className="glass-input w-full px-3.5 py-2 rounded-xl text-on-surface font-body-md text-sm"
                   placeholder="Masukkan nama lengkap pengurus"
                   required
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1">
                 <label className="font-label-md text-on-surface font-medium text-xs">Email <span className="text-error">*</span></label>
                 <input 
                   type="email" 
                   value={newUser.email}
                   onChange={e => setNewUser({...newUser, email: e.target.value})}
-                  className="glass-input w-full px-3.5 py-2.5 rounded-xl text-on-surface font-body-md text-sm"
+                  className="glass-input w-full px-3.5 py-2 rounded-xl text-on-surface font-body-md text-sm"
                   placeholder="email@contoh.com"
                   required
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1">
                 <label className="font-label-md text-on-surface font-medium text-xs">Peran (Role) <span className="text-error">*</span></label>
                 <select 
                   value={newUser.role}
                   onChange={e => setNewUser({...newUser, role: e.target.value})}
-                  className="glass-input w-full px-3.5 py-2.5 rounded-xl text-on-surface font-body-md text-sm appearance-none pr-10"
+                  className="glass-input w-full px-3.5 py-2 rounded-xl text-on-surface font-body-md text-sm appearance-none pr-10"
                   required
                 >
                   {ROLES.map(role => (
@@ -475,8 +483,8 @@ const TabUsers = ({ tabDataRef }) => {
               </div>
 
               {/* Direct Activate Checkbox Option */}
-              <div className="pt-2 pb-1 border-t border-outline-variant/40">
-                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-primary/5 hover:bg-primary/10 border border-primary/20 transition-all select-none">
+              <div className="pt-2 pb-0.5 border-t border-outline-variant/40">
+                <label className="flex items-start gap-2.5 cursor-pointer p-2.5 rounded-xl bg-primary/5 hover:bg-primary/10 border border-primary/20 transition-all select-none">
                   <input
                     type="checkbox"
                     checked={newUser.directActivate}
@@ -487,7 +495,7 @@ const TabUsers = ({ tabDataRef }) => {
                     <span className="font-semibold text-on-surface block text-sm">
                       Langsung aktifkan akun & buat kata sandi sekarang
                     </span>
-                    <span className="text-on-surface-variant block mt-0.5 leading-relaxed">
+                    <span className="text-on-surface-variant block mt-0.5 leading-relaxed text-[11px]">
                       {newUser.directActivate
                         ? 'Akun langsung aktif tanpa harus menunggu verifikasi email. Cocok untuk pendaftaran cepat.'
                         : 'Pengguna akan menerima email/link verifikasi untuk mengatur kata sandinya sendiri.'}
@@ -498,8 +506,8 @@ const TabUsers = ({ tabDataRef }) => {
 
               {/* Conditional Password Inputs */}
               {newUser.directActivate ? (
-                <div className="space-y-3 p-3.5 rounded-xl bg-surface-variant/30 border border-outline-variant/50 animate-in fade-in duration-200">
-                  <div className="flex flex-col gap-1.5">
+                <div className="space-y-2.5 p-3 rounded-xl bg-surface-variant/30 border border-outline-variant/50 animate-in fade-in duration-200">
+                  <div className="flex flex-col gap-1">
                     <label className="font-label-md text-on-surface font-medium text-xs">
                       Kata Sandi Awal <span className="text-error">*</span>
                     </label>
@@ -524,7 +532,7 @@ const TabUsers = ({ tabDataRef }) => {
                       </button>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-1">
                     <label className="font-label-md text-on-surface font-medium text-xs">
                       Konfirmasi Kata Sandi <span className="text-error">*</span>
                     </label>
@@ -548,7 +556,7 @@ const TabUsers = ({ tabDataRef }) => {
             </form>
 
             {/* Pinned Footer */}
-            <div className="px-5 py-3.5 border-t border-outline-variant/40 bg-surface/90 backdrop-blur-md flex items-center justify-end gap-3 shrink-0">
+            <div className="px-5 py-3 border-t border-outline-variant/40 bg-surface/95 backdrop-blur-md flex items-center justify-end gap-3 shrink-0">
               <button 
                 type="button"
                 onClick={() => setIsModalOpen(false)}
@@ -579,10 +587,18 @@ const TabUsers = ({ tabDataRef }) => {
 
       {/* Verification Link Result Modal */}
       {createdResultModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
-          <div className="w-full max-w-lg my-auto flex flex-col max-h-[calc(100dvh-2rem)] sm:max-h-[85vh] rounded-2xl shadow-2xl border border-outline bg-surface overflow-hidden animate-in zoom-in-95 duration-200">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setCreatedResultModal(null);
+          }}
+        >
+          <div 
+            className="w-full max-w-lg my-auto flex flex-col rounded-2xl shadow-2xl border border-outline bg-surface overflow-hidden animate-in zoom-in-95 duration-200"
+            style={{ maxHeight: 'min(88vh, 600px)' }}
+          >
             {/* Pinned Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-outline-variant/40 shrink-0 bg-surface">
+            <div className="flex items-center justify-between px-5 py-3.5 sm:py-4 border-b border-outline-variant/40 shrink-0 bg-surface">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-primary/20 text-primary flex items-center justify-center font-bold shrink-0">
                   <span className="material-symbols-outlined text-[20px]">mark_email_read</span>
@@ -604,8 +620,8 @@ const TabUsers = ({ tabDataRef }) => {
               </button>
             </div>
 
-            {/* Scrollable Body */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 overscroll-contain">
+            {/* Scrollable Body with min-h-0 */}
+            <div className="flex-1 overflow-y-auto min-h-0 p-4 sm:p-5 space-y-4 overscroll-contain">
               {createdResultModal.emailSent ? (
                 <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2.5">
                   <span className="material-symbols-outlined text-[20px] shrink-0">check_circle</span>
@@ -644,7 +660,7 @@ const TabUsers = ({ tabDataRef }) => {
             </div>
 
             {/* Pinned Footer */}
-            <div className="flex justify-end px-5 py-3.5 border-t border-outline-variant/40 bg-surface/90 backdrop-blur-md shrink-0">
+            <div className="flex justify-end px-5 py-3 border-t border-outline-variant/40 bg-surface/95 backdrop-blur-md shrink-0">
               <button
                 type="button"
                 onClick={() => setCreatedResultModal(null)}
