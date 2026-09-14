@@ -333,16 +333,21 @@ export async function autoInitDatabase() {
     try {
       const [users]: any = await connection.query("SELECT id, email FROM `user` LIMIT 1");
       if (!users || users.length === 0) {
-        console.log("🌱 [Auto-Init] No users found. Creating default admin user...");
+        const adminEmail = process.env.ADMIN_INITIAL_EMAIL || "admin_alfalah@example.com";
+        const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || "password123";
+        console.log("🌱 [Auto-Init] No users found. Creating initial admin user...");
         await auth.api.signUpEmail({
           body: {
-            email: "admin_alfalah@example.com",
-            password: "password123",
+            email: adminEmail,
+            password: adminPassword,
             name: "Admin Al-Falah",
             role: "Ketua",
           },
         });
-        console.log("✅ [Auto-Init] Default admin user created: admin_alfalah@example.com / password123");
+        console.log(`✅ [Auto-Init] Initial admin user created: ${adminEmail}`);
+        if (!process.env.ADMIN_INITIAL_PASSWORD) {
+          console.warn("⚠️ [SECURITY ADVISORY] Default admin password was used. Please change your password in Settings immediately after first login!");
+        }
       } else {
         console.log("✅ [Auto-Init] Admin user exists in database.");
       }

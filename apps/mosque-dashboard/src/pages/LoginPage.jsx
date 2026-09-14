@@ -71,7 +71,7 @@ const LoginPage = () => {
       if (loginError) {
         let msg = loginError.message || 'Gagal masuk. Periksa kembali email dan kata sandi Anda.';
         if (msg.toLowerCase().includes('invalid email or password')) {
-          msg = 'Email atau kata sandi salah. Gunakan akun default: admin_alfalah@example.com / password123 jika database baru di-deploy.';
+          msg = 'Email atau kata sandi salah. Silakan periksa kembali.';
         }
         setError(msg);
         setIsLoading(false);
@@ -234,24 +234,6 @@ const LoginPage = () => {
               <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/20 to-transparent"></div>
             </button>
           </form>
-
-          {/* Default Takmir Credential Hint */}
-          <div className="mt-md p-3 rounded-lg bg-surface-variant/70 border border-outline-variant/60 text-xs text-on-surface-variant">
-            <div className="flex items-center gap-1.5 font-semibold text-primary mb-1">
-              <span className="material-symbols-outlined text-[16px]">info</span>
-              <span>Kredensial Default Takmir (Admin):</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-on-surface mt-1">
-              <div className="bg-background/80 px-2 py-1 rounded border border-outline-variant/40">
-                <span className="text-on-surface-variant block text-[9px] uppercase font-sans">Email</span>
-                <span className="select-all">admin_alfalah@example.com</span>
-              </div>
-              <div className="bg-background/80 px-2 py-1 rounded border border-outline-variant/40">
-                <span className="text-on-surface-variant block text-[9px] uppercase font-sans">Kata Sandi</span>
-                <span className="select-all">password123</span>
-              </div>
-            </div>
-          </div>
         </div>
 
         <p className="text-center font-body-sm text-body-sm text-on-surface-variant/70 mt-lg">

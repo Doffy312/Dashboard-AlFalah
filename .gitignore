@@ -12,6 +12,8 @@ dist/
 # ─── Database & Backups ───────────────────────────────────────────
 backups/
 *.sql
+*.zip
+*.tar.gz
 
 # ─── Uploads (user-generated content) ─────────────────────────────
 uploads/
