@@ -1,6 +1,7 @@
 import asyncio
 import re
 from playwright import async_api
+from playwright.async_api import expect
 
 async def run_test():
     pw = None
@@ -39,33 +40,37 @@ async def run_test():
         except Exception:
             pass
         
-        # -> Open the profile page by navigating to '/profil' (Profile) so the mosque history, vision & mission, organization structure, and facilities sections can be checked.
-        await page.goto("http://localhost:5173/profil")
+        # -> Navigate to /portal-dkm to reach the DKM portal login/dashboard page.
+        await page.goto("http://localhost:5173/portal-dkm")
         try:
             await page.wait_for_load_state("domcontentloaded", timeout=5000)
         except Exception:
             pass
         
-        # -> Scroll the profile page to reveal the 'Sejarah', 'Struktur Organisasi', and 'Fasilitas' sections and locate those headings on the page.
-        await page.mouse.wheel(0, 300)
+        # -> Fill 'admin_alfalah@example.com' into the Email field, enter 'password123' into the Kata Sandi field, and click the 'MASUK' button.
+        # Masukkan Email Anda email field
+        elem = page.get_by_role("textbox", name="Email")
+        await elem.wait_for(state="visible", timeout=10000)
+        await elem.fill("admin_alfalah@example.com")
         
-        # -> Scroll down the profile page to reveal the 'Sejarah' and 'Struktur Organisasi' sections and verify their presence.
-        await page.mouse.wheel(0, 300)
+        # -> Fill 'admin_alfalah@example.com' into the Email field, enter 'password123' into the Kata Sandi field, and click the 'MASUK' button.
+        # •••••••• password field
+        elem = page.get_by_role("textbox", name="Kata Sandi")
+        await elem.wait_for(state="visible", timeout=10000)
+        await elem.fill("password123")
         
-        # -> Scroll the Profile page and search for the visible headings 'Sejarah' and 'Struktur Organisasi' to verify they are displayed.
-        await page.mouse.wheel(0, 300)
-        
-        # -> Scroll to the top of the Profil page and collect all headings (h1–h6) visible on the page so the presence of 'Sejarah' and 'Struktur Organisasi' can be verified.
-        await page.mouse.wheel(0, 300)
-        
-        # -> Scroll down the profile page one viewport and collect all visible headings (h1–h6) to check for 'Sejarah', 'Visi & Misi', 'Struktur Organisasi', and 'Fasilitas'.
-        await page.mouse.wheel(0, 300)
+        # -> Fill 'admin_alfalah@example.com' into the Email field, enter 'password123' into the Kata Sandi field, and click the 'MASUK' button.
+        # MASUK arrow_forward button
+        elem = page.get_by_role("button", name="MASUK arrow_forward")
+        await elem.click(timeout=10000)
         
         # --> Assertions to verify final state
-        current_url = await page.evaluate("() => window.location.href")
+        
+        # --> The Program Mendatang section is visible and shows an upcoming event.
+        await page.get_by_text("12SepPengajian Rutin").nth(0).scroll_into_view_if_needed()
         # Assert-outcome: passed
-        # Assert: page loaded with a URL (final outcome verified by the AI judge during the run)
-        assert current_url, 'Page should have loaded with a URL'
+        # Assert: Program Mendatang section with at least one upcoming event is visible.
+        await expect(page.get_by_text("12SepPengajian Rutin").nth(0)).to_be_visible(timeout=15000), "Program Mendatang section with at least one upcoming event is visible."
         await asyncio.sleep(5)
 
     finally:

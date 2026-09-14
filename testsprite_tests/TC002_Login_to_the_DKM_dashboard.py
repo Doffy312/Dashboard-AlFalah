@@ -40,42 +40,45 @@ async def run_test():
         except Exception:
             pass
         
-        # -> Open the DKM portal sign-in page by navigating to the '/portal-dkm' URL (Portal Pengurus sign-in).
+        # -> Navigate to /portal-dkm (open the staff portal page) so the login form can be located.
         await page.goto("http://localhost:5173/portal-dkm")
         try:
             await page.wait_for_load_state("domcontentloaded", timeout=5000)
         except Exception:
             pass
         
-        # -> Fill the 'Email' field with admin_alfalah@example.com, fill the 'Kata Sandi' field with password123, then click the 'MASUK' button.
+        # -> Fill the Email field with admin_alfalah@example.com and the Kata Sandi field with password123, then click the 'MASUK' button to submit the login form.
         # Masukkan Email Anda email field
-        elem = page.locator('[id="email"]')
+        elem = page.get_by_role("textbox", name="Email")
         await elem.wait_for(state="visible", timeout=10000)
         await elem.fill("admin_alfalah@example.com")
         
-        # -> Fill the 'Email' field with admin_alfalah@example.com, fill the 'Kata Sandi' field with password123, then click the 'MASUK' button.
+        # -> Fill the Email field with admin_alfalah@example.com and the Kata Sandi field with password123, then click the 'MASUK' button to submit the login form.
         # •••••••• password field
-        elem = page.locator('[id="password"]')
+        elem = page.get_by_role("textbox", name="Kata Sandi")
         await elem.wait_for(state="visible", timeout=10000)
         await elem.fill("password123")
         
-        # -> Fill the 'Email' field with admin_alfalah@example.com, fill the 'Kata Sandi' field with password123, then click the 'MASUK' button.
+        # -> Fill the Email field with admin_alfalah@example.com and the Kata Sandi field with password123, then click the 'MASUK' button to submit the login form.
         # MASUK arrow_forward button
-        elem = page.get_by_role('button', name='MASUK arrow_forward', exact=True)
+        elem = page.get_by_role("button", name="MASUK arrow_forward")
         await elem.click(timeout=10000)
         
         # --> Assertions to verify final state
         
-        # --> Dashboard overview page is displayed after login (navigated to /dashboard).
+        # --> The app navigated to and shows the Dashboard overview (navigation link present).
+        await page.get_by_role("link", name="dashboard Dashboard").nth(0).scroll_into_view_if_needed()
         # Assert-outcome: passed
-        # Assert: Verifies the browser URL contains 'dashboard'.
-        await expect(page).to_have_url(re.compile("dashboard"), timeout=15000), "Verifies the browser URL contains 'dashboard'."
+        # Assert: The Dashboard navigation link is visible, indicating the overview is displayed.
+        await expect(page.get_by_role("link", name="dashboard Dashboard").nth(0)).to_be_visible(timeout=15000), "The Dashboard navigation link is visible, indicating the overview is displayed."
         
-        # --> Summary metric cards are visible on the dashboard (Saldo Total, Pemasukan, Pengeluaran, Jemaah Terdaftar).
-        await page.locator("xpath=/html/body/div/main/div/div[1]/div[1]/div[1]/div[2]").nth(0).scroll_into_view_if_needed()
+        # --> Summary metrics are shown on the dashboard (balance icon and registered-members label visible).
         # Assert-outcome: passed
-        # Assert: Verifies a summary metric card (account balance icon) is visible on the dashboard.
-        await expect(page.locator("xpath=/html/body/div/main/div/div[1]/div[1]/div[1]/div[2]").nth(0)).to_be_visible(timeout=15000), "Verifies a summary metric card (account balance icon) is visible on the dashboard."
+        # Assert: The account balance icon/text is present on the summary card.
+        await expect(page.locator("xpath=/html/body/div[1]/main/div/div[1]/div[1]/div[1]/div[2]").nth(0)).to_have_text("account_balance_wallet", timeout=15000), "The account balance icon/text is present on the summary card."
+        # Assert-outcome: passed
+        # Assert: The 'terdaftar' label for registered members is visible as part of the summary metrics.
+        await expect(page.locator("xpath=/html/body/div[1]/main/div/div[1]/div[4]/div[2]/div[2]/span[2]").nth(0)).to_have_text("terdaftar", timeout=15000), "The 'terdaftar' label for registered members is visible as part of the summary metrics."
         await asyncio.sleep(5)
 
     finally:

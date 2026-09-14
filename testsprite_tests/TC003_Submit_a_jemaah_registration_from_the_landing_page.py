@@ -40,61 +40,75 @@ async def run_test():
         except Exception:
             pass
         
-        # -> Click the 'Daftar Jemaah' button to open the public jemaah registration form.
+        # -> Reload the public landing page (the 'Takmir Al-Falah' landing page) to attempt to finish SPA loading and reveal the jemaah registration form.
+        await page.goto("http://localhost:5173")
+        try:
+            await page.wait_for_load_state("domcontentloaded", timeout=5000)
+        except Exception:
+            pass
+        
+        # -> Click the 'Daftar Jemaah' button on the landing hero to open the jemaah registration form.
         # Daftar Jemaah button
-        elem = page.get_by_role('button', name='Daftar Jemaah', exact=True)
+        elem = page.get_by_role("button", name="Daftar Jemaah")
         await elem.click(timeout=10000)
         
-        # -> Fill the 'Nama Lengkap', 'Nomor Telepon / WA', and 'Alamat Lengkap' fields and click the 'Kirim Pendaftaran Jemaah' button to submit the form.
+        # -> Fill the 'Nama Lengkap', 'Nomor Telepon / WA', and 'Alamat Lengkap' fields, then click the 'Kirim Pendaftaran Jemaah' button to submit the registration.
         # Contoh: Ahmad Subagja text field
-        elem = page.locator('[id="regName"]')
+        elem = page.get_by_role("textbox", name="Nama Lengkap * (Wajib diisi)")
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("Ahmad Testuser")
+        await elem.fill("Test User")
         
-        # -> Fill the 'Nama Lengkap', 'Nomor Telepon / WA', and 'Alamat Lengkap' fields and click the 'Kirim Pendaftaran Jemaah' button to submit the form.
+        # -> Fill the 'Nama Lengkap', 'Nomor Telepon / WA', and 'Alamat Lengkap' fields, then click the 'Kirim Pendaftaran Jemaah' button to submit the registration.
         # Contoh: 081234567890 tel field
-        elem = page.locator('[id="regPhone"]')
+        elem = page.get_by_role("textbox", name="4. Nomor Telepon / WA (")
         await elem.wait_for(state="visible", timeout=10000)
         await elem.fill("081234567890")
         
-        # -> Fill the 'Nama Lengkap', 'Nomor Telepon / WA', and 'Alamat Lengkap' fields and click the 'Kirim Pendaftaran Jemaah' button to submit the form.
+        # -> Fill the 'Nama Lengkap', 'Nomor Telepon / WA', and 'Alamat Lengkap' fields, then click the 'Kirim Pendaftaran Jemaah' button to submit the registration.
         # Contoh: Jl. Masjid No. 45 RT 02 / RW 04, Bandung text area
-        elem = page.locator('[id="regAddress"]')
+        elem = page.get_by_role("textbox", name="Alamat Lengkap * (Wajib diisi)")
         await elem.wait_for(state="visible", timeout=10000)
         await elem.fill("Jl. Masjid No. 45 RT 02 / RW 04, Bandung")
         
-        # -> Fill the 'Nama Lengkap', 'Nomor Telepon / WA', and 'Alamat Lengkap' fields and click the 'Kirim Pendaftaran Jemaah' button to submit the form.
+        # -> Fill the 'Nama Lengkap', 'Nomor Telepon / WA', and 'Alamat Lengkap' fields, then click the 'Kirim Pendaftaran Jemaah' button to submit the registration.
         # Kirim Pendaftaran Jemaah button
-        elem = page.get_by_role('button', name='Kirim Pendaftaran Jemaah', exact=True)
+        elem = page.get_by_role("button", name="Kirim Pendaftaran Jemaah")
         await elem.click(timeout=10000)
         
-        # -> Bring the page area showing a registration confirmation into view and verify a visible message such as 'Pendaftaran berhasil' or 'Terima kasih'.
-        await page.mouse.wheel(0, 300)
-        
-        # -> Scroll the page to reveal any off-screen registration confirmation message such as 'Pendaftaran berhasil' or 'Terima kasih' and then search the page for those phrases.
-        await page.mouse.wheel(0, 300)
-        
-        # -> Search the page for confirmation text like 'Pendaftaran berhasil' or 'Terima kasih' and scroll down to reveal any off-screen confirmation message.
-        await page.mouse.wheel(0, 300)
-        
-        # -> Open the 'Formulir Pendaftaran Jemaah' modal to inspect whether a visible registration confirmation message (e.g., 'Pendaftaran berhasil', 'Sukses', or 'Terima kasih') is shown.
-        # Formulir Pendaftaran Jemaah button
-        elem = page.get_by_role('button', name='Formulir Pendaftaran Jemaah', exact=True)
+        # -> Open the 'Daftar Jemaah' registration form by clicking the 'Daftar Jemaah' button so the form fields appear.
+        # Daftar Jemaah button
+        elem = page.get_by_role("button", name="Daftar Jemaah")
         await elem.click(timeout=10000)
         
-        # -> Search the page for a visible confirmation message like 'Pendaftaran berhasil' or 'Terima kasih', and if none is visible, close the registration modal to reveal any background confirmation.
-        # Tutup Form Pendaftaran button
-        elem = page.get_by_role('button', name='Tutup Form Pendaftaran', exact=True)
-        await elem.click(timeout=10000)
+        # -> Fill the form fields ('Nama Lengkap', 'Nomor Telepon / WA', 'Alamat Lengkap') and click the 'Kirim Pendaftaran Jemaah' button to submit the registration.
+        # Contoh: Ahmad Subagja text field
+        elem = page.get_by_role("textbox", name="Nama Lengkap * (Wajib diisi)")
+        await elem.wait_for(state="visible", timeout=10000)
+        await elem.fill("Test User 2")
         
-        # -> Search the page for a visible confirmation message like 'Pendaftaran berhasil' or 'Terima kasih', and if none is visible, close the registration modal to reveal any background confirmation.
-        await page.mouse.wheel(0, 300)
+        # -> Fill the form fields ('Nama Lengkap', 'Nomor Telepon / WA', 'Alamat Lengkap') and click the 'Kirim Pendaftaran Jemaah' button to submit the registration.
+        # Contoh: 081234567890 tel field
+        elem = page.get_by_role("textbox", name="4. Nomor Telepon / WA (")
+        await elem.wait_for(state="visible", timeout=10000)
+        await elem.fill("081234567891")
+        
+        # -> Fill the form fields ('Nama Lengkap', 'Nomor Telepon / WA', 'Alamat Lengkap') and click the 'Kirim Pendaftaran Jemaah' button to submit the registration.
+        # Contoh: Jl. Masjid No. 45 RT 02 / RW 04, Bandung text area
+        elem = page.get_by_role("textbox", name="Alamat Lengkap * (Wajib diisi)")
+        await elem.wait_for(state="visible", timeout=10000)
+        await elem.fill("Jl. Masjid No. 45 RT 02 / RW 04, Bandung")
+        
+        # -> Fill the form fields ('Nama Lengkap', 'Nomor Telepon / WA', 'Alamat Lengkap') and click the 'Kirim Pendaftaran Jemaah' button to submit the registration.
+        # Kirim Pendaftaran Jemaah button
+        elem = page.get_by_role("button", name="Kirim Pendaftaran Jemaah")
+        await elem.click(timeout=10000)
         
         # --> Assertions to verify final state
-        current_url = await page.evaluate("() => window.location.href")
+        
+        # --> A visible success confirmation toast states the registration for 'Test User 2' was saved.
         # Assert-outcome: passed
-        # Assert: page loaded with a URL (final outcome verified by the AI judge during the run)
-        assert current_url, 'Page should have loaded with a URL'
+        # Assert: Confirms the success toast contains the saved registrant name and success text.
+        await expect(page.locator("xpath=/html/body/div[1]/div[2]/div/div/div[1]/div[2]/div").nth(0)).to_contain_text("Pendaftaran jemaah Test User 2 berhasil disimpan!", timeout=15000), "Confirms the success toast contains the saved registrant name and success text."
         await asyncio.sleep(5)
 
     finally:

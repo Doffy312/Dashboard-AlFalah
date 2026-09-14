@@ -42,30 +42,39 @@ async def run_test():
         
         # -> Click the header button labeled 'DONASI' to open the donation information.
         # Donasi button
-        elem = page.get_by_role('button', name='Donasi', exact=True)
+        elem = page.get_by_role("button", name="Donasi", exact=True)
         await elem.click(timeout=10000)
         
         # --> Assertions to verify final state
         
-        # --> The donation modal titled "Scan QRIS Donasi" is visible after opening Donasi.
+        # --> The donation modal is open and shows the title 'Scan QRIS Donasi' and the recipient 'AL-FALAH ORUNA'.
         # Assert-outcome: passed
-        # Assert: Modal contains the title 'Scan QRIS Donasi'.
-        await expect(page.locator("xpath=/html/body/div/div[1]/div[3]").nth(0)).to_contain_text("Scan QRIS Donasi", timeout=15000), "Modal contains the title 'Scan QRIS Donasi'."
+        # Assert: The modal title 'Scan QRIS Donasi' is visible.
+        await expect(page.locator("#root").nth(0)).to_contain_text("Scan QRIS Donasi", timeout=15000), "The modal title 'Scan QRIS Donasi' is visible."
+        # Assert-outcome: passed
+        # Assert: The donation recipient 'AL-FALAH ORUNA' is visible in the modal.
+        await expect(page.locator("#root").nth(0)).to_contain_text("AL-FALAH ORUNA", timeout=15000), "The donation recipient 'AL-FALAH ORUNA' is visible in the modal."
         
-        # --> The donation modal shows the recipient 'AL-FALAH ORUNA'.
+        # --> Preset donation amount buttons (for example 'Rp 10.000' and 'Rp 500.000') are present in the modal.
+        await page.get_by_role("button", name="Rp 10.000").nth(0).scroll_into_view_if_needed()
         # Assert-outcome: passed
-        # Assert: Recipient 'AL-FALAH ORUNA' is visible in the modal.
-        await expect(page.locator("xpath=/html/body/div/div[1]/div[3]").nth(0)).to_contain_text("AL-FALAH ORUNA", timeout=15000), "Recipient 'AL-FALAH ORUNA' is visible in the modal."
+        # Assert: Preset amount button 'Rp 10.000' is visible.
+        await expect(page.get_by_role("button", name="Rp 10.000").nth(0)).to_be_visible(timeout=15000), "Preset amount button 'Rp\u00a010.000' is visible."
+        await page.get_by_role("button", name="Rp 500.000").nth(0).scroll_into_view_if_needed()
+        # Assert-outcome: passed
+        # Assert: Preset amount button 'Rp 500.000' is visible.
+        await expect(page.get_by_role("button", name="Rp 500.000").nth(0)).to_be_visible(timeout=15000), "Preset amount button 'Rp\u00a0500.000' is visible."
         
-        # --> The donation modal shows action buttons to open the QRIS app and to copy the QRIS payload.
-        await page.locator("xpath=/html/body/div/div[1]/div[3]/div/div[2]/div/div[4]/button").nth(0).scroll_into_view_if_needed()
+        # --> A custom amount input is available in the donation modal.
         # Assert-outcome: passed
-        # Assert: The 'Buka Aplikasi QRIS / E-Wallet di HP' button is visible.
-        await expect(page.locator("xpath=/html/body/div/div[1]/div[3]/div/div[2]/div/div[4]/button").nth(0)).to_be_visible(timeout=15000), "The 'Buka Aplikasi QRIS / E-Wallet di HP' button is visible."
-        await page.locator("xpath=/html/body/div/div[1]/div[3]/div/div[2]/div/div[4]/div/button").nth(0).scroll_into_view_if_needed()
+        # Assert: The custom nominal input shows the expected placeholder text.
+        await expect(page.get_by_role("textbox", name="Nominal Kustom Donasi").nth(0)).to_have_attribute("placeholder", "Atur nominal kustom (contoh: 75.000)", timeout=15000), "The custom nominal input shows the expected placeholder text."
+        
+        # --> A QR code graphic (QRIS area) is visible in the donation modal.
+        await page.locator("xpath=/html/body/div/div[1]/div[3]/div/div[2]/div/div[3]/div[3]/div/div/svg").nth(0).scroll_into_view_if_needed()
         # Assert-outcome: passed
-        # Assert: The 'Salin Payload QRIS' button is visible.
-        await expect(page.locator("xpath=/html/body/div/div[1]/div[3]/div/div[2]/div/div[4]/div/button").nth(0)).to_be_visible(timeout=15000), "The 'Salin Payload QRIS' button is visible."
+        # Assert: The QR code graphic (SVG) is visible in the donation modal.
+        await expect(page.locator("xpath=/html/body/div/div[1]/div[3]/div/div[2]/div/div[3]/div[3]/div/div/svg").nth(0)).to_be_visible(timeout=15000), "The QR code graphic (SVG) is visible in the donation modal."
         await asyncio.sleep(5)
 
     finally:

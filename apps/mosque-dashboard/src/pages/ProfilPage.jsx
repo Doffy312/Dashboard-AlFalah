@@ -59,7 +59,7 @@ export default function ProfilPage() {
   ];
 
   return (
-    <div className="landing-container min-h-screen bg-[#0b131a] text-white selection:bg-emerald-500/30 selection:text-emerald-200">
+    <div className="landing-container min-h-screen bg-[#0a1f15] text-white selection:bg-emerald-500/30 selection:text-emerald-200">
       {/* Shared Header */}
       <LandingHeader 
         onOpenDonasi={() => setActiveDonasiType('Infaq')}

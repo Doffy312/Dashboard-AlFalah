@@ -1,0 +1,9 @@
+{
+  "include": [],
+  "exclude": [
+    "**/node_modules",
+    "testsprite_tests"
+  ],
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none"
+}

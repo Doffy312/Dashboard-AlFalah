@@ -1,3 +1,13 @@
 {
-  "css.lint.unknownAtRules": "ignore"
+  "css.lint.unknownAtRules": "ignore",
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingImports": "none",
+    "reportMissingModuleSource": "none"
+  },
+  "python.analysis.ignore": [
+    "testsprite_tests/**"
+  ],
+  "python.analysis.exclude": [
+    "testsprite_tests/**"
+  ]
 }

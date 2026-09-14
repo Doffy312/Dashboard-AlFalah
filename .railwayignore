@@ -1,0 +1,15 @@
+node_modules
+apps/mosque-backend/dist
+apps/mosque-backend/uploads
+apps/mosque-dashboard/dist
+apps/mosque-dashboard/node_modules
+backups
+scratch
+temp-test
+testsprite_tests
+testsprite-plans
+.testsprite
+Backup_Mosque_Dashboard_Secured.zip
+.env
+.env.*
+*.log

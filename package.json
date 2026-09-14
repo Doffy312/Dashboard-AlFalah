@@ -4,10 +4,15 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "packageManager": "npm@10.8.2",
   "workspaces": [
     "apps/*"
   ],
   "scripts": {
-    "dev": "npx concurrently \"npm run dev -w mosque-backend\" \"npm run dev -w mosque-dashboard\""
+    "dev": "npx concurrently \"npm run dev -w mosque-backend\" \"npm run dev -w mosque-dashboard\"",
+    "build:frontend": "npm run build -w mosque-dashboard",
+    "build:backend": "npm run build -w mosque-backend",
+    "build": "npm run build -w mosque-backend",
+    "start": "npm start -w mosque-backend"
   }
 }

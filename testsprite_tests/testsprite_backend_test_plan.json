@@ -1,0 +1,27 @@
+[
+  {
+    "id": "TC001",
+    "title": "test_database_financial_ledger_balance_consistency",
+    "description": "Verify database persistence and mathematical consistency for cash ledger: record an income transaction, verify balance recalculates accurately in the database, and verify cleanup rollback returns balance to baseline."
+  },
+  {
+    "id": "TC002",
+    "title": "test_database_jemaah_relational_integrity_and_validation",
+    "description": "Verify database schema validation and persistence integrity for jemaah records: ensure valid jemaah data persists with correct types, and invalid schema inputs are rejected without corrupting database state."
+  },
+  {
+    "id": "TC003",
+    "title": "test_database_work_program_lifecycle_and_audit_trail",
+    "description": "Verify database consistency across work program status transitions (Direncanakan -> Sedang Berjalan) and ensure corresponding audit trail records are created."
+  },
+  {
+    "id": "TC004",
+    "title": "test_database_ziswaf_calculation_and_inventory_consistency",
+    "description": "Verify database consistency for ZISWAF and mosque inventory items: ensure quantities, categories, and values remain mathematically consistent across reads."
+  },
+  {
+    "id": "TC005",
+    "title": "test_database_settings_and_profile_persistence",
+    "description": "Verify that mosque configuration, bank account data, and organization profile persist consistently across server requests and re-reads."
+  }
+]

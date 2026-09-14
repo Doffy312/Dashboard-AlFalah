@@ -40,37 +40,52 @@ async def run_test():
         except Exception:
             pass
         
-        # -> Click the 'Kontak' link in the top navigation to open or scroll to the public contact form.
+        # -> Reload the landing page titled 'Takmir Al-Falah - Dashboard &' to attempt to finish the SPA loading and reveal the contact form.
+        await page.goto("http://localhost:5173")
+        try:
+            await page.wait_for_load_state("domcontentloaded", timeout=5000)
+        except Exception:
+            pass
+        
+        # -> Click the 'Kontak' navigation link to jump to the contact section.
         # Kontak link
-        elem = page.get_by_text('Donasi', exact=True).locator("xpath=ancestor-or-self::*[.//a][1]").get_by_role('link', name='Kontak', exact=True)
+        elem = page.get_by_label("Landing Page Navigation").get_by_role("link", name="Kontak")
         await elem.click(timeout=10000)
         
-        # -> Scroll down the page to reveal the public contact form so its visible fields can be observed.
-        await page.mouse.wheel(0, 300)
+        # -> Fill the 'Nama Lengkap', 'Alamat Email', 'Nomor WhatsApp', and 'Pesan' fields and select 'Pertanyaan Umum' from the 'Subjek' dropdown.
+        # Masukkan nama Anda text field
+        elem = page.get_by_role("textbox", name="Nama Lengkap*")
+        await elem.wait_for(state="visible", timeout=10000)
+        await elem.fill("Auto Tester")
         
-        # -> Scroll down the landing page to reveal the 'Kontak' section so its contact form fields become visible.
-        await page.mouse.wheel(0, 300)
+        # -> Fill the 'Nama Lengkap', 'Alamat Email', 'Nomor WhatsApp', and 'Pesan' fields and select 'Pertanyaan Umum' from the 'Subjek' dropdown.
+        # nama@email.com email field
+        elem = page.get_by_role("textbox", name="Alamat Email*")
+        await elem.wait_for(state="visible", timeout=10000)
+        await elem.fill("autotest@example.com")
         
-        # -> Scroll down the page further to reveal the 'Hubungi Pengurus' contact form and its input fields so they can be observed.
-        await page.mouse.wheel(0, 300)
+        # -> Fill the 'Nama Lengkap', 'Alamat Email', 'Nomor WhatsApp', and 'Pesan' fields and select 'Pertanyaan Umum' from the 'Subjek' dropdown.
+        # 08xxxx tel field
+        elem = page.get_by_role("textbox", name="Nomor WhatsApp*")
+        await elem.wait_for(state="visible", timeout=10000)
+        await elem.fill("081234567891")
         
-        # -> Scroll down to reveal the 'Hubungi Pengurus' contact form so its visible input fields can be observed.
-        await page.mouse.wheel(0, 300)
+        # -> Fill the 'Nama Lengkap', 'Alamat Email', 'Nomor WhatsApp', and 'Pesan' fields and select 'Pertanyaan Umum' from the 'Subjek' dropdown.
+        # Tuliskan pesan Anda secara detail... text area
+        elem = page.get_by_role("textbox", name="Pesan*")
+        await elem.wait_for(state="visible", timeout=10000)
+        await elem.fill("Ini pesan percobaan untuk verifikasi formulir kontak. Mohon konfirmasi bila diterima.")
         
-        # -> Scroll to the 'Hubungi Pengurus' contact form so its input fields become visible and then list the form's input/textarea/button/select elements.
-        await page.mouse.wheel(0, 300)
+        # -> Fill the 'Nama Lengkap', 'Alamat Email', 'Nomor WhatsApp', and 'Pesan' fields and select 'Pertanyaan Umum' from the 'Subjek' dropdown.
+        # Pilih Layanan... Pertanyaan Umum Konsultasi &... dropdown
+        elem = page.locator("xpath=/html/body/div/div/section[7]/div[2]/div[2]/form/div/div[4]/select").nth(0)
+        await elem.wait_for(state="visible", timeout=10000)
+        await elem.select_option("")
         
-        # -> Scroll down to reveal the 'Hubungi Pengurus' contact form and list its input, textarea, and submit button elements so they can be filled.
-        await page.mouse.wheel(0, 300)
-        
-        # -> Scroll to the 'Hubungi Pengurus' contact area, then list the contact form's input, textarea and submit button elements and capture their attributes.
-        await page.mouse.wheel(0, 300)
-        
-        # -> List the 'Hubungi Pengurus' contact form fields (input, textarea, and submit button) and capture their attributes so the visible fields can be inspected before filling.
-        await page.mouse.wheel(0, 300)
-        
-        # -> Bring the 'Hubungi Pengurus' contact form into view and list its input, textarea, select and submit button fields with their visible labels/placeholders and attributes.
-        await page.mouse.wheel(0, 300)
+        # -> Click the 'KIRIM PESAN SEKARANG' button to submit the contact form and trigger the confirmation UI.
+        # KIRIM PESAN SEKARANG button
+        elem = page.get_by_role("button", name="KIRIM PESAN SEKARANG")
+        await elem.click(timeout=10000)
         
         # --> Assertions to verify final state
         current_url = await page.evaluate("() => window.location.href")

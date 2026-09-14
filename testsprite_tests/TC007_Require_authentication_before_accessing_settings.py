@@ -40,7 +40,7 @@ async def run_test():
         except Exception:
             pass
         
-        # -> Open the Settings page (Settings) by navigating to /dashboard/settings and check for a login prompt or access restriction preventing access to settings content.
+        # -> Navigate to the Settings page by opening /dashboard/settings and observe whether a login prompt or access restriction appears.
         await page.goto("http://localhost:5173/dashboard/settings")
         try:
             await page.wait_for_load_state("domcontentloaded", timeout=5000)
@@ -49,10 +49,16 @@ async def run_test():
         
         # --> Assertions to verify final state
         
-        # --> Navigating to the settings route shows a login form (authentication required) instead of the settings UI.
+        # --> The Settings route shows the application's login prompt (login form is visible).
+        await page.get_by_role("textbox", name="Email").nth(0).scroll_into_view_if_needed()
         # Assert-outcome: passed
-        # Assert: The login form's submit button labeled 'MASUK' is visible.
-        await expect(page.locator("xpath=/html/body/div/div[1]/main/div[2]/form/button").nth(0)).to_contain_text("MASUK", timeout=15000), "The login form's submit button labeled 'MASUK' is visible."
+        # Assert: Login email input is visible on the page.
+        await expect(page.get_by_role("textbox", name="Email").nth(0)).to_be_visible(timeout=15000), "Login email input is visible on the page."
+        
+        # --> The Settings content is not accessible (the app is on the login route instead of /dashboard/settings).
+        # Assert-outcome: passed
+        # Assert: The browser URL indicates the app is on the login route (not /dashboard/settings).
+        await expect(page).to_have_url(re.compile("portal\\-dkm"), timeout=15000), "The browser URL indicates the app is on the login route (not /dashboard/settings)."
         await asyncio.sleep(5)
 
     finally:

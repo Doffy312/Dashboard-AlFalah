@@ -51,7 +51,7 @@ export default function TransparansiKeuanganPage() {
   const saldoKas = Number(rawKas?.saldoSaatIni !== undefined && rawKas?.saldoSaatIni !== null ? rawKas.saldoSaatIni : (totalPemasukan - totalPengeluaran));
 
   return (
-    <div className="landing-container min-h-screen bg-[#0b131a] text-white selection:bg-emerald-500/30 selection:text-emerald-200">
+    <div className="landing-container min-h-screen bg-[#0a1f15] text-white selection:bg-emerald-500/30 selection:text-emerald-200">
       {/* Header */}
       <LandingHeader 
         onOpenDonasi={() => setActiveDonasiType('Infaq')}

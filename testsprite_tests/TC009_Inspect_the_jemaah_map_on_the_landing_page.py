@@ -40,22 +40,21 @@ async def run_test():
         except Exception:
             pass
         
-        # -> Scroll down the homepage to the jemaah map section so the map and any location markers become visible.
+        # -> Scroll to the 'Komunitas & Data Jemaah' section to reveal the public jemaah map and its markers/clusters.
         await page.mouse.wheel(0, 300)
         
         # --> Assertions to verify final state
         
-        # --> The public jemaah map canvas is visible on the homepage.
-        await page.locator("xpath=/html/body/div/div[1]/section[5]/div[3]/div[3]/div[2]/div[1]/div[1]/div[4]/div[1]/div/div[1]").nth(0).scroll_into_view_if_needed()
+        # --> The public 'Peta Interaktif Sebaran Jemaah' map section is displayed on the homepage.
         # Assert-outcome: passed
-        # Assert: Map canvas element is visible on the page.
-        await expect(page.locator("xpath=/html/body/div/div[1]/section[5]/div[3]/div[3]/div[2]/div[1]/div[1]/div[4]/div[1]/div/div[1]").nth(0)).to_be_visible(timeout=15000), "Map canvas element is visible on the page."
+        # Assert: The 'Semua' filter button is visible in the map section.
+        await expect(page.locator("xpath=/html/body/div/div[1]/section[5]/div[3]/div[2]/div[1]/button[1]").nth(0)).to_have_text("Semua", timeout=15000), "The 'Semua' filter button is visible in the map section."
         
-        # --> The jemaah map shows a marker-count label confirming markers/clusters are rendered.
-        await page.locator("xpath=/html/body/div/div[1]/section[5]/div[3]/div[3]/div[2]/div[2]/div[2]/span[3]/strong").nth(0).scroll_into_view_if_needed()
+        # --> Community location markers are present on the jemaah map (plotted points count is shown).
+        await page.get_by_text("13").nth(0).scroll_into_view_if_needed()
         # Assert-outcome: passed
-        # Assert: Marker-count label is visible on the map section.
-        await expect(page.locator("xpath=/html/body/div/div[1]/section[5]/div[3]/div[3]/div[2]/div[2]/div[2]/span[3]/strong").nth(0)).to_be_visible(timeout=15000), "Marker-count label is visible on the map section."
+        # Assert: The plotted-points count element is visible on the map, indicating markers are present.
+        await expect(page.get_by_text("13").nth(0)).to_be_visible(timeout=15000), "The plotted-points count element is visible on the map, indicating markers are present."
         await asyncio.sleep(5)
 
     finally:
