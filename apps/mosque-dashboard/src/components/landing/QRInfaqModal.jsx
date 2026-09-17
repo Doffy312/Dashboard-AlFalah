@@ -386,21 +386,73 @@ const QRInfaqModal = ({ isOpen, onClose, defaultType = 'Infaq', onSuccessCallbac
 
               </div>
 
-              {/* Direct Action Buttons for Mobile/Scan */}
-              <div className="space-y-3">
+              {/* Donor Details Input (Optional) */}
+              <div className="space-y-3 pt-2 border-t border-white/10">
+                <div>
+                  <label htmlFor="donorNameInput" className="text-xs font-semibold text-slate-300 block mb-1">
+                    Nama Donatur (Opsional)
+                  </label>
+                  <input 
+                    id="donorNameInput"
+                    type="text"
+                    placeholder="Nama Anda (atau biarkan 'Hamba Allah')"
+                    value={donorName}
+                    onChange={(e) => setDonorName(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="donorNotesInput" className="text-xs font-semibold text-slate-300 block mb-1">
+                    Catatan / Doa (Opsional)
+                  </label>
+                  <input 
+                    id="donorNotesInput"
+                    type="text"
+                    placeholder="Contoh: Semoga berkah dan lancar rezeki"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons: Primary Confirmation (for Testing & Submitting) + Mobile E-Wallet */}
+              <div className="space-y-2.5 pt-1">
+                {/* Primary Button: Konfirmasi / Catat Donasi ke Database */}
+                <button
+                  type="button"
+                  onClick={handleProcessDonateSimulasi}
+                  disabled={donateMutation.isPending || finalAmount <= 0}
+                  className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 hover:from-emerald-400 hover:via-emerald-300 hover:to-teal-300 text-slate-950 font-extrabold text-sm transition-all shadow-lg shadow-emerald-500/25 active:scale-95 flex items-center justify-center gap-2 border border-emerald-300/30 disabled:opacity-50 cursor-pointer"
+                >
+                  {donateMutation.isPending ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin text-slate-950" />
+                      <span>Menyimpan ke Database MySQL...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check size={18} className="text-slate-950 stroke-[3]" />
+                      <span>Konfirmasi &amp; Kirim Donasi ({formatCurrency(finalAmount)})</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Secondary Button: Buka App Mobile (Deep Link) */}
                 <button
                   type="button"
                   onClick={handleOpenQRISApp}
-                  className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 hover:from-emerald-400 hover:via-emerald-300 hover:to-teal-300 text-slate-950 font-extrabold text-sm transition-all shadow-lg shadow-emerald-500/25 active:scale-95 flex items-center justify-center gap-2 border border-emerald-300/30"
+                  className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold flex items-center justify-center gap-2 transition-colors border border-white/10"
                 >
-                  <Smartphone size={20} className="text-slate-950" />
-                  <span>Buka Aplikasi QRIS / E-Wallet di HP ({formatCurrency(finalAmount)})</span>
+                  <Smartphone size={15} className="text-emerald-400" />
+                  <span>Buka di Aplikasi M-Banking / E-Wallet HP</span>
                 </button>
 
-                <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+                <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 pt-1">
                   <span className="flex items-center gap-1 text-amber-400">
                     <Info size={13} />
-                    Scan barcode langsung dengan Kamera / M-Banking HP
+                    Masuk ke menu ZISWAF Takmir untuk verifikasi
                   </span>
                   <button
                     type="button"
@@ -413,68 +465,11 @@ const QRInfaqModal = ({ isOpen, onClose, defaultType = 'Infaq', onSuccessCallbac
                 </div>
               </div>
 
-              {/* Dev / Testing Database Simulation Section */}
-              <div className="pt-3 border-t border-white/10">
-                <button
-                  type="button"
-                  onClick={() => setShowSimulasiForm(!showSimulasiForm)}
-                  className="w-full text-center py-2 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold flex items-center justify-center gap-2 transition-colors border border-white/5"
-                >
-                  <Sparkles size={14} className="text-emerald-400" />
-                  <span>{showSimulasiForm ? 'Sembunyikan Form Catat MySQL' : 'Mode Uji Coba: Catat Donasi Langsung ke MySQL'}</span>
-                </button>
-
-                {showSimulasiForm && (
-                  <form onSubmit={handleProcessDonateSimulasi} className="space-y-3 pt-3 animate-in fade-in duration-200">
-                    <div>
-                      <label htmlFor="donorNameInput" className="text-xs font-semibold text-slate-300 block mb-1">Nama Donatur (Opsional)</label>
-                      <input 
-                        id="donorNameInput"
-                        type="text"
-                        placeholder="Nama Anda (atau biarkan 'Hamba Allah')"
-                        value={donorName}
-                        onChange={(e) => setDonorName(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="donorNotesInput" className="text-xs font-semibold text-slate-300 block mb-1">Catatan / Doa (Opsional)</label>
-                      <input 
-                        id="donorNotesInput"
-                        type="text"
-                        placeholder="Contoh: Semoga berkah dan lancar rezeki"
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 transition-colors"
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={donateMutation.isPending || finalAmount <= 0}
-                      className="w-full py-3 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-extrabold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                    >
-                      {donateMutation.isPending ? (
-                        <>
-                          <Loader2 size={16} className="animate-spin text-emerald-400" />
-                          <span>Menyimpan ke Database MySQL...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Check size={16} />
-                          <span>Simpan Rekam Donasi ke Database MySQL ({formatCurrency(finalAmount)})</span>
-                        </>
-                      )}
-                    </button>
-                  </form>
-                )}
-              </div>
-
               <div className="flex items-center justify-center text-[10px] text-slate-500 gap-1 pt-1">
                 <ShieldCheck size={13} className="text-emerald-400" />
-                <span>Sistem Donasi Digital Terstruktur &amp; Otomatis Valid</span>
+                <span>Sistem Donasi Terintegrasi Two-Step Verification Akuntabel</span>
               </div>
+
 
             </div>
           )}

@@ -18,7 +18,7 @@ export default function ZiswafPage() {
   const [filterType, setFilterType] = useState('Semua');
   const [filterStatus, setFilterStatus] = useState('Semua');
 
-  const { data: ziswaf = [], isLoading, isError } = useZiswafList({});
+  const { data: ziswaf = [], isLoading, isError, error, refetch } = useZiswafList({});
   
   const createMutation = useCreateZiswaf();
   const updateMutation = useUpdateZiswaf();
@@ -44,10 +44,20 @@ export default function ZiswafPage() {
   const canAdd = ['Ketua', 'Bendahara'].includes(session?.user?.role);
   const canVerify = ['Ketua', 'Bendahara'].includes(session?.user?.role);
 
+  // Normalize API response safely (handles array or object with data property)
+  const ziswafList = useMemo(() => {
+    if (Array.isArray(ziswaf)) return ziswaf;
+    if (ziswaf && Array.isArray(ziswaf.data)) return ziswaf.data;
+    return [];
+  }, [ziswaf]);
+
   const filteredData = useMemo(() => {
-    return ziswaf.filter(item => {
-      const matchSearch = item.donorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    return ziswafList.filter(item => {
+      if (!item) return false;
+      const donor = (item.donorName || '').toLowerCase();
+      const desc = (item.description || '').toLowerCase();
+      const query = (searchTerm || '').toLowerCase();
+      const matchSearch = donor.includes(query) || desc.includes(query);
       const matchType = filterType === 'Semua' || item.type === filterType;
       
       let matchStatus = true;
@@ -62,13 +72,13 @@ export default function ZiswafPage() {
 
       return matchSearch && matchType && matchStatus;
     });
-  }, [ziswaf, searchTerm, filterType, filterStatus]);
+  }, [ziswafList, searchTerm, filterType, filterStatus]);
 
   // Statistics: Pisahkan transaksi terverifikasi (riil kas) vs pending (perlu cek bank)
   const stats = useMemo(() => {
-    const verifiedItems = ziswaf.filter(i => (i.status || 'verified') === 'verified');
-    const pendingItems = ziswaf.filter(i => i.status === 'pending');
-    const rejectedItems = ziswaf.filter(i => i.status === 'rejected');
+    const verifiedItems = ziswafList.filter(i => (i.status || 'verified') === 'verified');
+    const pendingItems = ziswafList.filter(i => i.status === 'pending');
+    const rejectedItems = ziswafList.filter(i => i.status === 'rejected');
 
     const totalVerifiedCount = verifiedItems.length;
     const totalVerifiedAmount = verifiedItems.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
@@ -96,7 +106,8 @@ export default function ZiswafPage() {
       infaqAmount, 
       wakafAmount 
     };
-  }, [ziswaf]);
+  }, [ziswafList]);
+
 
   const handleEdit = (data) => {
     setEditingData(data);
@@ -169,7 +180,7 @@ export default function ZiswafPage() {
 
   const types = ['Semua', 'Zakat Fitrah', 'Zakat Mal', 'Infaq', 'Sedekah', 'Wakaf'];
   const statusTabs = [
-    { label: 'Semua', value: 'Semua', count: ziswaf.length },
+    { label: 'Semua', value: 'Semua', count: ziswafList.length },
     { label: 'Perlu Verifikasi', value: 'Perlu Verifikasi', count: stats.pendingCount, alert: stats.pendingCount > 0 },
     { label: 'Terverifikasi', value: 'Terverifikasi', count: stats.totalVerifiedCount },
     { label: 'Ditolak', value: 'Ditolak', count: stats.rejectedCount }
@@ -382,9 +393,18 @@ export default function ZiswafPage() {
             <p className="text-xs text-on-surface-variant">Memuat data ZISWAF...</p>
           </div>
         ) : isError ? (
-          <div className="p-8 text-center text-error space-y-2">
-            <span className="material-symbols-outlined text-3xl">error</span>
+          <div className="p-8 text-center text-error space-y-3">
+            <span className="material-symbols-outlined text-4xl">error</span>
             <p className="text-sm font-semibold">Gagal memuat data ZISWAF.</p>
+            <p className="text-xs text-on-surface-variant max-w-sm mx-auto">
+              {error?.message || 'Terjadi kendala saat menghubungkan ke server. Pastikan Anda telah masuk sebagai Takmir.'}
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="px-4 py-2 rounded-xl bg-primary/15 hover:bg-primary/25 text-primary text-xs font-bold transition-all border border-primary/30"
+            >
+              Muat Ulang
+            </button>
           </div>
         ) : filteredData.length === 0 ? (
           <div className="p-12 text-center text-on-surface-variant space-y-3">
