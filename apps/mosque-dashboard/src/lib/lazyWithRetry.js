@@ -19,7 +19,9 @@ export function lazyWithRetry(componentImport) {
       // Successful load: clear any previous reload flag
       try {
         sessionStorage.removeItem(reloadKey);
-      } catch {}
+      } catch {
+        // ignore storage access restrictions
+      }
       return module;
     } catch (error) {
       const isChunkError =
@@ -31,12 +33,16 @@ export function lazyWithRetry(componentImport) {
       let alreadyReloaded = false;
       try {
         alreadyReloaded = sessionStorage.getItem(reloadKey) === 'true';
-      } catch {}
+      } catch {
+        // ignore storage access restrictions
+      }
 
       if (isChunkError && !alreadyReloaded) {
         try {
           sessionStorage.setItem(reloadKey, 'true');
-        } catch {}
+        } catch {
+          // ignore storage access restrictions
+        }
         
         console.warn('Chunk load error detected, auto-refreshing to fetch latest version:', error);
         window.location.reload();

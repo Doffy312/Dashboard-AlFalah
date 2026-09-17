@@ -168,7 +168,7 @@ const LoginPage = () => {
                 </span>
               )}
               {backendStatus === 'error' && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20" title={`Target API: ${backendUrl}`}>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20" title={backendErrorDetails || `Target API: ${backendUrl}`}>
                   <span className="w-2 h-2 rounded-full bg-rose-500"></span>
                   Backend Belum Terhubung
                 </span>

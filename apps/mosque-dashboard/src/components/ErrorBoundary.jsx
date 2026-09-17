@@ -19,7 +19,9 @@ export class ErrorBoundary extends React.Component {
     try {
       sessionStorage.clear();
       localStorage.removeItem('theme_preference_temp');
-    } catch {}
+    } catch {
+      // ignore storage errors
+    }
     // Force reload bypassing HTTP cache if possible
     window.location.reload();
   };
