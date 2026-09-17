@@ -34,14 +34,11 @@ const QRIS_CONFIG = {
   realQrisImageUrl: null, // Pasang URL gambar jika ada (misal: '/images/qris-real.png')
 };
 
-const PRESET_AMOUNTS = [10000, 20000, 50000, 100000, 250000, 500000];
-
 const QRInfaqModal = ({ isOpen, onClose, defaultType = 'Infaq', onSuccessCallback }) => {
-  const [amount, setAmount] = useState(50000);
-  const [customAmount, setCustomAmount] = useState('');
   const [donorName, setDonorName] = useState('');
   const [notes, setNotes] = useState('');
   const [donasiType, setDonasiType] = useState(defaultType);
+  const [simulasiAmount, setSimulasiAmount] = useState('50000');
   const [showSimulasiForm, setShowSimulasiForm] = useState(false);
   
   const [isCopied, setIsCopied] = useState(false);
@@ -67,29 +64,17 @@ const QRInfaqModal = ({ isOpen, onClose, defaultType = 'Infaq', onSuccessCallbac
 
   if (!isOpen) return null;
 
-  const finalAmount = customAmount ? Number(customAmount) : Number(amount);
-
-  // Dynamic QRIS Payload standard string
-  const dynamicPayload = `00020101021226680014ID.LINKAJA.WWW0118936009110022008915021500000000000000053033605405${finalAmount}5802ID5914${QRIS_CONFIG.merchantName}6007${QRIS_CONFIG.city}61054011562070703A0163047B4A`;
-
-  const handleSelectPreset = (val) => {
-    setAmount(val);
-    setCustomAmount('');
-  };
-
-  const handleCustomAmountChange = (e) => {
-    const val = e.target.value.replace(/\D/g, '');
-    setCustomAmount(val);
-  };
+  // Standar QRIS Statis ASPI / Bank Indonesia (Tag 01 = '11', Open Amount / Nominal diinput langsung di HP donatur)
+  const staticPayload = `00020101021126680014ID.LINKAJA.WWW0118936009110022008915021500000000000000053033605802ID5914${QRIS_CONFIG.merchantName}6007${QRIS_CONFIG.city}61054011562070703A0163047B4A`;
 
   const handleCopyPayload = () => {
-    navigator.clipboard.writeText(dynamicPayload);
+    navigator.clipboard.writeText(staticPayload);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 3000);
   };
 
   const handleOpenQRISApp = () => {
-    const qrisDeepLink = `qris://pay?amount=${finalAmount}&name=${encodeURIComponent(QRIS_CONFIG.merchantName)}`;
+    const qrisDeepLink = `qris://pay?name=${encodeURIComponent(QRIS_CONFIG.merchantName)}`;
     window.location.href = qrisDeepLink;
     setTimeout(() => {
       handleCopyPayload();
@@ -98,11 +83,12 @@ const QRInfaqModal = ({ isOpen, onClose, defaultType = 'Infaq', onSuccessCallbac
 
   const handleProcessDonateSimulasi = async (e) => {
     e?.preventDefault();
-    if (!finalAmount || finalAmount <= 0) return;
+    const testAmount = Number(simulasiAmount) || 50000;
+    if (testAmount <= 0) return;
 
     donateMutation.mutate(
       {
-        amount: finalAmount,
+        amount: testAmount,
         donorName: donorName.trim() || 'Hamba Allah',
         type: donasiType,
         description: notes.trim() || `Donasi Scan QRIS (${QRIS_CONFIG.merchantName})`,
@@ -114,7 +100,7 @@ const QRInfaqModal = ({ isOpen, onClose, defaultType = 'Infaq', onSuccessCallbac
             refId: `QRIS-${Date.now().toString().slice(-8)}`,
             donorName: donorName.trim() || 'Hamba Allah',
             recipient: QRIS_CONFIG.merchantName,
-            amount: finalAmount,
+            amount: testAmount,
             type: donasiType,
             date: new Date().toLocaleDateString('id-ID', {
               day: 'numeric',
@@ -126,7 +112,7 @@ const QRInfaqModal = ({ isOpen, onClose, defaultType = 'Infaq', onSuccessCallbac
             dbId: txData?.id || 'MYSQL-DB-SYNC'
           });
           if (onSuccessCallback) {
-            onSuccessCallback(`Donasi ${donasiType} ke ${QRIS_CONFIG.merchantName} sebesar ${formatCurrency(finalAmount)} tersimpan di MySQL Database!`);
+            onSuccessCallback(`Donasi ${donasiType} ke ${QRIS_CONFIG.merchantName} sebesar ${formatCurrency(testAmount)} tersimpan di MySQL Database!`);
           }
         }
       }
@@ -244,46 +230,7 @@ const QRInfaqModal = ({ isOpen, onClose, defaultType = 'Infaq', onSuccessCallbac
                 ))}
               </div>
 
-              {/* Nominal Selection Section */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
-                  <span>Pilih Nominal Donasi {donasiType}</span>
-                  <span className="text-slate-400 font-normal text-[11px]">Bebas atur nominal</span>
-                </label>
 
-                <div className="grid grid-cols-3 gap-2">
-                  {PRESET_AMOUNTS.map((val) => (
-                    <button
-                      key={val}
-                      type="button"
-                      onClick={() => handleSelectPreset(val)}
-                      className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all ${
-                        amount === val && !customAmount
-                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-md'
-                          : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
-                      }`}
-                    >
-                      {formatCurrency(val)}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Custom Amount Input */}
-                <div className="relative mt-2">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-emerald-400 font-bold">
-                    Rp
-                  </span>
-                  <input 
-                    id="customDonationAmount"
-                    type="text"
-                    aria-label="Nominal Kustom Donasi"
-                    placeholder="Atur nominal kustom (contoh: 75.000)"
-                    value={customAmount ? Number(customAmount).toLocaleString('id-ID') : ''}
-                    onChange={handleCustomAmountChange}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm font-bold text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 transition-colors"
-                  />
-                </div>
-              </div>
 
               {/* Visual QR Barcode Box (QRIS Direct) */}
               <div className="bg-white p-5 rounded-2xl border-2 border-emerald-500/40 text-center shadow-2xl space-y-3 text-slate-900 relative overflow-hidden">
@@ -366,14 +313,22 @@ const QRInfaqModal = ({ isOpen, onClose, defaultType = 'Infaq', onSuccessCallbac
                   )}
                 </div>
 
-                {/* Nominal Summary & Supporting Banks */}
-                <div className="pt-1 px-2 space-y-1">
-                  <div className="flex items-center justify-between text-xs font-semibold">
-                    <span className="text-slate-600">Total Nominal Transaksi:</span>
-                    <span className="text-emerald-700 font-black text-lg">{formatCurrency(finalAmount)}</span>
+                {/* Nominal Info & Supporting Banks */}
+                <div className="pt-2 px-1 space-y-2.5">
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-900">
+                    <span className="text-xs font-semibold flex items-center gap-1.5">
+                      <Sparkles size={15} className="text-emerald-600 shrink-0" />
+                      Nominal Donasi:
+                    </span>
+                    <span className="text-xs font-extrabold uppercase bg-emerald-600 text-white px-2.5 py-1 rounded-lg tracking-wide">
+                      Bebas / Seikhlasnya
+                    </span>
                   </div>
-                  <div className="text-[10px] text-slate-500 flex items-center justify-center gap-2 pt-1 border-t border-slate-100 font-medium">
-                    <span>GoPay</span> • <span>OVO</span> • <span>Dana</span> • <span>ShopeePay</span> • <span>BCA</span> • <span>Mandiri</span> • <span>BRI</span>
+                  <p className="text-[11px] text-slate-500 text-center leading-relaxed">
+                    Scan barcode langsung menggunakan kamera M-Banking atau E-Wallet pilihan Anda. Masukkan nominal donasi seikhlasnya di aplikasi HP Anda.
+                  </p>
+                  <div className="text-[10px] text-slate-500 flex items-center justify-center gap-1.5 pt-1.5 border-t border-slate-100 font-medium flex-wrap">
+                    <span>GoPay</span> • <span>OVO</span> • <span>Dana</span> • <span>ShopeePay</span> • <span>BCA</span> • <span>Mandiri</span> • <span>BRI</span> • <span>BSI</span>
                   </div>
                 </div>
 
@@ -387,7 +342,7 @@ const QRInfaqModal = ({ isOpen, onClose, defaultType = 'Infaq', onSuccessCallbac
                   className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 hover:from-emerald-400 hover:via-emerald-300 hover:to-teal-300 text-slate-950 font-extrabold text-sm transition-all shadow-lg shadow-emerald-500/25 active:scale-95 flex items-center justify-center gap-2 border border-emerald-300/30"
                 >
                   <Smartphone size={20} className="text-slate-950" />
-                  <span>Buka Aplikasi QRIS / E-Wallet di HP ({formatCurrency(finalAmount)})</span>
+                  <span>Buka Aplikasi QRIS / E-Wallet di HP</span>
                 </button>
 
                 <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
@@ -443,9 +398,21 @@ const QRInfaqModal = ({ isOpen, onClose, defaultType = 'Infaq', onSuccessCallbac
                       />
                     </div>
 
+                    <div>
+                      <label htmlFor="simulasiAmountInput" className="text-xs font-semibold text-slate-300 block mb-1">Nominal Donasi Simulasi (Rp)</label>
+                      <input 
+                        id="simulasiAmountInput"
+                        type="text"
+                        placeholder="Contoh: 50.000"
+                        value={simulasiAmount ? Number(simulasiAmount).toLocaleString('id-ID') : ''}
+                        onChange={(e) => setSimulasiAmount(e.target.value.replace(/\D/g, ''))}
+                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white font-mono placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 transition-colors"
+                      />
+                    </div>
+
                     <button
                       type="submit"
-                      disabled={donateMutation.isPending || finalAmount <= 0}
+                      disabled={donateMutation.isPending || Number(simulasiAmount) <= 0}
                       className="w-full py-3 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-extrabold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                     >
                       {donateMutation.isPending ? (
@@ -456,7 +423,7 @@ const QRInfaqModal = ({ isOpen, onClose, defaultType = 'Infaq', onSuccessCallbac
                       ) : (
                         <>
                           <Check size={16} />
-                          <span>Simpan Rekam Donasi ke Database MySQL ({formatCurrency(finalAmount)})</span>
+                          <span>Simpan Rekam Donasi ke Database MySQL ({formatCurrency(Number(simulasiAmount) || 50000)})</span>
                         </>
                       )}
                     </button>
