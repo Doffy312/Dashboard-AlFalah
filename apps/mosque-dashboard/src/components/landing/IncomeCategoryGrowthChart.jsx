@@ -14,34 +14,95 @@ import {
 import { Lock, TrendingUp, PieChart as PieIcon, BarChart2, Inbox } from 'lucide-react';
 import { useAllocation, useCategoryTrends } from '../../hooks/useDashboard';
 
-const CATEGORY_COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6'];
+// Authoritative fixed color mapping for categories across all charts on landing/transparency page
+export const FIXED_CATEGORY_COLORS = {
+  'Zakat': '#10b981',         // Emerald Green
+  'Zakat Fitrah': '#10b981',
+  'Zakat Mal': '#059669',
+  'Wakaf': '#f59e0b',         // Amber / Warm Orange
+  'Infaq': '#3b82f6',         // Vibrant Blue
+  'Sedekah': '#8b5cf6',       // Purple
+  'Donasi Khusus': '#ec4899', // Pink
+  'Operasional': '#64748b',   // Slate
+  'Pembangunan': '#f97316',   // Deep Orange
+  'Sosial': '#06b6d4',        // Cyan
+};
 
-const CustomHiddenTooltip = ({ active, payload }) => {
+export const FALLBACK_PALETTE = ['#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#06b6d4'];
+
+export const getCategoryColor = (categoryName, fallbackIndex = 0) => {
+  if (!categoryName) return FALLBACK_PALETTE[fallbackIndex % FALLBACK_PALETTE.length];
+  if (FIXED_CATEGORY_COLORS[categoryName]) {
+    return FIXED_CATEGORY_COLORS[categoryName];
+  }
+  const lower = categoryName.toLowerCase().trim();
+  for (const [key, color] of Object.entries(FIXED_CATEGORY_COLORS)) {
+    if (key.toLowerCase() === lower) return color;
+  }
+  return FALLBACK_PALETTE[fallbackIndex % FALLBACK_PALETTE.length];
+};
+
+const CustomDonutTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     const categoryName = data.category || data.name || payload[0].name;
     const value = data.percentage ?? payload[0].value ?? 0;
+    const color = getCategoryColor(categoryName);
 
     return (
-      <div className="bg-[#0b131a] border border-white/15 p-3 rounded-xl shadow-2xl text-xs text-white space-y-1.5 z-30">
+      <div className="bg-[#0b131a] border border-white/15 p-3 rounded-xl shadow-2xl text-xs text-white space-y-1.5 z-30 min-w-[150px]">
         <p className="font-bold text-amber-400 border-b border-white/10 pb-1 flex items-center justify-between gap-4">
-          <span>{categoryName}</span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
+            <span>{categoryName}</span>
+          </span>
           <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1">
             <Lock size={10} className="text-emerald-400" /> Nominal Tersembunyi
           </span>
         </p>
         <div className="space-y-1 text-slate-300">
           <div className="flex justify-between gap-6">
-            <span className="text-slate-400">Porsi / Indeks:</span>
+            <span className="text-slate-400">Porsi Inflow:</span>
             <span className="font-bold text-emerald-400 font-mono">{value}%</span>
           </div>
-          {data.growth && (
-            <div className="flex justify-between gap-6">
-              <span className="text-slate-400">Pertumbuhan:</span>
-              <span className="font-bold text-amber-300 font-mono">{data.growth}</span>
-            </div>
-          )}
         </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+const CustomBarTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    // Filter out categories with 0 or null values so we only show active categories in that month
+    const validItems = payload.filter((item) => Number(item.value) > 0);
+
+    return (
+      <div className="bg-[#0b131a] border border-white/15 p-3 rounded-xl shadow-2xl text-xs text-white space-y-2 z-30 min-w-[170px]">
+        <p className="font-bold text-amber-400 border-b border-white/10 pb-1 flex items-center justify-between gap-3">
+          <span>Bulan {label}</span>
+          <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1">
+            <Lock size={10} className="text-emerald-400" /> Nominal Tersembunyi
+          </span>
+        </p>
+        {validItems.length > 0 ? (
+          <div className="space-y-1.5 text-slate-300">
+            {validItems.map((item, idx) => {
+              const color = getCategoryColor(item.name, idx);
+              return (
+                <div key={idx} className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: color }} />
+                    <span className="text-slate-300 font-medium">{item.name}</span>
+                  </div>
+                  <span className="font-bold text-white font-mono">{item.value}%</span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-[11px] text-slate-400">Tidak ada transaksi di bulan ini</p>
+        )}
       </div>
     );
   }
@@ -67,15 +128,18 @@ export default function IncomeCategoryGrowthChart() {
     }));
   }, [allocationData]);
 
-  // Unique categories for the trends chart
+  // Unique categories for the trends chart - ordered consistently with categoryContributions
   const activeCategories = useMemo(() => {
-    if (!Array.isArray(trendsRawData) || trendsRawData.length === 0) {
-      return categoryContributions.map(c => c.category).slice(0, 4);
+    // Preserve ordering from categoryContributions first for visual harmony across charts
+    const categoriesFromContributions = categoryContributions.map(c => c.category);
+    const set = new Set(categoriesFromContributions);
+
+    if (Array.isArray(trendsRawData)) {
+      trendsRawData.forEach(d => {
+        if (d.category) set.add(d.category);
+      });
     }
-    const set = new Set();
-    trendsRawData.forEach(d => {
-      if (d.category) set.add(d.category);
-    });
+
     return Array.from(set).slice(0, 4);
   }, [trendsRawData, categoryContributions]);
 
@@ -220,10 +284,10 @@ export default function IncomeCategoryGrowthChart() {
                     nameKey="category"
                   >
                     {categoryContributions.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
+                      <Cell key={`cell-${index}`} fill={getCategoryColor(entry.category, index)} />
                     ))}
                   </Pie>
-                  <Tooltip content={<CustomHiddenTooltip />} />
+                  <Tooltip content={<CustomDonutTooltip />} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -234,7 +298,7 @@ export default function IncomeCategoryGrowthChart() {
                 <div key={`legend-${index}`} className="flex items-center gap-2.5 px-2 py-1 rounded-lg bg-white/5 sm:bg-transparent hover:bg-white/10 transition-colors">
                   <span 
                     className="w-3 h-3 rounded-sm shrink-0 shadow-sm" 
-                    style={{ backgroundColor: CATEGORY_COLORS[index % CATEGORY_COLORS.length] }} 
+                    style={{ backgroundColor: getCategoryColor(entry.category, index) }} 
                   />
                   <span className="text-slate-200 text-xs font-medium truncate" title={entry.category}>
                     {entry.category} ({entry.percentage}%)
@@ -266,7 +330,7 @@ export default function IncomeCategoryGrowthChart() {
                 <BarChart data={monthlyCategoryTrends}>
                   <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
                   <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} domain={[0, 100]} unit="%" />
-                  <Tooltip content={<CustomHiddenTooltip />} />
+                  <Tooltip content={<CustomBarTooltip />} />
                   <Legend 
                     verticalAlign="bottom"
                     wrapperStyle={{ paddingTop: '10px' }}
@@ -276,7 +340,7 @@ export default function IncomeCategoryGrowthChart() {
                     <Bar 
                       key={cat} 
                       dataKey={cat} 
-                      fill={CATEGORY_COLORS[idx % CATEGORY_COLORS.length]} 
+                      fill={getCategoryColor(cat, idx)} 
                       radius={[4, 4, 0, 0]} 
                     />
                   ))}
@@ -295,10 +359,11 @@ export default function IncomeCategoryGrowthChart() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {categoryContributions.map((item, idx) => {
           const growth = categoryGrowthMap[item.category] || '0%';
+          const color = getCategoryColor(item.category, idx);
           return (
             <div key={idx} className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: CATEGORY_COLORS[idx % CATEGORY_COLORS.length] }} />
+                <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
                 <div className="min-w-0">
                   <div className="text-xs font-medium text-white truncate" title={item.category}>{item.category}</div>
                   <div className="text-[11px] text-emerald-400 flex items-center gap-1 mt-0.5 font-mono">
