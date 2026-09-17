@@ -132,54 +132,45 @@ export class TransactionService {
       ? `Donasi ${type} Scan QR - ${donorName} (${description})`
       : `Donasi ${type} Scan QR - ${donorName}`;
 
-    const txId = crypto.randomUUID();
     const ziswafId = crypto.randomUUID();
 
-    // Atomic database transaction: writes to both tables must succeed or rollback together
-    await db.transaction(async (tx) => {
-      await tx.insert(transaction).values({
-        id: txId,
-        date: today,
-        type: "Pemasukan",
-        category: type,
-        amount: amountStr,
-        description: txDescription,
-        programId: null,
-        createdBy: null,
-      });
-
-      await tx.insert(ziswafTransaction).values({
-        id: ziswafId,
-        date: today,
-        type: type,
-        donorName: donorName,
-        amount: amountStr,
-        description: description || "Donasi via Scan QR Code",
-      });
+    // Catat ke ziswaf_transactions dengan status 'pending'.
+    // DANA BELUM MASUK KE KAS (transactions) sebelum diverifikasi oleh Bendahara/Ketua.
+    await db.insert(ziswafTransaction).values({
+      id: ziswafId,
+      date: today,
+      type: type,
+      donorName: donorName,
+      amount: amountStr,
+      status: "pending",
+      transactionId: null,
+      description: description || `Donasi via Scan QR Code (${type})`,
     });
 
-    const newTx = await this.findById(txId);
+    const createdZiswaf = (
+      await db.select().from(ziswafTransaction).where(eq(ziswafTransaction.id, ziswafId))
+    )[0];
 
     import("./notifications.service.js").then((ns) => {
       const formattedAmount = Number(amountStr).toLocaleString("id-ID");
       ns.notificationService.create({
         type: "Donasi",
-        title: `Donasi ${type} Scan QR Masuk`,
-        description: `Rp ${formattedAmount} dari ${donorName} melalui Scan QR Code QRIS`,
+        title: `Donasi ${type} Scan QR (Perlu Verifikasi)`,
+        description: `Rp ${formattedAmount} dari ${donorName} menunggu verifikasi mutasi rekening di menu ZISWAF.`,
       });
     });
 
     import("./auditLog.service.js").then((als) => {
       als.auditLogService.logActivity({
         userId: null,
-        action: "PUBLIC_DONATION",
-        entity: "transaction",
-        entityId: txId,
-        details: { type, donorName, amount: amountStr, description: txDescription, ziswafId },
+        action: "PUBLIC_DONATION_PENDING",
+        entity: "ziswaf",
+        entityId: ziswafId,
+        details: { type, donorName, amount: amountStr, description, status: "pending" },
       });
     });
 
-    return newTx;
+    return createdZiswaf;
   }
 
   async update(id: string, data: Partial<CreateTransactionInput>, isSystemSync = false) {

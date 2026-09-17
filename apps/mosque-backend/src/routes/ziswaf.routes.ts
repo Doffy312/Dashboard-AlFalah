@@ -21,4 +21,8 @@ router.post("/", requireRole("Ketua", "Bendahara"), sanitizeBody, validate(creat
 router.put("/:id", requireRole("Ketua"), sanitizeBody, validate(createZiswafSchema), asyncHandler(ziswafController.update));
 router.delete("/:id", requireRole("Ketua"), asyncHandler(ziswafController.remove));
 
+// Verification actions: Verified by Ketua & Bendahara after checking bank statements
+router.post("/:id/verify", requireRole("Ketua", "Bendahara"), asyncHandler(ziswafController.verify));
+router.post("/:id/reject", requireRole("Ketua", "Bendahara"), sanitizeBody, asyncHandler(ziswafController.reject));
+
 export default router;

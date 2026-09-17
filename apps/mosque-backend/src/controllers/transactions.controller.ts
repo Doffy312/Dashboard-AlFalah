@@ -47,10 +47,9 @@ export class TransactionController {
         description,
       });
 
-      // Emit real-time updates via Socket.IO
+      // Emit real-time updates via Socket.IO untuk ziswaf dan notifikasi
       try {
         const io = getSocketIO();
-        io.emit("dataUpdate", { entity: "transactions" });
         io.emit("dataUpdate", { entity: "ziswaf" });
         io.emit("notificationUpdated");
       } catch (e) {
@@ -58,7 +57,7 @@ export class TransactionController {
       }
 
       res.status(201).json({
-        message: "Donasi Scan QR berhasil diproses dan disimpan ke database MySQL",
+        message: "Donasi Scan QR berhasil dicatat dan menunggu verifikasi mutasi rekening",
         data: newTx,
       });
     } catch (err: any) {

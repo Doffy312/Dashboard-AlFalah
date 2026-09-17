@@ -34,6 +34,7 @@ export {
 
 export {
   ziswafTransaction,
+  ziswafTransactionRelations,
 } from "./ziswaf.js";
 
 export {

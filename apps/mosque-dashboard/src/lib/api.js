@@ -137,6 +137,8 @@ export const ziswafApi = {
   create: (data) => request("/ziswaf", { method: "POST", body: JSON.stringify(data) }),
   update: (id, data) => request(`/ziswaf/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   delete: (id) => request(`/ziswaf/${id}`, { method: "DELETE" }),
+  verify: (id) => request(`/ziswaf/${id}/verify`, { method: "POST" }),
+  reject: (id, reason) => request(`/ziswaf/${id}/reject`, { method: "POST", body: JSON.stringify({ reason }) }),
 };
 
 export const qurbanApi = {

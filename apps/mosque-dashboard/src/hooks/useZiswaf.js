@@ -45,9 +45,43 @@ export const useDeleteZiswaf = () => {
     onSuccess: () => {
       toast.success('Data ZISWAF berhasil dihapus');
       queryClient.invalidateQueries({ queryKey: ['ziswaf'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
     },
     onError: (error) => {
       toast.error(error.message || 'Gagal menghapus data ZISWAF');
     },
   });
 };
+
+export const useVerifyZiswaf = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => ziswafApi.verify(id),
+    onSuccess: () => {
+      toast.success('Donasi berhasil diverifikasi dan dibukukan ke Kas');
+      queryClient.invalidateQueries({ queryKey: ['ziswaf'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Gagal memverifikasi donasi');
+    },
+  });
+};
+
+export const useRejectZiswaf = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, reason }) => ziswafApi.reject(id, reason),
+    onSuccess: () => {
+      toast.success('Donasi berhasil ditandai ditolak/fiktif');
+      queryClient.invalidateQueries({ queryKey: ['ziswaf'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Gagal menolak transaksi donasi');
+    },
+  });
+};
+
