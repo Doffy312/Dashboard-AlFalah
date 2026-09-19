@@ -66,3 +66,7 @@ export {
   auditLog,
 } from "./auditLogs.js";
 
+export {
+  errorLogs,
+} from "./errorLogs.js";
+

@@ -32,3 +32,19 @@ export const authRateLimiter = rateLimit({
     message: "Terlalu banyak percobaan login/registrasi. Silakan tunggu 15 menit demi keamanan akun.",
   },
 });
+
+/**
+ * Rate Limiter untuk Client Error Telemetry (/api/logs/client)
+ * Mencegah banjir reporting/spamming log dari browser klien.
+ */
+export const clientLogRateLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 menit
+  limit: 30, // Maksimal 30 laporan error per menit per IP
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: {
+    status: 429,
+    error: "Too Many Requests",
+    message: "Terlalu banyak laporan log dari IP ini.",
+  },
+});

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useUsers, useCreateUser, useDeleteUser, useUpdateUserRole, useResendVerification } from '../../hooks/useUsers';
 
 const ROLES = ['Ketua', 'Sekretaris', 'Bendahara', 'Pengurus'];
@@ -30,6 +31,26 @@ const TabUsers = ({ tabDataRef }) => {
   const [createdResultModal, setCreatedResultModal] = useState(null);
   const [editingUserId, setEditingUserId] = useState(null);
   const [actionMessage, setActionMessage] = useState(null);
+
+  // Lock body scroll and handle Escape key when modals are open
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (isModalOpen) setIsModalOpen(false);
+        if (createdResultModal) setCreatedResultModal(null);
+      }
+    };
+
+    if (isModalOpen || createdResultModal) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isModalOpen, createdResultModal]);
 
   const showMessage = (msg, type = 'success') => {
     setActionMessage({ text: msg, type });
@@ -415,7 +436,7 @@ const TabUsers = ({ tabDataRef }) => {
       </div>
 
       {/* Add User Modal */}
-      {isModalOpen && (
+      {isModalOpen && createPortal(
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
           onClick={(e) => {
@@ -424,7 +445,7 @@ const TabUsers = ({ tabDataRef }) => {
         >
           <div 
             className="w-full max-w-md my-auto flex flex-col rounded-2xl shadow-2xl border border-outline bg-surface overflow-hidden animate-in zoom-in-95 duration-200"
-            style={{ maxHeight: 'min(88vh, 660px)' }}
+            style={{ maxHeight: 'min(calc(100dvh - 2rem), 660px)' }}
           >
             {/* Pinned Header */}
             <div className="flex justify-between items-center px-5 py-3.5 sm:py-4 border-b border-outline-variant/40 shrink-0 bg-surface">
@@ -582,11 +603,12 @@ const TabUsers = ({ tabDataRef }) => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Verification Link Result Modal */}
-      {createdResultModal && (
+      {createdResultModal && createPortal(
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
           onClick={(e) => {
@@ -595,7 +617,7 @@ const TabUsers = ({ tabDataRef }) => {
         >
           <div 
             className="w-full max-w-lg my-auto flex flex-col rounded-2xl shadow-2xl border border-outline bg-surface overflow-hidden animate-in zoom-in-95 duration-200"
-            style={{ maxHeight: 'min(88vh, 600px)' }}
+            style={{ maxHeight: 'min(calc(100dvh - 2rem), 600px)' }}
           >
             {/* Pinned Header */}
             <div className="flex items-center justify-between px-5 py-3.5 sm:py-4 border-b border-outline-variant/40 shrink-0 bg-surface">
@@ -670,7 +692,8 @@ const TabUsers = ({ tabDataRef }) => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

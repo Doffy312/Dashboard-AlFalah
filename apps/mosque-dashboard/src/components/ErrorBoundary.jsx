@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { API_BASE } from '../lib/api';
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -13,6 +14,32 @@ export class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error("Uncaught error in UI:", error, errorInfo);
+
+    try {
+      const payload = {
+        errorName: (error?.name || 'ClientUIError').substring(0, 150),
+        errorMessage: (error?.message || 'Unknown UI error').substring(0, 2000),
+        stackTrace: error?.stack ? String(error.stack).substring(0, 10000) : undefined,
+        currentPath: (window.location.pathname + window.location.search).substring(0, 500),
+        componentStack: errorInfo?.componentStack ? String(errorInfo.componentStack).substring(0, 5000) : undefined,
+        metadata: {
+          screenWidth: window.innerWidth,
+          screenHeight: window.innerHeight,
+        },
+      };
+
+      const body = JSON.stringify(payload);
+      fetch(`${API_BASE}/logs/client`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+        keepalive: true,
+      }).catch(() => {
+        // Abaikan kegagalan jaringan logger agar tidak loop
+      });
+    } catch {
+      // Abaikan kegagalan telemetry
+    }
   }
 
   handleHardReload = () => {

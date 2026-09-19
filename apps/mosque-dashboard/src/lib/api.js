@@ -28,6 +28,16 @@ async function request(path, options = {}) {
     delete headers["Content-Type"];
   }
 
+  // Request correlation tracing (X-Request-Id)
+  const requestId =
+    headers["X-Request-Id"] ||
+    (typeof crypto !== "undefined" && crypto.randomUUID
+      ? crypto.randomUUID()
+      : undefined);
+  if (requestId) {
+    headers["X-Request-Id"] = requestId;
+  }
+
   const res = await fetch(`${API_BASE}${path}`, {
     credentials: "include",
     ...options,
@@ -44,8 +54,17 @@ async function request(path, options = {}) {
       const detailsMap = validationIssues.map(d => `• ${d.field ? `${d.field}: ` : ''}${d.message}`).join("\n");
       errMsg = `${errMsg}\n${detailsMap}`;
     }
+
+    // Attach request ID for easier tracking/reporting
+    const correlationId = err.requestId || res.headers.get("X-Request-Id") || requestId;
+    if (correlationId && res.status >= 500) {
+      errMsg = `${errMsg} (Ref ID: ${correlationId})`;
+    }
     
-    throw new Error(errMsg);
+    const errorInstance = new Error(errMsg);
+    (errorInstance).requestId = correlationId;
+    (errorInstance).status = res.status;
+    throw errorInstance;
   }
   
   return res.json();

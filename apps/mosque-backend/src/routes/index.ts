@@ -14,6 +14,7 @@ import settingsRoutes from "./settings.routes.js";
 import articlesRoutes from "./articles.routes.js";
 import contactMessagesRoutes from "./contactMessages.routes.js";
 import auditLogRoutes from "./auditLog.routes.js";
+import errorLogRoutes from "./errorLog.routes.js";
 
 const router = Router();
 
@@ -33,6 +34,7 @@ router.use("/settings", settingsRoutes);
 router.use("/articles", articlesRoutes);
 router.use("/contact-messages", contactMessagesRoutes);
 router.use("/audit-logs", auditLogRoutes);
+router.use("/logs", errorLogRoutes);
 
 export default router;
 

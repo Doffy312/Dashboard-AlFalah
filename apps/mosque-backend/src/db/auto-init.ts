@@ -13,6 +13,7 @@ import { inventaris } from "./schema/inventaris.js";
 import { article } from "./schema/articles.js";
 import { syncProgramTable } from "./sync-program-db.js";
 import { syncZiswafTable } from "./sync-ziswaf-db.js";
+import { syncErrorLogTable } from "./sync-error-log-db.js";
 import { programService } from "../services/programs.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -373,8 +374,9 @@ export async function autoInitDatabase() {
   try {
     await syncProgramTable();
     await syncZiswafTable();
+    await syncErrorLogTable();
     await programService.syncAllCompletedPrograms();
-    console.log("✅ [Auto-Init] Program & ZISWAF schema sync completed.");
+    console.log("✅ [Auto-Init] Program, ZISWAF & ErrorLog schema sync completed.");
   } catch (err) {
     console.error("⚠️ [Auto-Init] Schema sync notice:", err);
   }

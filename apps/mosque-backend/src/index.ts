@@ -4,11 +4,13 @@ import helmet from "helmet";
 import { env, getCorsOrigins, isLocalNetworkOrigin } from "./config/env.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { globalRateLimiter } from "./middlewares/rateLimiter.middleware.js";
+import { requestIdMiddleware } from "./middlewares/requestId.middleware.js";
 import { sanitizeBody, sanitizeQuery } from "./middlewares/sanitize.middleware.js";
 import apiRoutes from "./routes/index.js";
 import { createServer } from "http";
 import { initializeSocket } from "./lib/socket.js";
 import { initBackupService } from "./services/backup.service.js";
+import { errorLogService } from "./services/errorLog.service.js";
 import { programService } from "./services/programs.service.js";
 import { syncProgramTable } from "./db/sync-program-db.js";
 import { autoInitDatabase } from "./db/auto-init.js";
@@ -19,10 +21,24 @@ import fs from "fs";
 // ─── Process Level Crash Resilience ──────────────────────────────────
 process.on("uncaughtException", (err) => {
   console.error("💥 Uncaught Exception:", err);
+  errorLogService.logError({
+    level: "FATAL",
+    source: "BACKEND",
+    error: err,
+  });
 });
 
 process.on("unhandledRejection", (reason, promise) => {
   console.error("💥 Unhandled Rejection at:", promise, "reason:", reason);
+  const errorObj =
+    reason instanceof Error
+      ? reason
+      : new Error(typeof reason === "string" ? reason : JSON.stringify(reason));
+  errorLogService.logError({
+    level: "FATAL",
+    source: "BACKEND",
+    error: errorObj,
+  });
 });
 
 const app = express();
@@ -30,6 +46,9 @@ const httpServer = createServer(app);
 
 // ─── Reverse Proxy Support (Render, Vercel, Railway, Nginx, Cloudflare)
 app.set("trust proxy", 1);
+
+// ─── Request Correlation Tracing (X-Request-Id) ───────────────────────
+app.use(requestIdMiddleware);
 
 // ─── Socket.IO Setup ───────────────────────────────────────────────────
 initializeSocket(httpServer);
@@ -106,6 +125,7 @@ app.use(errorHandler);
 // ─── Start Server ────────────────────────────────────────────────────
 httpServer.listen(env.PORT, () => {
   initBackupService();
+  errorLogService.initRetentionCron(30);
   autoInitDatabase().catch((err) => {
     console.error("Failed to auto-init database on startup:", err);
   });
